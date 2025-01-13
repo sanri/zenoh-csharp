@@ -4,12 +4,16 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
+using ZResult = System.SByte;
+
+// zenoh_commons.h
 // z_congestion_control_t
 public enum CongestionControl
 {
-    Block,
-    Drop
+    Block = 0,
+    Drop = 1
 }
+
 
 // z_encoding_prefix_t
 public enum EncodingPrefix
@@ -37,6 +41,7 @@ public enum EncodingPrefix
     ImageGif = 20
 }
 
+// zenoh_commons.h
 // z_sample_kind_t
 public enum SampleKind
 {
@@ -44,6 +49,7 @@ public enum SampleKind
     Delete = 1
 }
 
+// zenoh_commons.h
 // z_priority_t
 public enum Priority
 {
@@ -56,13 +62,14 @@ public enum Priority
     Background = 7
 }
 
+// zenoh_commons.h
 // z_consolidation_mode_t
 public enum ConsolidationMode
 {
     Auto = -1,
     None = 0,
     Monotonic = 1,
-    Latest = 2,
+    Latest = 2
 }
 
 // z_query_consolidation_t
@@ -71,7 +78,7 @@ public enum QueryConsolidation
     Auto = -1,
     None = 0,
     Monotonic = 1,
-    Latest = 2,
+    Latest = 2
 }
 
 // z_reliability_t
@@ -81,13 +88,569 @@ public enum Reliability
     Reliable
 }
 
+// zenoh_commons.h
 // z_query_target_t 
 public enum QueryTarget
 {
-    BestMatching,
-    All,
-    AllComplete,
-};
+    BestMatching = 0,
+    All = 1,
+    AllComplete = 2
+}
+
+// zenoh_commons.h
+// z_what_t
+public enum What
+{
+    Router = 1,
+    Peer = 2,
+    Client = 4,
+    RouterPeer = 1 | 2,
+    RouterClient = 1 | 4,
+    PeerClient = 2 | 4,
+    RouterPeerClient = 1 | 2 | 4,
+}
+
+// zenoh_commons.h
+// z_whatami_t
+public enum Whatami
+{
+    Router = 1,
+    Peer = 2,
+    Client = 4
+}
+
+// zenoh_commons.h
+// zc_locality_t
+public enum ZcLocality
+{
+    Any = 0,
+    Local = 1,
+    Remote = 2,
+}
+
+// zenoh_commons.h
+// zc_log_severity_t
+public enum ZcLogSeverity
+{
+    Trace = 0,
+    Debug = 1,
+    Info = 2,
+    Warn = 3,
+    Error = 4,
+}
+
+// zenoh_opaque.h
+// z_owned_bytes_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedBytes
+{
+    private fixed byte data[32];
+} 
+
+// zenoh_opaque.h
+// z_loaned_bytes_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedBytes
+{
+    private fixed byte data[32];
+} 
+
+// zenoh_opaque.h
+// z_loaned_slice_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedSlice
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_owned_slice_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedSlice
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_view_slice_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZViewSlice
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_loaned_string_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedString
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_owned_string_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedString
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_view_string_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZViewString
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_bytes_reader_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZBytesReader
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_loaned_bytes_writer_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedBytesWriter
+{
+    private fixed byte data[56];
+}
+
+// zenoh_opaque.h
+// z_owned_bytes_writer_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedBytesWriter
+{
+    private fixed byte data[56];
+}
+
+// zenoh_opaque.h
+// z_loaned_session_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedSession
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_hello_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedHello
+{
+    private fixed byte data[48];
+}
+
+// zenoh_opaque.h
+// z_loaned_closure_hello_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedClosureHello
+{
+    private fixed byte data[3];
+}
+
+// zenoh_opaque.h
+// z_loaned_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedQuery
+{
+    private fixed byte data[136];
+}
+
+// zenoh_opaque.h
+// z_loaned_closure_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedClosureQuery
+{
+    private fixed ulong data[3];
+}
+
+// zenoh_opaque.h
+// z_loaned_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedReply
+{
+    private fixed byte data[184];
+}
+
+// zenoh_opaque.h
+// z_loaned_closure_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedClosureReply
+{
+    private fixed ulong data[3];
+}
+
+// zenoh_opaque.h
+// z_loaned_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedSample
+{
+    private fixed byte data[184];
+}
+
+// zenoh_opaque.h
+// z_loaned_closure_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedClosureSample
+{
+    private fixed ulong data[3];
+}
+
+// zenoh_opaque.h
+// z_id_t
+[StructLayout(LayoutKind.Sequential, Pack = 1)]
+internal unsafe struct ZId
+{
+    private fixed byte id[16];
+}
+
+// zenoh_opaque.h
+// z_loaned_closure_zid_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedClosureZid
+{
+    private fixed ulong data[3];
+}
+
+// zenoh_opaque.h
+// z_owned_condvar_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedCondvar
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_loaned_condvar_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedCondvar
+{
+    private fixed byte data[16];
+}
+
+// zenoh_opaque.h
+// z_loaned_mutex_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedMutex
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_timestamp_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZTimestamp
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_owned_config_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedConfig
+{
+    private fixed byte data[1736];
+}
+
+// zenoh_opaque.h
+// z_loaned_config_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedConfig
+{
+    private fixed byte data[1736];
+}
+
+// zenoh_opaque.h
+// z_owned_keyexpr_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedKeyexpr
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_loaned_keyexpr_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedKeyexpr
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_view_keyexpr_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZViewKeyexpr
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_owned_encoding_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedEncoding
+{
+    private fixed byte data[40];
+}
+
+// zenoh_opaque.h
+// z_loaned_encoding_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedEncoding
+{
+    private fixed byte data[40];
+}
+
+// zenoh_opaque.h
+// z_owned_publisher_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedPublisher
+{
+    private fixed byte data[96];
+}
+
+// zenoh_opaque.h
+// z_loaned_publisher_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedPublisher
+{
+    private fixed byte data[96];
+}
+
+// zenoh_opaque.h
+// z_owned_queryable_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedQueryable
+{
+    private fixed byte data[16];
+}
+
+// zenoh_opaque.h
+// z_loaned_queryable_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedQueryable
+{
+    private fixed byte data[16];
+}
+
+// zenoh_opaque.h
+// z_owned_subscriber_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedSubscriber
+{
+    private fixed byte data[48];
+}
+
+// zenoh_opaque.h
+// z_loaned_subscriber_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedSubscriber
+{
+    private fixed byte data[48];
+}
+
+// zenoh_opaque.h
+// z_owned_fifo_handler_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedFifoHandlerQuery
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_fifo_handler_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedFifoHandlerReply
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_fifo_handler_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedFifoHandlerSample
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_fifo_handler_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedFifoHandlerQuery
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_fifo_handler_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedFifoHandlerReply
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_fifo_handler_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedFifoHandlerSample
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedQuery
+{
+    private fixed byte data[136];
+}
+
+// zenoh_opaque.h
+// z_owned_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedReply
+{
+    private fixed byte data[184];
+}
+
+// zenoh_opaque.h
+// z_owned_reply_err_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedReplyErr
+{
+    private fixed byte data[72];
+}
+
+// zenoh_opaque.h
+// z_loaned_reply_err_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedReplyErr
+{
+    private fixed byte data[72];
+}
+
+// zenoh_opaque.h
+// z_owned_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedSample
+{
+    private fixed byte data[184];
+}
+
+// zenoh_opaque.h
+// z_owned_hello_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedHello
+{
+    private fixed byte data[48];
+}
+
+// zenoh_opaque.h
+// z_owned_string_array_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedStringArray
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_loaned_string_array_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedStringArray
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_owned_liveliness_token_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedLivelinessToken
+{
+    private fixed byte data[16];
+}
+
+// zenoh_opaque.h
+// z_loaned_liveliness_token_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedLivelinessToken
+{
+    private fixed byte data[16];
+}
+
+// zenoh_opaque.h
+// z_owned_mutex_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedMutex
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_owned_ring_handler_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedRingHandlerQuery
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_ring_handler_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedRingHandlerQuery
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_ring_handler_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedRingHandlerReply
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_ring_handler_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedRingHandlerReply
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_ring_handler_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedRingHandlerSample
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_loaned_ring_handler_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedRingHandlerSample
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_session_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedSession
+{
+    private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_task_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedTask
+{
+    private fixed byte data[24];
+}
+
 
 // z_bytes_t
 // --------------------------------
@@ -103,18 +666,6 @@ internal unsafe struct ZBytes
     internal byte* start;
 }
 
-// z_id_t
-// --------------------------------
-//  typedef struct z_id_t {
-//      uint8_t id[16];
-//  } z_id_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZId
-{
-    // [MarshalAs(UnmanagedType.ByValArray, SizeConst = 16)]
-    internal fixed byte id[16];
-}
 
 // z_owned_str_t 
 // --------------------------------
@@ -156,21 +707,6 @@ internal struct ZStrArray
     internal nint val;
 }
 
-// z_owned_encoding_t 
-// --------------------------------
-//  typedef struct z_owned_encoding_t {
-//      enum z_encoding_prefix_t prefix;
-//      struct z_bytes_t suffix;
-//      bool _dropped;
-//  } z_owned_encoding_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal struct ZOwnedEncoding
-{
-    internal EncodingPrefix prefix;
-    internal ZBytes suffix;
-    internal sbyte _dropped;
-}
 
 // z_encoding_t
 // --------------------------------
@@ -199,19 +735,6 @@ internal struct ZEncoding
 // [DllImport(ZenohC.DllName, EntryPoint = "z_encoding", CallingConvention = CallingConvention.Cdecl)]
 // internal static extern ZEncoding FnZEncoding(EncodingPrefix prefix, IntPtr suffix);
 
-// z_timestamp_t
-// --------------------------------
-//  typedef struct z_timestamp_t {
-//      uint64_t time;
-//      struct z_id_t id;
-//  } z_timestamp_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal struct ZTimestamp
-{
-    internal ulong time;
-    internal ZId id;
-}
 
 // z_keyexpr_t  
 // --------------------------------
@@ -226,17 +749,6 @@ internal unsafe struct ZKeyexpr
     private fixed ulong _[4];
 }
 
-// --------------------------------
-//  typedef struct z_owned_keyexpr_t {
-//      uint64_t _0[4];
-//  } z_keyexpr_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedKeyexpr
-{
-    // [MarshalAs(UnmanagedType.ByValArray, SizeConst = 4)]
-    private fixed ulong _[4];
-}
 
 // z_sample_t
 // --------------------------------
@@ -260,18 +772,6 @@ internal struct ZSample
     internal ZTimestamp timestamp;
 }
 
-// z_owned_config_t
-// --------------------------------
-//  typedef struct z_owned_config_t {
-//      void *_0;
-//  } z_owned_config_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal struct ZOwnedConfig
-{
-    private nint _;
-}
-
 // z_config_t
 // --------------------------------
 //  typedef struct z_config_t {
@@ -284,30 +784,7 @@ internal struct ZConfig
     private nint _;
 }
 
-// z_owned_publisher_t
-// --------------------------------
-//  typedef struct ALIGN(8) z_owned_publisher_t {
-//      uint64_t _0[7];
-//  } z_owned_publisher_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedPublisher
-{
-    // [MarshalAs(UnmanagedType.ByValArray, SizeConst = 7)]
-    private fixed ulong _[7];
-}
 
-// z_owned_queryable_t 
-// --------------------------------
-//  typedef struct ALIGN(8) z_owned_queryable_t {
-//      uint64_t _0[4];
-//  } z_owned_queryable_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedQueryable
-{
-    private fixed ulong _[4];
-}
 
 // z_publisher_t 
 // --------------------------------
@@ -419,18 +896,6 @@ internal struct ZSubscriberOptions
     internal Reliability reliability;
 }
 
-// z_owned_subscriber_t 
-// --------------------------------
-//  typedef struct ALIGN(8) z_owned_subscriber_t {
-//      uint64_t _0[1];
-//  } z_owned_subscriber_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal struct ZOwnedSubscriber
-{
-    private ulong _;
-}
-
 #if PLATFORM_ARM64
 // --------------------------------
 //  typedef struct ALIGN(16) z_owned_reply_t {
@@ -447,11 +912,11 @@ internal unsafe struct ZOwnedReply{
 //      uint64_t _0[22];
 //  } z_owned_reply_t;
 // --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedReply
-{
-    private fixed ulong _[22];
-}
+// [StructLayout(LayoutKind.Sequential, Pack = 8)]
+// internal unsafe struct ZOwnedReply
+// {
+//     private fixed ulong _[22];
+// }
 #else
 #error  PLATFORM_ARM64 or PLATFORM_x64
 #endif
@@ -589,17 +1054,6 @@ internal struct ZQuery
     private nint _;
 }
 
-// z_owned_session_t 
-// --------------------------------
-//  typedef struct z_owned_session_t {
-//    uintptr_t _0;
-//  } z_owned_session_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal struct ZOwnedSession
-{
-    private nint _;
-}
 
 // z_session_t 
 // --------------------------------
@@ -750,18 +1204,15 @@ internal static unsafe class ZenohC
 
     internal static string ZOwnedStrToString(ZOwnedStr* zs)
     {
-        if (z_str_check(zs) != 1)
-        {
-            return "";
-        }
+        if (z_str_check(zs) != 1) return "";
 
         return Marshal.PtrToStringUTF8(zs->cstr) ?? "";
     }
 
     internal static string ZKeyexprToString(ZKeyexpr keyexpr)
     {
-        ZOwnedStr str = z_keyexpr_to_string(keyexpr);
-        string o = ZOwnedStrToString(&str);
+        var str = z_keyexpr_to_string(keyexpr);
+        var o = ZOwnedStrToString(&str);
         z_str_drop(&str);
         return o;
     }
