@@ -155,18 +155,26 @@ internal unsafe struct ZLoanedBytes
     private fixed byte data[32];
 } 
 
-// zenoh_opaque.h
-// z_loaned_slice_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZLoanedSlice
+// zenoh_commons.h
+// z_moved_bytes_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedBytes
 {
-    private fixed byte data[32];
-}
+    private ZOwnedBytes ownedBytes;
+} 
 
 // zenoh_opaque.h
 // z_owned_slice_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZOwnedSlice
+{
+    private fixed byte data[32];
+}
+
+// zenoh_opaque.h
+// z_loaned_slice_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedSlice
 {
     private fixed byte data[32];
 }
@@ -179,18 +187,34 @@ internal unsafe struct ZViewSlice
     private fixed byte data[32];
 }
 
-// zenoh_opaque.h
-// z_loaned_string_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZLoanedString
+// zenoh_commons.h
+// z_moved_slice_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedSlice
 {
-    private fixed byte data[32];
-}
+    private ZOwnedSlice ownedSlice;
+} 
 
 // zenoh_opaque.h
 // z_owned_string_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZOwnedString
+{
+    private fixed byte data[32];
+}
+
+// zenoh_commons.h
+// z_bytes_slice_iterator_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZBytesSliceIterator
+{
+    private fixed byte data[24];
+}
+
+// zenoh_opaque.h
+// z_loaned_string_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedString
 {
     private fixed byte data[32];
 }
@@ -203,20 +227,20 @@ internal unsafe struct ZViewString
     private fixed byte data[32];
 }
 
+// zenoh_commons.h
+// z_moved_string_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedString
+{
+    private ZOwnedString ownedString;
+} 
+
 // zenoh_opaque.h
 // z_bytes_reader_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZBytesReader
 {
     private fixed byte data[24];
-}
-
-// zenoh_opaque.h
-// z_loaned_bytes_writer_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZLoanedBytesWriter
-{
-    private fixed byte data[56];
 }
 
 // zenoh_opaque.h
@@ -228,11 +252,35 @@ internal unsafe struct ZOwnedBytesWriter
 }
 
 // zenoh_opaque.h
+// z_loaned_bytes_writer_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZLoanedBytesWriter
+{
+    private fixed byte data[56];
+}
+
+// zenoh_commons.h
+// z_moved_bytes_writer_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedBytesWriter
+{
+    internal ZOwnedBytesWriter ownedBytesWriter;
+} 
+
+// zenoh_opaque.h
 // z_loaned_session_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedSession
 {
     private fixed byte data[8];
+}
+
+// zenoh_opaque.h
+// z_owned_hello_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedHello
+{
+    private fixed byte data[48];
 }
 
 // zenoh_opaque.h
@@ -243,12 +291,50 @@ internal unsafe struct ZLoanedHello
     private fixed byte data[48];
 }
 
+// zenoh_commons.h
+// z_moved_hello_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedHello
+{
+    internal ZOwnedHello ownedHello;
+}
+
+
+// zenoh_commons.h
+// z_owned_closure_hello_t
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct ZOwnedClosureHello
+{
+     internal void* context;
+     internal ZOwnedClosureHelloCall call;
+     internal ZOwnedClosureHelloDrop? drop;
+}
+
+internal unsafe delegate void ZOwnedClosureHelloCall(ZLoanedHello* hello, void* context); 
+internal unsafe delegate void ZOwnedClosureHelloDrop(void* context); 
+
 // zenoh_opaque.h
 // z_loaned_closure_hello_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedClosureHello
 {
     private fixed byte data[3];
+}
+
+// zenoh_commons.h
+// z_moved_closure_hello_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedClosureHello
+{
+    internal ZOwnedClosureHello _ownedClosureHello;
+}
+
+// zenoh_opaque.h
+// z_owned_query_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedQuery
+{
+    private fixed byte data[136];
 }
 
 // zenoh_opaque.h
@@ -259,12 +345,41 @@ internal unsafe struct ZLoanedQuery
     private fixed byte data[136];
 }
 
+// zenoh_commons.h
+// z_owned_closure_query_t
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct ZOwnedClosureQuery
+{
+     internal void* context;
+     internal ZOwnedClosureQueryCall call;
+     internal ZOwnedClosureQueryDrop? drop;
+}
+
+internal unsafe delegate void ZOwnedClosureQueryCall(ZLoanedQuery* query, void* context); 
+internal unsafe delegate void ZOwnedClosureQueryDrop(void* context); 
+
 // zenoh_opaque.h
 // z_loaned_closure_query_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedClosureQuery
 {
     private fixed ulong data[3];
+}
+
+// zenoh_commons.h
+// z_moved_closure_query_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedClosureQuery
+{
+    internal ZOwnedClosureQuery _ownedClosureQuery;
+}
+
+// zenoh_opaque.h
+// z_owned_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedReply
+{
+    private fixed byte data[184];
 }
 
 // zenoh_opaque.h
@@ -275,12 +390,41 @@ internal unsafe struct ZLoanedReply
     private fixed byte data[184];
 }
 
+// zenoh_commons.h
+// z_owned_closure_reply_t
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct ZOwnedClosureReply
+{
+     internal void* context;
+     internal ZOwnedClosureReplyCall call;
+     internal ZOwnedClosureReplyDrop? drop;
+}
+
+internal unsafe delegate void ZOwnedClosureReplyCall(ZLoanedReply* reply, void* context); 
+internal unsafe delegate void ZOwnedClosureReplyDrop(void* context); 
+
 // zenoh_opaque.h
 // z_loaned_closure_reply_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedClosureReply
 {
     private fixed ulong data[3];
+}
+
+// zenoh_commons.h
+// z_moved_closure_reply_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedClosureReply
+{
+    internal ZOwnedClosureReply _ownedClosureReply;
+}
+
+// zenoh_opaque.h
+// z_owned_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedSample
+{
+    private fixed byte data[184];
 }
 
 // zenoh_opaque.h
@@ -291,12 +435,33 @@ internal unsafe struct ZLoanedSample
     private fixed byte data[184];
 }
 
+// zenoh_commons.h
+// z_owned_closure_sample_t
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct ZOwnedClosureSample
+{
+     internal void* context;
+     internal ZOwnedClosureSampleCall call;
+     internal ZOwnedClosureSampleDrop? drop;
+}
+
+internal unsafe delegate void ZOwnedClosureSampleCall(ZLoanedSample* reply, void* context); 
+internal unsafe delegate void ZOwnedClosureSampleDrop(void* context); 
+
 // zenoh_opaque.h
 // z_loaned_closure_sample_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedClosureSample
 {
     private fixed ulong data[3];
+}
+
+// zenoh_commons.h
+// z_owned_moved_sample_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedClosureSample
+{
+    internal ZOwnedClosureSample _ownedClosureSample;
 }
 
 // zenoh_opaque.h
@@ -307,12 +472,33 @@ internal unsafe struct ZId
     private fixed byte id[16];
 }
 
+// zenoh_commons.h
+// z_owned_closure_zid_t
+[StructLayout(LayoutKind.Sequential)]
+internal unsafe struct ZOwnedClosureZid
+{
+     internal void* context;
+     internal ZOwnedClosureZidCall call;
+     internal ZOwnedClosureZidDrop? drop;
+}
+
+internal unsafe delegate void ZOwnedClosureZidCall(ZId* zId, void* context); 
+internal unsafe delegate void ZOwnedClosureZidDrop(void* context); 
+
 // zenoh_opaque.h
 // z_loaned_closure_zid_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedClosureZid
 {
     private fixed ulong data[3];
+}
+
+// zenoh_commons.h
+// z_moved_closure_zid_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedClosureZid
+{
+    internal ZOwnedClosureZid _ownedClosureZid;
 }
 
 // zenoh_opaque.h
@@ -330,6 +516,15 @@ internal unsafe struct ZLoanedCondvar
 {
     private fixed byte data[16];
 }
+
+// zenoh_commons.h
+// z_moved_condvar_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedCondvar
+{
+    internal ZOwnedCondvar _ownedCondvar;
+}
+
 
 // zenoh_opaque.h
 // z_loaned_mutex_t
@@ -352,7 +547,7 @@ internal unsafe struct ZTimestamp
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZOwnedConfig
 {
-    private fixed byte data[1736];
+    private fixed byte data[1800];
 }
 
 // zenoh_opaque.h
@@ -360,7 +555,15 @@ internal unsafe struct ZOwnedConfig
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedConfig
 {
-    private fixed byte data[1736];
+    private fixed byte data[1800];
+}
+
+// zenoh_commons.h
+// z_moved_config_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedConfig
+{
+    internal ZOwnedConfig _ownedConfig;
 }
 
 // zenoh_opaque.h
@@ -387,6 +590,14 @@ internal unsafe struct ZViewKeyexpr
     private fixed byte data[32];
 }
 
+// zenoh_commons.h
+// z_moved_keyexpr_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedKeyexpr
+{
+    internal ZOwnedKeyexpr ownedKeyexpr;
+}
+
 // zenoh_opaque.h
 // z_owned_encoding_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -401,6 +612,14 @@ internal unsafe struct ZOwnedEncoding
 internal unsafe struct ZLoanedEncoding
 {
     private fixed byte data[40];
+}
+
+// zenoh_commons.h
+// z_moved_encoding_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedEncoding
+{
+    internal ZOwnedEncoding _ownedEncoding;
 }
 
 // zenoh_opaque.h
@@ -460,25 +679,25 @@ internal unsafe struct ZOwnedFifoHandlerQuery
 }
 
 // zenoh_opaque.h
-// z_owned_fifo_handler_reply_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedFifoHandlerReply
-{
-    private fixed byte data[8];
-}
-
-// zenoh_opaque.h
-// z_owned_fifo_handler_sample_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedFifoHandlerSample
-{
-    private fixed byte data[8];
-}
-
-// zenoh_opaque.h
 // z_loaned_fifo_handler_query_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
 internal unsafe struct ZLoanedFifoHandlerQuery
+{
+    private fixed byte data[8];
+}
+
+// zenoh_commons.h
+// z_moved_fifo_handler_query_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedFifoHandlerQuery
+{
+    internal ZOwnedFifoHandlerQuery _ownedFifoHandlerQuery;
+}
+
+// zenoh_opaque.h
+// z_owned_fifo_handler_reply_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedFifoHandlerReply
 {
     private fixed byte data[8];
 }
@@ -491,6 +710,22 @@ internal unsafe struct ZLoanedFifoHandlerReply
     private fixed byte data[8];
 }
 
+// zenoh_commons.h
+// z_moved_fifo_handler_reply_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedFifoHandlerReply
+{
+    internal ZOwnedFifoHandlerReply _ownedFifoHandlerReply;
+}
+
+// zenoh_opaque.h
+// z_owned_fifo_handler_sample_t
+[StructLayout(LayoutKind.Sequential, Pack = 8)]
+internal unsafe struct ZOwnedFifoHandlerSample
+{
+    private fixed byte data[8];
+}
+
 // zenoh_opaque.h
 // z_loaned_fifo_handler_sample_t
 [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -499,20 +734,12 @@ internal unsafe struct ZLoanedFifoHandlerSample
     private fixed byte data[8];
 }
 
-// zenoh_opaque.h
-// z_owned_query_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedQuery
+// zenoh_commons.h
+// z_moved_fifo_handler_sample_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZMovedFifoHandlerSample
 {
-    private fixed byte data[136];
-}
-
-// zenoh_opaque.h
-// z_owned_reply_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedReply
-{
-    private fixed byte data[184];
+    internal ZOwnedFifoHandlerSample _ownedFifoHandlerSample;
 }
 
 // zenoh_opaque.h
@@ -531,21 +758,7 @@ internal unsafe struct ZLoanedReplyErr
     private fixed byte data[72];
 }
 
-// zenoh_opaque.h
-// z_owned_sample_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedSample
-{
-    private fixed byte data[184];
-}
 
-// zenoh_opaque.h
-// z_owned_hello_t
-[StructLayout(LayoutKind.Sequential, Pack = 8)]
-internal unsafe struct ZOwnedHello
-{
-    private fixed byte data[48];
-}
 
 // zenoh_opaque.h
 // z_owned_string_array_t
@@ -577,6 +790,14 @@ internal unsafe struct ZOwnedLivelinessToken
 internal unsafe struct ZLoanedLivelinessToken
 {
     private fixed byte data[16];
+}
+
+// zenoh_commons.h
+// z_liveliness_subscriber_options_t
+[StructLayout(LayoutKind.Sequential)]
+internal struct ZLivelinessSubscriberOptions
+{
+    internal byte history;
 }
 
 // zenoh_opaque.h
@@ -798,18 +1019,15 @@ internal struct ZPublisher
     private nint _;
 }
 
+// zenoh_commons.h
 // z_publisher_options_t 
-// --------------------------------
-//  typedef struct z_publisher_options_t {
-//      enum z_congestion_control_t congestion_control;
-//      enum z_priority_t priority;
-//  } z_publisher_options_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
-internal struct ZPublisherOptions
+internal unsafe struct ZPublisherOptions
 {
+    internal ZMovedEncoding *encoding;
     internal CongestionControl congestion_control;
     internal Priority priority;
+    internal byte is_express;
 }
 
 // z_publisher_delete_options_t 
@@ -872,28 +1090,20 @@ internal struct ZPullSubscriber
     internal nint _;
 }
 
+// zenoh_commons.h
 // z_queryable_options_t 
-// --------------------------------
-//  typedef struct z_queryable_options_t {
-//      bool complete;
-//  } z_queryable_options_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
 internal struct ZQueryableOptions
 {
-    internal sbyte complete;
+    internal byte complete;
 }
 
+// zenoh_commons.h
 // z_subscriber_options_t 
-// --------------------------------
-// typedef struct z_subscriber_options_t {
-//   enum z_reliability_t reliability;
-// } z_subscriber_options_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
 internal struct ZSubscriberOptions
 {
-    internal Reliability reliability;
+    internal byte option;
 }
 
 #if PLATFORM_ARM64
@@ -921,46 +1131,38 @@ internal unsafe struct ZOwnedReply{
 #error  PLATFORM_ARM64 or PLATFORM_x64
 #endif
 
+// zenoh_commons.h
 // z_delete_options_t 
-// --------------------------------
-//  typedef struct z_delete_options_t {
-//      enum z_congestion_control_t congestion_control;
-//      enum z_priority_t priority;
-//  } z_delete_options_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
-internal struct ZDeleteOptions
+internal unsafe struct ZDeleteOptions
 {
     internal CongestionControl congestion_control;
     internal Priority priority;
+    internal byte is_express;
+    internal ZTimestamp *timestamp;
 }
 
+// zenoh_commons.h
 // z_query_consolidation_t 
-// --------------------------------
-//  typedef struct z_query_consolidation_t {
-//      enum z_consolidation_mode_t mode;
-//  } z_query_consolidation_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
 internal struct ZQueryConsolidation
 {
     internal ConsolidationMode mode;
 }
 
+// zenoh_commons.h
 // z_get_options_t 
-// --------------------------------
-//  typedef struct z_get_options_t {
-//      enum z_query_target_t target;
-//      struct z_query_consolidation_t consolidation;
-//      struct z_value_t value;
-//  } z_get_options_t;
-// --------------------------------
 [StructLayout(LayoutKind.Sequential)]
-internal struct ZGetOptions
+internal unsafe struct ZGetOptions
 {
     internal QueryTarget target;
     internal ZQueryConsolidation consolidation;
-    internal ZValue value;
+    internal ZMovedBytes *payload;
+    internal ZMovedEncoding *encoding;
+    internal CongestionControl congestion_control;
+    internal byte is_express;
+    internal ZMovedBytes* attachment;
+    internal ulong timeout_ms;
 }
 
 // z_value_t 
@@ -1067,25 +1269,6 @@ internal struct ZSession
     private nint _;
 }
 
-// z_owned_closure_sample_t 
-// --------------------------------
-//  typedef struct z_owned_closure_sample_t {
-//      void *context;
-//      void (*call)(const struct z_sample_t*, void *context);
-//      void (*drop)(void*);
-//  } z_owned_closure_sample_t;
-// --------------------------------
-internal unsafe delegate void ZOwnedClosureSampleCall(ZSample* sample, void* context);
-
-internal unsafe delegate void ZOwnedClosureSampleDrop(void* context);
-
-[StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZOwnedClosureSample
-{
-    internal void* context;
-    internal ZOwnedClosureSampleCall call;
-    internal ZOwnedClosureSampleDrop? drop;
-}
 
 // --------------------------------
 // typedef struct z_owned_closure_zid_t {
@@ -1106,41 +1289,6 @@ internal unsafe struct ZOwnedClosureZId
     internal ZOwnedClosureZIdDrop? drop;
 }
 
-internal unsafe delegate void ZOwnedClosureQueryCall(ZQuery* zQuery, void* context);
-
-internal unsafe delegate void ZOwnedClosureQueryDrop(void* context);
-
-// z_owned_closure_query_t 
-// --------------------------------
-//  typedef struct z_owned_closure_query_t {
-//      void *context;
-//      void (*call)(const struct z_query_t*, void *context);
-//      void (*drop)(void*);
-//  } z_owned_closure_query_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZOwnedClosureQuery
-{
-    internal void* context;
-    internal ZOwnedClosureQueryCall call;
-    internal ZOwnedClosureQueryDrop? drop;
-}
-
-// z_owned_closure_reply_t 
-// --------------------------------
-//  typedef struct z_owned_closure_reply_t {
-//      void *context;
-//      void (*call)(struct z_owned_reply_t*, void*);
-//      void (*drop)(void*);
-//  } z_owned_closure_reply_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZOwnedClosureReply
-{
-    internal void* context;
-    internal delegate* unmanaged[Cdecl]<ZOwnedReply*, void*, void> call;
-    internal delegate* unmanaged[Cdecl]<void*, void> drop;
-}
 
 // z_owned_reply_channel_closure_t 
 // --------------------------------
