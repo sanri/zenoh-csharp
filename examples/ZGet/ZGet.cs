@@ -36,7 +36,7 @@ class Program
 
         string keyexpr = clArgs.GetSelector();
         byte[] data = Encoding.UTF8.GetBytes(clArgs.GetValue());
-        QueryOptions queryOptions = new QueryOptions(keyexpr, EncodingPrefix.TextPlain, data);
+        QueryOptions queryOptions = new QueryOptions(keyexpr, ZEncodingPrefix.TextPlain, data);
 
         Console.WriteLine($"Sending Query '{keyexpr}'");
         Querier? querier = session.Query(queryOptions);
@@ -49,16 +49,16 @@ class Program
         QuerierCallback callback = sample =>
         {
             string key = sample.GetKeyexpr();
-            EncodingPrefix encodingPrefix = sample.GetEncodingPrefix();
+            ZEncodingPrefix zEncodingPrefix = sample.GetEncodingPrefix();
             string? s = sample.GetString();
             if (s is null)
             {
                 byte[] d = sample.GetPayload();
-                Console.WriteLine($">> Received ('{key}' '{encodingPrefix}': '{d}')");
+                Console.WriteLine($">> Received ('{key}' '{zEncodingPrefix}': '{d}')");
             }
             else
             {
-                Console.WriteLine($">> Received ('{key}' '{encodingPrefix}': '{s}')");
+                Console.WriteLine($">> Received ('{key}' '{zEncodingPrefix}': '{s}')");
             }
         };
 

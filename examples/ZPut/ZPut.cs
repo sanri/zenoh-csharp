@@ -60,7 +60,7 @@ class Program
         string keyBin = "demo/example/zenoh-cs-put/bin";
         byte[] dataBin = { 0x1, 0x2, 0x3, 0x4 };
         Console.WriteLine(
-            session.PutData(keyBin, dataBin, EncodingPrefix.AppCustom)
+            session.PutData(keyBin, dataBin, ZEncodingPrefix.AppCustom)
                 ? $"Putting data bin ('{keyBin}': {dataBin.Length} Byte"
                 : "Putting data bin fault!");
 

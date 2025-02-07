@@ -32,7 +32,7 @@ public class Session : IDisposable
     {
         unsafe
         {
-            ZOwnedSession session = ZenohC.z_open(config.ownedConfig);
+            ZOwnedSession session = ZenohC.z_open(config.OwnedConfig);
             if (ZenohC.z_session_check(&session) != 1)
             {
                 return null;
@@ -137,67 +137,67 @@ public class Session : IDisposable
 
     public bool PutStr(string key, string value)
     {
-        return PutStr(key, value, CongestionControl.Block, Priority.RealTime);
+        return PutStr(key, value, ZCongestionControl.Block, ZPriority.RealTime);
     }
 
-    public bool PutStr(string key, string s, CongestionControl congestionControl, Priority priority)
+    public bool PutStr(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _put(key, data, congestionControl, priority, EncodingPrefix.TextPlain);
+        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.TextPlain);
     }
 
     public bool PutJson(string key, string value)
     {
-        return PutJson(key, value, CongestionControl.Block, Priority.RealTime);
+        return PutJson(key, value, ZCongestionControl.Block, ZPriority.RealTime);
     }
 
-    public bool PutJson(string key, string s, CongestionControl congestionControl, Priority priority)
+    public bool PutJson(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _put(key, data, congestionControl, priority, EncodingPrefix.AppJson);
+        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppJson);
     }
 
     public bool PutInt(string key, long value)
     {
-        return PutInt(key, value, CongestionControl.Block, Priority.RealTime);
+        return PutInt(key, value, ZCongestionControl.Block, ZPriority.RealTime);
     }
 
-    public bool PutInt(string key, long value, CongestionControl congestionControl, Priority priority)
+    public bool PutInt(string key, long value, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         string s = value.ToString("G");
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _put(key, data, congestionControl, priority, EncodingPrefix.AppInteger);
+        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppInteger);
     }
 
     public bool PutFloat(string key, double value)
     {
-        return PutFloat(key, value, CongestionControl.Block, Priority.RealTime);
+        return PutFloat(key, value, ZCongestionControl.Block, ZPriority.RealTime);
     }
 
-    public bool PutFloat(string key, double value, CongestionControl congestionControl, Priority priority)
+    public bool PutFloat(string key, double value, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         string s = value.ToString("G");
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _put(key, data, congestionControl, priority, EncodingPrefix.AppFloat);
+        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppFloat);
     }
 
-    public bool PutData(string key, byte[] value, EncodingPrefix encodingPrefix, byte[]? encodingSuffix = null)
+    public bool PutData(string key, byte[] value, ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null)
     {
-        return PutData(key, value, CongestionControl.Block, Priority.RealTime, encodingPrefix, encodingSuffix);
+        return PutData(key, value, ZCongestionControl.Block, ZPriority.RealTime, zEncodingPrefix, encodingSuffix);
     }
 
     public bool PutData(string key, byte[] value,
-        CongestionControl congestionControl, Priority priority,
-        EncodingPrefix encodingPrefix, byte[]? encodingSuffix = null
+        ZCongestionControl zCongestionControl, ZPriority zPriority,
+        ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null
     )
     {
-        return _put(key, value, congestionControl, priority, encodingPrefix, encodingSuffix);
+        return _put(key, value, zCongestionControl, zPriority, zEncodingPrefix, encodingSuffix);
     }
 
     private bool _put(
         string key, byte[] value,
-        CongestionControl congestionControl, Priority priority,
-        EncodingPrefix encodingPrefix, byte[]? encodingSuffix = null
+        ZCongestionControl zCongestionControl, ZPriority zPriority,
+        ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null
     )
     {
         if (_disposed) return false;
@@ -215,9 +215,9 @@ public class Session : IDisposable
                 {
                     ZPutOptions options = new ZPutOptions
                     {
-                        encoding = ZenohC.z_encoding(encodingPrefix, null),
-                        congestionControl = congestionControl,
-                        priority = priority,
+                        encoding = ZenohC.z_encoding(zEncodingPrefix, null),
+                        ZCongestionControl = zCongestionControl,
+                        ZPriority = zPriority,
                     };
                     r = ZenohC.z_put(session, keyexpr, pv, len, &options);
                 }
@@ -227,9 +227,9 @@ public class Session : IDisposable
                     {
                         ZPutOptions options = new ZPutOptions
                         {
-                            encoding = ZenohC.z_encoding(encodingPrefix, pEncodingSuffix),
-                            congestionControl = congestionControl,
-                            priority = priority,
+                            encoding = ZenohC.z_encoding(zEncodingPrefix, pEncodingSuffix),
+                            ZCongestionControl = zCongestionControl,
+                            ZPriority = zPriority,
                         };
                         r = ZenohC.z_put(session, keyexpr, pv, len, &options);
                     }
@@ -245,36 +245,36 @@ public class Session : IDisposable
     public bool PubStr(PublisherHandle handle, string value)
     {
         byte[] data = Encoding.UTF8.GetBytes(value);
-        return _publisher_put(handle, data, EncodingPrefix.TextPlain);
+        return _publisher_put(handle, data, ZEncodingPrefix.TextPlain);
     }
 
     public bool PubJson(PublisherHandle handle, string value)
     {
         byte[] data = Encoding.UTF8.GetBytes(value);
-        return _publisher_put(handle, data, EncodingPrefix.AppJson);
+        return _publisher_put(handle, data, ZEncodingPrefix.AppJson);
     }
 
     public bool PubInt(PublisherHandle handle, long value)
     {
         string s = value.ToString("G");
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _publisher_put(handle, data, EncodingPrefix.AppInteger);
+        return _publisher_put(handle, data, ZEncodingPrefix.AppInteger);
     }
 
     public bool PubFloat(PublisherHandle handle, double value)
     {
         string s = value.ToString("G");
         byte[] data = Encoding.UTF8.GetBytes(s);
-        return _publisher_put(handle, data, EncodingPrefix.AppFloat);
+        return _publisher_put(handle, data, ZEncodingPrefix.AppFloat);
     }
 
-    public bool PubData(PublisherHandle handle, byte[] data, EncodingPrefix encodingPrefix,
+    public bool PubData(PublisherHandle handle, byte[] data, ZEncodingPrefix zEncodingPrefix,
         byte[]? encodingSuffix = null)
     {
-        return _publisher_put(handle, data, encodingPrefix, encodingSuffix);
+        return _publisher_put(handle, data, zEncodingPrefix, encodingSuffix);
     }
 
-    private bool _publisher_put(PublisherHandle handle, byte[] value, EncodingPrefix encodingPrefix,
+    private bool _publisher_put(PublisherHandle handle, byte[] value, ZEncodingPrefix zEncodingPrefix,
         byte[]? encodingSuffix = null)
     {
         if (_disposed) return false;
@@ -291,7 +291,7 @@ public class Session : IDisposable
                 {
                     ZPublisherPutOptions options = new ZPublisherPutOptions
                     {
-                        encoding = ZenohC.z_encoding(encodingPrefix, null),
+                        encoding = ZenohC.z_encoding(zEncodingPrefix, null),
                     };
                     nuint len = (nuint)value.Length;
                     r = ZenohC.z_publisher_put(pub, pv, len, &options);
@@ -302,7 +302,7 @@ public class Session : IDisposable
                     {
                         ZPublisherPutOptions options = new ZPublisherPutOptions
                         {
-                            encoding = ZenohC.z_encoding(encodingPrefix, pSuffix),
+                            encoding = ZenohC.z_encoding(zEncodingPrefix, pSuffix),
                         };
                         nuint len = (nuint)value.Length;
                         r = ZenohC.z_publisher_put(pub, pv, len, &options);
@@ -437,7 +437,7 @@ public class Session : IDisposable
             ZGetOptions getOptions = new ZGetOptions();
             getOptions.target = options.target;
             getOptions.consolidation.mode = options.mode;
-            getOptions.value.encoding = ZenohC.z_encoding(options.encodingPrefix, null);
+            getOptions.value.encoding = ZenohC.z_encoding(options.ZEncodingPrefix, null);
             getOptions.value.payload.len = (nuint)options.payload.Length;
             sbyte r;
             fixed (byte* data = options.payload)

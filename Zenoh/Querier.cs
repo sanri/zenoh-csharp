@@ -8,33 +8,33 @@ namespace Zenoh;
 public class QueryOptions
 {
     internal string keyexpr;
-    internal QueryTarget target;
-    internal ConsolidationMode mode;
-    internal EncodingPrefix encodingPrefix;
+    internal ZQueryTarget target;
+    internal ZConsolidationMode mode;
+    internal ZEncodingPrefix ZEncodingPrefix;
     internal byte[] payload;
 
     public QueryOptions(string keyexpr) :
-        this(keyexpr, QueryTarget.BestMatching, ConsolidationMode.Auto, EncodingPrefix.Empty, Array.Empty<byte>())
+        this(keyexpr, ZQueryTarget.BestMatching, ZConsolidationMode.Auto, ZEncodingPrefix.Empty, Array.Empty<byte>())
     {
     }
 
-    public QueryOptions(string keyexpr, QueryTarget target, ConsolidationMode mode) :
-        this(keyexpr, target, mode, EncodingPrefix.Empty, Array.Empty<byte>())
+    public QueryOptions(string keyexpr, ZQueryTarget target, ZConsolidationMode mode) :
+        this(keyexpr, target, mode, ZEncodingPrefix.Empty, Array.Empty<byte>())
     {
     }
 
-    public QueryOptions(string keyexpr, EncodingPrefix encodingPrefix, byte[] payload) :
-        this(keyexpr, QueryTarget.BestMatching, ConsolidationMode.Auto, encodingPrefix, payload)
+    public QueryOptions(string keyexpr, ZEncodingPrefix zEncodingPrefix, byte[] payload) :
+        this(keyexpr, ZQueryTarget.BestMatching, ZConsolidationMode.Auto, zEncodingPrefix, payload)
     {
     }
 
-    public QueryOptions(string keyexpr, QueryTarget target, ConsolidationMode mode,
-        EncodingPrefix encodingPrefix, byte[] payload)
+    public QueryOptions(string keyexpr, ZQueryTarget target, ZConsolidationMode mode,
+        ZEncodingPrefix zEncodingPrefix, byte[] payload)
     {
         this.keyexpr = keyexpr;
         this.target = target;
         this.mode = mode;
-        this.encodingPrefix = encodingPrefix;
+        this.ZEncodingPrefix = zEncodingPrefix;
         this.payload = payload;
     }
 }

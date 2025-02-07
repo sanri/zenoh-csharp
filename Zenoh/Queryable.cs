@@ -106,7 +106,7 @@ public class Query
         }
     }
 
-    public bool Reply(string key, byte[] payload, EncodingPrefix encodingPrefix, byte[]? encodingSuffix)
+    public bool Reply(string key, byte[] payload, ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix)
     {
         unsafe
         {
@@ -119,7 +119,7 @@ public class Query
                 {
                     ZQueryReplyOptions options = new ZQueryReplyOptions
                     {
-                        encoding = ZenohC.z_encoding(encodingPrefix, null),
+                        encoding = ZenohC.z_encoding(zEncodingPrefix, null),
                     };
                     nuint len = (nuint)payload.Length;
                     r = ZenohC.z_query_reply(_query, keyexpr, pv, len, &options);
@@ -130,7 +130,7 @@ public class Query
                     {
                         ZQueryReplyOptions options = new ZQueryReplyOptions
                         {
-                            encoding = ZenohC.z_encoding(encodingPrefix, suffix),
+                            encoding = ZenohC.z_encoding(zEncodingPrefix, suffix),
                         };
                         nuint len = (nuint)payload.Length;
                         r = ZenohC.z_query_reply(_query, keyexpr, pv, len, &options);
@@ -147,26 +147,26 @@ public class Query
     public bool ReplyStr(string key, string value)
     {
         byte[] payload = Encoding.UTF8.GetBytes(value);
-        return Reply(key, payload, EncodingPrefix.TextPlain, null);
+        return Reply(key, payload, ZEncodingPrefix.TextPlain, null);
     }
 
     public bool ReplyJson(string key, string value)
     {
         byte[] payload = Encoding.UTF8.GetBytes(value);
-        return Reply(key, payload, EncodingPrefix.AppJson, null);
+        return Reply(key, payload, ZEncodingPrefix.AppJson, null);
     }
 
     public bool ReplyInt(string key, long value)
     {
         string s = value.ToString("G");
         byte[] payload = Encoding.UTF8.GetBytes(s);
-        return Reply(key, payload, EncodingPrefix.AppInteger, null);
+        return Reply(key, payload, ZEncodingPrefix.AppInteger, null);
     }
 
     public bool ReplyFloat(string key, double value)
     {
         string s = value.ToString("G");
         byte[] payload = Encoding.UTF8.GetBytes(s);
-        return Reply(key, payload, EncodingPrefix.AppFloat, null);
+        return Reply(key, payload, ZEncodingPrefix.AppFloat, null);
     }
 }

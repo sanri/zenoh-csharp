@@ -15,19 +15,19 @@ public class Publisher : IDisposable
     internal readonly string keyexpr;
     private bool _disposed;
 
-    public Publisher(string key) : this(key, CongestionControl.Block, Priority.RealTime)
+    public Publisher(string key) : this(key, ZCongestionControl.Block, ZPriority.RealTime)
     {
     }
 
-    public Publisher(string key, CongestionControl control, Priority priority)
+    public Publisher(string key, ZCongestionControl control, ZPriority zPriority)
     {
         unsafe
         {
             keyexpr = key;
             _disposed = false;
             ownedPublisher = null;
-            options.congestion_control = control;
-            options.priority = priority;
+            options.ZCongestionControl = control;
+            options.ZPriority = zPriority;
         }
     }
 

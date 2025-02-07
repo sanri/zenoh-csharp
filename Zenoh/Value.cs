@@ -13,7 +13,7 @@ public class Value
         zValue = value;
     }
 
-    public EncodingPrefix GetEncodingPrefix()
+    public ZEncodingPrefix GetEncodingPrefix()
     {
         return zValue.encoding.prefix;
     }

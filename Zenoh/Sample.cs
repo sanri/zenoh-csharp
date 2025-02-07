@@ -21,7 +21,7 @@ public class Sample
         }
     }
 
-    public EncodingPrefix GetEncodingPrefix()
+    public ZEncodingPrefix GetEncodingPrefix()
     {
         unsafe
         {
@@ -41,7 +41,7 @@ public class Sample
         }
     }
 
-    public SampleKind GetSampleKind()
+    public ZSampleKind GetSampleKind()
     {
         unsafe
         {

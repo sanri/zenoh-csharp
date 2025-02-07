@@ -23,17 +23,17 @@ public class Subscriber : IDisposable
     private bool _disposed;
 
     public Subscriber(string key, SubscriberCallback userCallback)
-        : this(key, userCallback, Reliability.Reliable)
+        : this(key, userCallback, ZReliability.Reliable)
     {
     }
 
-    public Subscriber(string key, SubscriberCallback userCallback, Reliability reliability)
+    public Subscriber(string key, SubscriberCallback userCallback, ZReliability zReliability)
     {
         unsafe
         {
             keyexpr = key;
             _disposed = false;
-            options.reliability = reliability;
+            options.reliability = zReliability;
             _userCallbackGcHandle = GCHandle.Alloc(userCallback, GCHandleType.Normal);
             _ownedClosureSample = new ZOwnedClosureSample
             {
