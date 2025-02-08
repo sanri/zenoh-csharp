@@ -1,14 +1,83 @@
-#pragma warning disable CS8500
-
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text;
 
-
 namespace Zenoh;
 
-public class Session : IDisposable
+public sealed class OpenOptions : IDisposable
+{
+    // z_open_options*
+    internal nint HandleZOpenOptions { get; private set; }
+
+    public OpenOptions()
+    {
+        var pOpenOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZOpenOptions>());
+        ZenohC.z_open_options_default(pOpenOptions);
+        HandleZOpenOptions = pOpenOptions;
+    }
+
+    public OpenOptions(OpenOptions source)
+    {
+        var pTarget = Marshal.AllocHGlobal(Marshal.SizeOf<ZOpenOptions>());
+        var openOptions = Marshal.PtrToStructure<ZOpenOptions>(source.HandleZOpenOptions);
+        Marshal.StructureToPtr(openOptions, pTarget, false);
+        HandleZOpenOptions = pTarget;
+    }
+
+    public void Dispose()
+    {
+        if (HandleZOpenOptions == nint.Zero) return;
+
+        Marshal.FreeHGlobal(HandleZOpenOptions);
+        HandleZOpenOptions = nint.Zero;
+    }
+}
+
+public sealed class Session : IDisposable
+{
+    // z_owned_session*
+    internal nint HandleZOwnedSession { get; private set; }
+
+    public Session()
+    {
+        var pOwnedSession = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSession>());
+        ZenohC.z_internal_session_null(pOwnedSession);
+        
+        HandleZOwnedSession = pOwnedSession;
+    }
+    
+    private Session(Session session){}
+
+    /// <summary>
+    /// <para> Constructs and opens a new Zenoh session. </para>
+    /// <para>
+    ///     Calling this function repeatedly without closing the session will always return Ok.
+    ///     The newly passed configuration will not work.
+    /// </para>
+    /// </summary>
+    /// <param name="config"></param>
+    /// <param name="openOptions"></param>
+    /// <returns>
+    /// ZResult.Ok in case of success
+    /// </returns>
+    public ZResult Open(Config config, in OpenOptions openOptions)
+    {
+        
+        var r=  ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
+        
+    }
+
+    void IDisposable.Dispose()
+    {
+        if (HandleZOwnedSession == nint.Zero) return;
+
+        Marshal.FreeHGlobal(HandleZOwnedSession);
+        HandleZOwnedSession = nint.Zero;
+    }
+}
+
+public class OldSession : IDisposable
 {
     internal SortedDictionary<int, Subscriber> subscribersDictionary;
     private int _indexSubscriber = 1;
@@ -19,7 +88,7 @@ public class Session : IDisposable
     private bool _disposed;
     private readonly unsafe ZOwnedSession* _session;
 
-    private unsafe Session(ZOwnedSession* session)
+    private unsafe OldSession(ZOwnedSession* session)
     {
         subscribersDictionary = new SortedDictionary<int, Subscriber>();
         publishersDictionary = new SortedDictionary<int, Publisher>();
@@ -28,7 +97,7 @@ public class Session : IDisposable
         _session = session;
     }
 
-    public static Session? Open(Config config)
+    public static OldSession? Open(Config config)
     {
         unsafe
         {
@@ -41,7 +110,7 @@ public class Session : IDisposable
             nint p = Marshal.AllocHGlobal(Marshal.SizeOf(session));
             Marshal.StructureToPtr(session, p, false);
 
-            return new Session((ZOwnedSession*)p);
+            return new OldSession((ZOwnedSession*)p);
         }
     }
 

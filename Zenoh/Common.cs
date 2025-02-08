@@ -3,28 +3,24 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-public class ZString : IDisposable
+public sealed class ZString : IDisposable
 {
-    // ZOwnedString
-    internal nint Handle { get; private set; }
-    private bool _disposed;
-
+    // z_owned_string*
+    internal nint HandleZOwnedString { get; private set; }
 
     public ZString()
     {
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
         ZenohC.z_string_empty(pOwnedString);
-        Handle = pOwnedString;
-        _disposed = false;
+        HandleZOwnedString = pOwnedString;
     }
 
-    public ZString(ZString zString)
+    public ZString(ZString src)
     {
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
-        var pLoanedString = ZenohC.z_string_loan(zString.Handle);
+        var pLoanedString = ZenohC.z_string_loan(src.HandleZOwnedString);
         ZenohC.z_string_clone(pOwnedString, pLoanedString);
-        Handle = pOwnedString;
-        _disposed = false;
+        HandleZOwnedString = pOwnedString;
     }
 
     public ZString(string str)
@@ -34,74 +30,103 @@ public class ZString : IDisposable
         var r = ZenohC.z_string_copy_from_str(pOwnedString, pStr);
         if (r != ZResult.Ok) ZenohC.z_string_empty(pOwnedString);
         Marshal.FreeHGlobal(pStr);
-        Handle = pOwnedString;
-        _disposed = false;
+        HandleZOwnedString = pOwnedString;
     }
 
     public bool IsEmpty()
     {
-        var pLoanedString = ZenohC.z_string_loan(Handle);
+        var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_is_empty(pLoanedString);
     }
 
     public nuint Length()
     {
-        var pLoanedString = ZenohC.z_string_loan(Handle);
+        var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_len(pLoanedString);
     }
 
     public override string ToString()
     {
-        var pLoanedString = ZenohC.z_string_loan(Handle);
+        var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         var pS = ZenohC.z_string_data(pLoanedString);
         var s = Marshal.PtrToStringAnsi(pS);
         return s ?? string.Empty;
     }
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
-        if(_disposed) return;
-        
-        ZenohC.z_string_drop(Handle);
-        Marshal.FreeHGlobal(Handle);
-        Handle = nint.Zero;
-        _disposed = true;
+        if (HandleZOwnedString == nint.Zero) return;
+
+        ZenohC.z_string_drop(HandleZOwnedString);
+        Marshal.FreeHGlobal(HandleZOwnedString);
+        HandleZOwnedString = nint.Zero;
     }
 }
 
-public class ZBytes : IDisposable
+public sealed class ZBytes : IDisposable
 {
-    // ZOwnedBytes
-    internal nint Handle { get; private set; }
-    private bool _disposed;
+    // z_owned_bytes*
+    internal nint HandleZOwnedBytes { get; private set; }
 
     public ZBytes()
     {
         var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
         ZenohC.z_bytes_empty(pOwnedBytes);
-        Handle = pOwnedBytes;
-        _disposed = false;
+        HandleZOwnedBytes = pOwnedBytes;
     }
-    
-    
-    void IDisposable.Dispose()
+
+    public bool IsEmpty()
     {
-        if(_disposed) return;
-        ZenohC.z_bytes_drop(Handle);
-        Marshal.FreeHGlobal(Handle);
-        Handle = nint.Zero;
-        _disposed = true;
+        var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
+        return ZenohC.z_bytes_is_empty(pLoanedBytes);
+    }
+
+    public nuint Length()
+    {
+        var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
+        return ZenohC.z_bytes_len(pLoanedBytes);
+    }
+
+    public void Dispose()
+    {
+        if (HandleZOwnedBytes == nint.Zero) return;
+
+        ZenohC.z_bytes_drop(HandleZOwnedBytes);
+        Marshal.FreeHGlobal(HandleZOwnedBytes);
+        HandleZOwnedBytes = nint.Zero;
     }
 }
 
-public class ZSlice : IDisposable
+public sealed class ZSlice : IDisposable
 {
-    // ZOwnedSlice
-    internal nint Handle { get; private set; }
-    private bool _disposed;
-    
-    void IDisposable.Dispose()
+    // z_owned_slice*
+    internal nint HandleZOwnedSlice { get; private set; }
+
+    public ZSlice()
     {
-        
+        var pOwnedSlice = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSlice>());
+        ZenohC.z_slice_empty(pOwnedSlice);
+        HandleZOwnedSlice = pOwnedSlice;
+    }
+
+    public bool IsEmpty()
+    {
+        var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
+        return ZenohC.z_slice_is_empty(pLoanedSlice);
+    }
+
+    public nuint Length()
+    {
+        var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
+        return ZenohC.z_slice_len(pLoanedSlice);
+    }
+
+    public void Dispose()
+    {
+        if (HandleZOwnedSlice == nint.Zero) return;
+
+        ZenohC.z_slice_drop(HandleZOwnedSlice);
+        Marshal.FreeHGlobal(HandleZOwnedSlice);
+        HandleZOwnedSlice = nint.Zero;
     }
 }

@@ -3,6 +3,9 @@
 // 从 NET7 开始, 已支持 LibraryImportAttribute
 // 但是考虑到兼容性, 还是使用 DllImportAttribute
 
+// 从 NET6 开始, 管理非托管内存已支持 NativeMemory Class
+// 但是考虑到兼容性, 还是使用 Marshal Class 中的函数
+
 // Marshal.GetFunctionPointerForDelegate 
 // 将委托转换为可从非托管代码调用的函数指针
 
@@ -1394,20 +1397,36 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern ZBytesSliceIterator z_bytes_get_slice_iterator(ZLoanedBytes* data);
 
+    /// bool
+    /// z_bytes_is_empty(
+    ///     const struct z_loaned_bytes_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_bytes_is_empty", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_bytes_is_empty(ZLoanedBytes* data);
+    internal static extern bool z_bytes_is_empty(nint data);
 
+    /// size_t
+    /// z_bytes_len(
+    ///     const struct z_loaned_bytes_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_bytes_len", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-    internal static extern nuint z_bytes_len(ZLoanedBytes* data);
+    internal static extern nuint z_bytes_len(nint data);
 
+    /// const struct z_loaned_bytes_t*
+    /// z_bytes_loan(
+    ///     const struct z_owned_bytes_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_bytes_loan", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-    internal static extern ZLoanedBytes* z_bytes_loan(ZOwnedBytes* data);
+    internal static extern nint z_bytes_loan(nint data);
 
+    /// struct z_loaned_bytes_t*
+    /// z_bytes_loan_mut(
+    ///     struct z_owned_bytes_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_bytes_loan_mut", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedBytes* z_bytes_loan_mut(ZOwnedBytes* data);
+    internal static extern nint z_bytes_loan_mut(nint data);
 
     [DllImport(DllName, EntryPoint = "z_bytes_reader_read", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2192,14 +2211,22 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_internal_condvar_null(ZOwnedCondvar* condvar);
 
+    /// bool
+    /// z_internal_config_check(
+    ///     const struct z_owned_config_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_config_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_internal_config_check(ZOwnedConfig* config);
+    internal static extern bool z_internal_config_check(nint config);
 
+    /// void
+    /// z_internal_config_null(
+    ///     struct z_owned_config_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_config_null", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_internal_config_null(ZOwnedConfig* config);
+    internal static extern void z_internal_config_null(nint config);
 
     [DllImport(DllName, EntryPoint = "z_internal_encoding_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2356,14 +2383,22 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_internal_sample_null(ZOwnedSample* sample);
 
+    /// bool
+    /// z_internal_session_check(
+    ///     const struct z_owned_session_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_session_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
     internal static extern bool z_internal_session_check(ZOwnedSession* session);
 
+    /// void
+    /// z_internal_session_null(
+    ///     struct z_owned_session_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_session_null", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_internal_session_null(ZOwnedSession* session);
+    internal static extern void z_internal_session_null(nint session);
 
     [DllImport(DllName, EntryPoint = "z_internal_slice_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2555,13 +2590,23 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern ZResult z_mutex_unlock(ZLoanedMutex* mutex);
 
+    /// z_result_t
+    /// z_open(
+    ///     struct z_owned_session_t *this_,
+    ///     struct z_moved_config_t *config,
+    ///     const struct z_open_options_t *_options
+    /// )
     [DllImport(DllName, EntryPoint = "z_open", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_open(ZOwnedSession* session, ZMovedConfig* config, ZOpenOptions* options);
+    internal static extern ZResult z_open(nint session, nint config, nint options);
 
+    /// void
+    /// z_open_options_default(
+    ///     struct z_open_options_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_open_options_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_open_options_default(ZOpenOptions* options);
+    internal static extern void z_open_options_default(nint options);
 
     [DllImport(DllName, EntryPoint = "z_priority_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2915,18 +2960,30 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_session_drop(ZMovedSession* session);
 
+    /// bool
+    /// z_session_is_closed(
+    ///     const struct z_loaned_session_t *session
+    /// )
     [DllImport(DllName, EntryPoint = "z_session_is_closed", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_session_is_closed(ZLoanedSession* session);
+    internal static extern bool z_session_is_closed(nint session);
 
+    /// const struct z_loaned_session_t*
+    /// z_session_loan(
+    ///     const struct z_owned_session_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_session_loan", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedSession* z_session_loan(ZOwnedSession* session);
+    internal static extern nint z_session_loan(nint session);
 
+    /// struct z_loaned_session_t*
+    /// z_session_loan_mut(
+    ///     struct z_owned_session_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_session_loan_mut", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedSession* z_session_loan_mut(ZOwnedSession* session);
+    internal static extern nint z_session_loan_mut(nint session);
 
     [DllImport(DllName, EntryPoint = "z_sleep_s", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2952,9 +3009,13 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern byte* z_slice_data(ZLoanedSlice* slice);
 
+    /// void
+    /// z_slice_drop(
+    ///     struct z_moved_slice_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_slice_drop", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_slice_drop(ZMovedSlice* slice);
+    internal static extern void z_slice_drop(nint slice);
 
     /// void
     /// z_slice_empty(
@@ -2964,23 +3025,43 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_slice_empty(nint slice);
 
+    /// z_result_t
+    /// z_slice_from_buf(
+    ///     struct z_owned_slice_t *this_,
+    ///     uint8_t *data,
+    ///     size_t len,
+    ///     void (*drop)(void *data, void *context),
+    ///     void *context
+    /// )
     [DllImport(DllName, EntryPoint = "z_slice_from_buf", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     internal static extern ZResult z_slice_from_buf(
-        ZOwnedSlice* slice, byte* data, nuint len, delegate*<void*, void*, void> drop, void* context);
+        nint slice, nint data, nuint len, delegate*<void*, void*, void> drop, nint context);
 
+    /// bool
+    /// z_slice_is_empty(
+    ///     const struct z_loaned_slice_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_slice_is_empty", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_slice_is_empty(ZLoanedSlice* slice);
+    internal static extern bool z_slice_is_empty(nint slice);
 
+    /// size_t
+    /// z_slice_len(
+    ///     const struct z_loaned_slice_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_slice_len", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern nuint z_slice_len(ZLoanedSlice* slice);
+    internal static extern nuint z_slice_len(nint slice);
 
+    /// const struct z_loaned_slice_t*
+    /// z_slice_loan(
+    ///     const struct z_owned_slice_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_slice_loan", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedSlice* z_slice_loan(ZOwnedSlice* slice);
+    internal static extern nint z_slice_loan(nint slice);
 
     [DllImport(DllName, EntryPoint = "z_string_array_clone", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

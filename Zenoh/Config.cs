@@ -5,103 +5,90 @@ namespace Zenoh;
 
 public class Config : IDisposable
 {
-    // ZOwnedConfig
-    internal nint Handle { get; private set; }
-    private bool _disposed;
+    // z_owned_config*
+    internal nint HandleZOwnedConfig { get; private set; }
 
     private Config()
     {
     }
 
-    private Config(nint config, bool disposed)
+    private Config(nint config)
     {
-        Handle = config;
-        _disposed = disposed;
+        HandleZOwnedConfig = config;
     }
 
-    public Config(Config config)
+    public Config(Config source)
     {
-        var pLoanedConfig = ZenohC.z_config_loan(config.Handle);
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
-        ZenohC.z_config_clone(pOwnedConfig, pLoanedConfig);
+        ZenohC.z_internal_config_null(pOwnedConfig);
 
-        Handle = pOwnedConfig;
-        _disposed = false;
+        var pLoanedConfig = ZenohC.z_config_loan(source.HandleZOwnedConfig);
+        ZenohC.z_config_clone(pOwnedConfig, pLoanedConfig);
+        HandleZOwnedConfig = pOwnedConfig;
     }
 
     public static Config? Default()
     {
-        var p = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
-        var r = ZenohC.z_config_default(p);
-        if (r != ZResult.Ok)
-        {
-            Marshal.FreeHGlobal(p);
-            return null;
-        }
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
 
-        return new Config(p, false);
+        var r = ZenohC.z_config_default(pOwnedConfig);
+        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
     }
 
     public static Config? FromEnv()
     {
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
-        var r = ZenohC.zc_config_from_env(pOwnedConfig);
-        if (r != ZResult.Ok)
-        {
-            Marshal.FreeHGlobal(pOwnedConfig);
-            return null;
-        }
+        ZenohC.z_internal_config_null(pOwnedConfig);
 
-        return new Config(pOwnedConfig, false);
+        var r = ZenohC.zc_config_from_env(pOwnedConfig);
+        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
     }
 
     public static Config? FromFile(string path)
     {
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
         var pPath = Marshal.StringToHGlobalAnsi(path);
         var r = ZenohC.zc_config_from_file(pOwnedConfig, pPath);
-        if (r != ZResult.Ok)
-        {
-            Marshal.FreeHGlobal(pOwnedConfig);
-            Marshal.FreeHGlobal(pPath);
-            return null;
-        }
-
         Marshal.FreeHGlobal(pPath);
-        return new Config(pOwnedConfig, false);
+        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
     }
 
     public static Config? FromStr(string s)
     {
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
         var pS = Marshal.StringToHGlobalAnsi(s);
         var r = ZenohC.zc_config_from_str(pOwnedConfig, pS);
-        if (r != ZResult.Ok)
-        {
-            Marshal.FreeHGlobal(pOwnedConfig);
-            Marshal.FreeHGlobal(pS);
-            return null;
-        }
-
         Marshal.FreeHGlobal(pS);
-        return new Config(pOwnedConfig, false);
+        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
     }
 
-    void IDisposable.Dispose()
+    public void Dispose()
     {
-        if (_disposed) return;
+        if (HandleZOwnedConfig == nint.Zero) return;
 
-        ZenohC.z_config_drop(Handle);
-        Marshal.FreeHGlobal(Handle);
-        Handle = nint.Zero;
-        _disposed = true;
+        ZenohC.z_config_drop(HandleZOwnedConfig);
+        Marshal.FreeHGlobal(HandleZOwnedConfig);
+        HandleZOwnedConfig = nint.Zero;
     }
 
     public ZString? ToZString()
     {
         var zString = new ZString();
-        var pLoanedConfig = ZenohC.z_config_loan(Handle);
-        var r = ZenohC.zc_config_to_string(pLoanedConfig, zString.Handle);
-        return r != ZResult.Ok ? null : zString;
+        var pLoanedConfig = ZenohC.z_config_loan(HandleZOwnedConfig);
+        var r = ZenohC.zc_config_to_string(pLoanedConfig, zString.HandleZOwnedString);
+        return r == ZResult.Ok ? zString : null;
     }
 }
