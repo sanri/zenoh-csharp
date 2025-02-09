@@ -27,6 +27,14 @@ public sealed class OpenOptions : IDisposable
 
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~OpenOptions() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
         if (HandleZOpenOptions == nint.Zero) return;
 
         Marshal.FreeHGlobal(HandleZOpenOptions);
@@ -43,38 +51,56 @@ public sealed class Session : IDisposable
     {
         var pOwnedSession = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSession>());
         ZenohC.z_internal_session_null(pOwnedSession);
-        
+
         HandleZOwnedSession = pOwnedSession;
     }
-    
-    private Session(Session session){}
+
+    private Session(Session session)
+    {
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Session() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandleZOwnedSession == nint.Zero) return;
+
+        // TODO
+
+        Marshal.FreeHGlobal(HandleZOwnedSession);
+        HandleZOwnedSession = nint.Zero;
+    }
 
     /// <summary>
-    /// <para> Constructs and opens a new Zenoh session. </para>
-    /// <para>
-    ///     Calling this function repeatedly without closing the session will always return Ok.
-    ///     The newly passed configuration will not work.
-    /// </para>
+    /// Constructs and opens a new Zenoh session.
     /// </summary>
-    /// <param name="config"></param>
+    /// <param name="config">Zenoh session config</param>
     /// <param name="openOptions"></param>
     /// <returns>
     /// ZResult.Ok in case of success
     /// </returns>
     public ZResult Open(Config config, in OpenOptions openOptions)
     {
-        
-        var r=  ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
-        
+        return ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
     }
 
-    void IDisposable.Dispose()
+    /// <summary>
+    /// Checks if zenoh session is closed.
+    /// </summary>
+    /// <returns>
+    /// `true` if session is closed, `false` otherwise.
+    /// </returns>
+    public bool IsClosed()
     {
-        if (HandleZOwnedSession == nint.Zero) return;
-
-        Marshal.FreeHGlobal(HandleZOwnedSession);
-        HandleZOwnedSession = nint.Zero;
+        return ZenohC.z_session_is_closed(HandleZOwnedSession);
     }
+
 }
 
 public class OldSession : IDisposable

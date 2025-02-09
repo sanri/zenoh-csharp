@@ -33,6 +33,23 @@ public sealed class ZString : IDisposable
         HandleZOwnedString = pOwnedString;
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~ZString() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandleZOwnedString == nint.Zero) return;
+
+        ZenohC.z_string_drop(HandleZOwnedString);
+        Marshal.FreeHGlobal(HandleZOwnedString);
+        HandleZOwnedString = nint.Zero;
+    }
+
     public bool IsEmpty()
     {
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
@@ -53,14 +70,6 @@ public sealed class ZString : IDisposable
         return s ?? string.Empty;
     }
 
-    public void Dispose()
-    {
-        if (HandleZOwnedString == nint.Zero) return;
-
-        ZenohC.z_string_drop(HandleZOwnedString);
-        Marshal.FreeHGlobal(HandleZOwnedString);
-        HandleZOwnedString = nint.Zero;
-    }
 }
 
 public sealed class ZBytes : IDisposable
@@ -73,6 +82,23 @@ public sealed class ZBytes : IDisposable
         var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
         ZenohC.z_bytes_empty(pOwnedBytes);
         HandleZOwnedBytes = pOwnedBytes;
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    ~ZBytes() => Dispose(false);
+    
+    private void Dispose(bool disposing)
+    {
+        if (HandleZOwnedBytes == nint.Zero) return;
+
+        ZenohC.z_bytes_drop(HandleZOwnedBytes);
+        Marshal.FreeHGlobal(HandleZOwnedBytes);
+        HandleZOwnedBytes = nint.Zero;
     }
 
     public bool IsEmpty()
@@ -87,14 +113,6 @@ public sealed class ZBytes : IDisposable
         return ZenohC.z_bytes_len(pLoanedBytes);
     }
 
-    public void Dispose()
-    {
-        if (HandleZOwnedBytes == nint.Zero) return;
-
-        ZenohC.z_bytes_drop(HandleZOwnedBytes);
-        Marshal.FreeHGlobal(HandleZOwnedBytes);
-        HandleZOwnedBytes = nint.Zero;
-    }
 }
 
 public sealed class ZSlice : IDisposable
@@ -109,6 +127,23 @@ public sealed class ZSlice : IDisposable
         HandleZOwnedSlice = pOwnedSlice;
     }
 
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~ZSlice() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandleZOwnedSlice == nint.Zero) return;
+
+        ZenohC.z_slice_drop(HandleZOwnedSlice);
+        Marshal.FreeHGlobal(HandleZOwnedSlice);
+        HandleZOwnedSlice = nint.Zero;
+    }
+
     public bool IsEmpty()
     {
         var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
@@ -121,12 +156,4 @@ public sealed class ZSlice : IDisposable
         return ZenohC.z_slice_len(pLoanedSlice);
     }
 
-    public void Dispose()
-    {
-        if (HandleZOwnedSlice == nint.Zero) return;
-
-        ZenohC.z_slice_drop(HandleZOwnedSlice);
-        Marshal.FreeHGlobal(HandleZOwnedSlice);
-        HandleZOwnedSlice = nint.Zero;
-    }
 }

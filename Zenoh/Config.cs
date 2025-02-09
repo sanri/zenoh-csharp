@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-public class Config : IDisposable
+public sealed class Config : IDisposable
 {
     // z_owned_config*
     internal nint HandleZOwnedConfig { get; private set; }
@@ -76,6 +76,14 @@ public class Config : IDisposable
     }
 
     public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Config() => Dispose(false);
+
+    private void Dispose(bool disposing)
     {
         if (HandleZOwnedConfig == nint.Zero) return;
 

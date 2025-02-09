@@ -2390,7 +2390,7 @@ internal static unsafe class ZenohC
     [DllImport(DllName, EntryPoint = "z_internal_session_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_internal_session_check(ZOwnedSession* session);
+    internal static extern bool z_internal_session_check(nint session);
 
     /// void
     /// z_internal_session_null(
