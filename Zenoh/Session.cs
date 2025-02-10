@@ -237,7 +237,7 @@ public class OldSession : IDisposable
 
     public bool PutStr(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.TextPlain);
     }
 
@@ -248,7 +248,7 @@ public class OldSession : IDisposable
 
     public bool PutJson(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppJson);
     }
 
@@ -260,7 +260,7 @@ public class OldSession : IDisposable
     public bool PutInt(string key, long value, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         string s = value.ToString("G");
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppInteger);
     }
 
@@ -272,7 +272,7 @@ public class OldSession : IDisposable
     public bool PutFloat(string key, double value, ZCongestionControl zCongestionControl, ZPriority zPriority)
     {
         string s = value.ToString("G");
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppFloat);
     }
 
@@ -339,27 +339,27 @@ public class OldSession : IDisposable
 
     public bool PubStr(PublisherHandle handle, string value)
     {
-        byte[] data = Encoding.UTF8.GetBytes(value);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
         return _publisher_put(handle, data, ZEncodingPrefix.TextPlain);
     }
 
     public bool PubJson(PublisherHandle handle, string value)
     {
-        byte[] data = Encoding.UTF8.GetBytes(value);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
         return _publisher_put(handle, data, ZEncodingPrefix.AppJson);
     }
 
     public bool PubInt(PublisherHandle handle, long value)
     {
         string s = value.ToString("G");
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _publisher_put(handle, data, ZEncodingPrefix.AppInteger);
     }
 
     public bool PubFloat(PublisherHandle handle, double value)
     {
         string s = value.ToString("G");
-        byte[] data = Encoding.UTF8.GetBytes(s);
+        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
         return _publisher_put(handle, data, ZEncodingPrefix.AppFloat);
     }
 

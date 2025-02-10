@@ -1073,9 +1073,10 @@ internal struct ZScoutOptions
 // zenoh_commons.h
 // z_publisher_options_t 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZPublisherOptions
+internal struct ZPublisherOptions
 {
-    internal ZMovedEncoding* encoding;
+    // z_moved_encoding_t*
+    internal nint encoding;
     internal ZCongestionControl ZCongestionControl;
     internal ZPriority ZPriority;
     [MarshalAs(UnmanagedType.U1)] internal bool is_express;
@@ -1760,235 +1761,461 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_delete_options_default(ZDeleteOptions* options);
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_cbor(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_cbor", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_cbor();
+    internal static extern nint z_encoding_application_cbor();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_cdr(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_cdr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_cdr();
+    internal static extern nint z_encoding_application_cdr();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_coap_payload(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_coap_payload", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_coap_payload();
+    internal static extern nint z_encoding_application_coap_payload();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_java_serialized_object(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_java_serialized_object",
         CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_java_serialized_object();
+    internal static extern nint z_encoding_application_java_serialized_object();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_json(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_json", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_json();
+    internal static extern nint z_encoding_application_json();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_json_patch_json(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_json_patch_json",
         CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_json_patch_json();
+    internal static extern nint z_encoding_application_json_patch_json();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_json_seq(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_json_seq", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_json_seq();
+    internal static extern nint z_encoding_application_json_seq();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_jsonpath(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_jsonpath", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_jsonpath();
+    internal static extern nint z_encoding_application_jsonpath();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_jwt(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_jwt", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_jwt();
+    internal static extern nint z_encoding_application_jwt();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_mp4(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_mp4", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_mp4();
+    internal static extern nint z_encoding_application_mp4();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_octet_stream(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_octet_stream", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_octet_stream();
+    internal static extern nint z_encoding_application_octet_stream();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_openmetrics_text(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_openmetrics_text",
         CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_openmetrics_text();
+    internal static extern nint z_encoding_application_openmetrics_text();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_protobuf(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_protobuf", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_protobuf();
+    internal static extern nint z_encoding_application_protobuf();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_python_serialized_object(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_python_serialized_object",
         CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_python_serialized_object();
+    internal static extern nint z_encoding_application_python_serialized_object();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_soap_xml(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_soap_xml", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_soap_xml();
+    internal static extern nint z_encoding_application_soap_xml();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_sql(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_sql", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_sql();
+    internal static extern nint z_encoding_application_sql();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_x_www_form_urlencoded(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_x_www_form_urlencoded",
         CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_x_www_form_urlencoded();
+    internal static extern nint z_encoding_application_x_www_form_urlencoded();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_xml(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_xml", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_xml();
+    internal static extern nint z_encoding_application_xml();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_yaml(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_yaml", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_yaml();
+    internal static extern nint z_encoding_application_yaml();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_application_yang(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_application_yang", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_application_yang();
+    internal static extern nint z_encoding_application_yang();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_audio_aac(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_audio_aac", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_audio_aac();
+    internal static extern nint z_encoding_audio_aac();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_audio_flac(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_audio_flac", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_audio_flac();
+    internal static extern nint z_encoding_audio_flac();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_audio_mp4(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_audio_mp4", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_audio_mp4();
+    internal static extern nint z_encoding_audio_mp4();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_audio_ogg(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_audio_ogg", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_audio_ogg();
+    internal static extern nint z_encoding_audio_ogg();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_audio_vorbis(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_audio_vorbis", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_audio_vorbis();
+    internal static extern nint z_encoding_audio_vorbis();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_image_bmp(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_image_bmp", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_image_bmp();
+    internal static extern nint z_encoding_image_bmp();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_image_gif(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_image_gif", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_image_gif();
+    internal static extern nint z_encoding_image_gif();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_image_jpeg(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_image_jpeg", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_image_jpeg();
+    internal static extern nint z_encoding_image_jpeg();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_image_png(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_image_png", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_image_png();
+    internal static extern nint z_encoding_image_png();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_image_webp(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_image_webp", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_image_webp();
+    internal static extern nint z_encoding_image_webp();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_css(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_css", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_css();
+    internal static extern nint z_encoding_text_css();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_csv(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_csv", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_csv();
+    internal static extern nint z_encoding_text_csv();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_html(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_html", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_html();
+    internal static extern nint z_encoding_text_html();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_javascript(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_javascript", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_javascript();
+    internal static extern nint z_encoding_text_javascript();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_json(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_json", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_json();
+    internal static extern nint z_encoding_text_json();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_json5(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_json5", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_json5();
+    internal static extern nint z_encoding_text_json5();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_markdown(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_markdown", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_markdown();
+    internal static extern nint z_encoding_text_markdown();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_plain(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_plain", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_plain();
+    internal static extern nint z_encoding_text_plain();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_xml(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_xml", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_xml();
+    internal static extern nint z_encoding_text_xml();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_text_yaml(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_text_yaml", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_text_yaml();
+    internal static extern nint z_encoding_text_yaml();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_h261(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_h261", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_h261();
+    internal static extern nint z_encoding_video_h261();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_h263(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_h263", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_h263();
+    internal static extern nint z_encoding_video_h263();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_h264(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_h264", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_h264();
+    internal static extern nint z_encoding_video_h264();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_h265(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_h265", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_h265();
+    internal static extern nint z_encoding_video_h265();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_h266(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_h266", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_h266();
+    internal static extern nint z_encoding_video_h266();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_mp4(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_mp4", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_mp4();
+    internal static extern nint z_encoding_video_mp4();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_ogg(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_ogg", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_ogg();
+    internal static extern nint z_encoding_video_ogg();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_video_raw(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_raw", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_raw();
+    internal static extern nint z_encoding_video_raw();
 
+    /// const struct z_loaned_encoding_t *
+    /// z_encoding_video_vp8(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_vp8", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_vp8();
+    internal static extern nint z_encoding_video_vp8();
 
+    /// const struct z_loaned_encoding_t *
+    /// z_encoding_video_vp9(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_video_vp9", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_video_vp9();
+    internal static extern nint z_encoding_video_vp9();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_zenoh_bytes(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_zenoh_bytes", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_zenoh_bytes();
+    internal static extern nint z_encoding_zenoh_bytes();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_zenoh_serialized(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_zenoh_serialized", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_zenoh_serialized();
+    internal static extern nint z_encoding_zenoh_serialized();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_zenoh_string(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_zenoh_string", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_zenoh_string();
+    internal static extern nint z_encoding_zenoh_string();
 
+    /// void
+    /// z_encoding_clone(
+    ///     struct z_owned_encoding_t *dst,
+    ///     const struct z_loaned_encoding_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_clone", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_encoding_clone(ZOwnedEncoding* dst, ZLoanedEncoding* src);
+    internal static extern void z_encoding_clone(nint dst, nint src);
 
+    /// void
+    /// z_encoding_drop(
+    ///     struct z_moved_encoding_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_drop", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_encoding_drop(ZMovedEncoding* encoding);
+    internal static extern void z_encoding_drop(nint encoding);
 
+    /// bool
+    /// z_encoding_equals(
+    ///     const struct z_loaned_encoding_t *this_,
+    ///     const struct z_loaned_encoding_t *other
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_equals", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_encoding_equals(ZLoanedEncoding* encoding, ZLoanedEncoding* other);
+    internal static extern bool z_encoding_equals(nint encoding, nint other);
 
     [DllImport(DllName, EntryPoint = "z_encoding_from_str", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -1998,29 +2225,57 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern ZResult z_encoding_from_substr(ZOwnedEncoding* encoding, byte* s, nuint len);
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_loan_default(
+    ///     void
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_loan_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_loan_default();
+    internal static extern nint z_encoding_loan_default();
 
+    /// const struct z_loaned_encoding_t*
+    /// z_encoding_loan(
+    ///     const struct z_owned_encoding_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_loan", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_loan(ZOwnedEncoding* encoding);
+    internal static extern nint z_encoding_loan(nint encoding);
 
+    /// struct z_loaned_encoding_t*
+    /// z_encoding_loan_mut(
+    ///     struct z_owned_encoding_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_loan_mut", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_encoding_loan_mut(ZOwnedEncoding* encoding);
+    internal static extern nint z_encoding_loan_mut(nint encoding);
 
+    /// z_result_t
+    /// z_encoding_set_schema_from_str(
+    ///     struct z_loaned_encoding_t *this_,
+    ///     const char *s
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_set_schema_from_str", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_encoding_set_schema_from_str(ZLoanedEncoding* encoding, byte* s);
+    internal static extern ZResult z_encoding_set_schema_from_str(nint encoding, nint s);
 
+    /// z_result_t
+    /// z_encoding_set_schema_from_substr(
+    ///     struct z_loaned_encoding_t *this_,
+    ///     const char *s,
+    ///     size_t len
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_set_schema_from_substr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_encoding_set_schema_from_substr(ZLoanedEncoding* encoding, byte* s, nuint len);
+    internal static extern ZResult z_encoding_set_schema_from_substr(nint encoding, nint s, nuint len);
 
+    /// void
+    /// z_encoding_to_string(
+    ///     const struct z_loaned_encoding_t *this_,
+    ///     struct z_owned_string_t *out_str
+    /// )
     [DllImport(DllName, EntryPoint = "z_encoding_to_string", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_encoding_to_string(ZLoanedEncoding* encoding, ZOwnedString* outStr);
+    internal static extern void z_encoding_to_string(nint encoding, nint outStr);
 
     [DllImport(DllName, EntryPoint = "z_fifo_channel_query_new", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2636,9 +2891,13 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern ZLoanedPublisher* z_publisher_loan_mut(ZOwnedPublisher* publisher);
 
+    /// void
+    /// z_publisher_put_options_default(
+    ///     struct z_publisher_put_options_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_publisher_options_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_publisher_options_default(ZPublisherOptions* options);
+    internal static extern void z_publisher_options_default(nint options);
 
     [DllImport(DllName, EntryPoint = "z_publisher_put", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

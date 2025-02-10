@@ -146,27 +146,27 @@ public class Query
 
     public bool ReplyStr(string key, string value)
     {
-        byte[] payload = Encoding.UTF8.GetBytes(value);
+        byte[] payload = System.Text.Encoding.UTF8.GetBytes(value);
         return Reply(key, payload, ZEncodingPrefix.TextPlain, null);
     }
 
     public bool ReplyJson(string key, string value)
     {
-        byte[] payload = Encoding.UTF8.GetBytes(value);
+        byte[] payload = System.Text.Encoding.UTF8.GetBytes(value);
         return Reply(key, payload, ZEncodingPrefix.AppJson, null);
     }
 
     public bool ReplyInt(string key, long value)
     {
         string s = value.ToString("G");
-        byte[] payload = Encoding.UTF8.GetBytes(s);
+        byte[] payload = System.Text.Encoding.UTF8.GetBytes(s);
         return Reply(key, payload, ZEncodingPrefix.AppInteger, null);
     }
 
     public bool ReplyFloat(string key, double value)
     {
         string s = value.ToString("G");
-        byte[] payload = Encoding.UTF8.GetBytes(s);
+        byte[] payload = System.Text.Encoding.UTF8.GetBytes(s);
         return Reply(key, payload, ZEncodingPrefix.AppFloat, null);
     }
 }

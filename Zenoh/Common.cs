@@ -15,10 +15,10 @@ public sealed class ZString : IDisposable
         HandleZOwnedString = pOwnedString;
     }
 
-    public ZString(ZString src)
+    public ZString(ZString other)
     {
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
-        var pLoanedString = ZenohC.z_string_loan(src.HandleZOwnedString);
+        var pLoanedString = ZenohC.z_string_loan(other.HandleZOwnedString);
         ZenohC.z_string_clone(pOwnedString, pLoanedString);
         HandleZOwnedString = pOwnedString;
     }
@@ -62,19 +62,19 @@ public sealed class ZString : IDisposable
         return ZenohC.z_string_len(pLoanedString);
     }
 
-    public override string ToString()
+    public override string? ToString()
     {
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         var pS = ZenohC.z_string_data(pLoanedString);
         var s = Marshal.PtrToStringAnsi(pS);
-        return s ?? string.Empty;
+        return s;
     }
 
 }
 
 public sealed class ZBytes : IDisposable
 {
-    // z_owned_bytes*
+    // z_owned_bytes_t*
     internal nint HandleZOwnedBytes { get; private set; }
 
     public ZBytes()
@@ -117,7 +117,7 @@ public sealed class ZBytes : IDisposable
 
 public sealed class ZSlice : IDisposable
 {
-    // z_owned_slice*
+    // z_owned_slice_t*
     internal nint HandleZOwnedSlice { get; private set; }
 
     public ZSlice()

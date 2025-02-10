@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using CommandLine;
 using Zenoh;
+using Encoding = System.Text.Encoding;
 
 namespace ZGet;
 

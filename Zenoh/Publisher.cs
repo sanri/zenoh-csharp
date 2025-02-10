@@ -3,44 +3,57 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-public struct PublisherHandle
-{
-    internal int handle;
-}
 
-public class Publisher : IDisposable
+public sealed class PublisherOptions : IDisposable
 {
-    internal unsafe ZOwnedPublisher* ownedPublisher;
-    internal readonly ZPublisherOptions options;
-    internal readonly string keyexpr;
-    private bool _disposed;
+    // z_publisher_options_t*
+    internal nint HandleZPublisherOptions { get; private set; }
 
-    public Publisher(string key) : this(key, ZCongestionControl.Block, ZPriority.RealTime)
+    public PublisherOptions()
     {
+        var pPublisherOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZPublisherOptions>());
+        ZenohC.z_publisher_options_default(pPublisherOptions);
+        HandleZPublisherOptions = pPublisherOptions;
     }
 
-    public Publisher(string key, ZCongestionControl control, ZPriority zPriority)
+    public PublisherOptions(PublisherOptions other)
     {
-        unsafe
-        {
-            keyexpr = key;
-            _disposed = false;
-            ownedPublisher = null;
-            options.ZCongestionControl = control;
-            options.ZPriority = zPriority;
-        }
+        
     }
-
-    public void Dispose() => Dispose(true);
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    ~PublisherOptions() => Dispose(false);
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
-        unsafe
-        {
-            Marshal.FreeHGlobal((nint)ownedPublisher);
-        }
+        // todo
+    }
+}
 
-        _disposed = true;
+
+public sealed class Publisher : IDisposable
+{
+    // z_owned_publisher_t*
+    internal nint HandleZOwnedPublisher { get; private set; }
+    
+    private Publisher(){}
+    
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Publisher() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        // todo
     }
 }
