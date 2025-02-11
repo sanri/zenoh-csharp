@@ -69,7 +69,41 @@ public sealed class ZString : IDisposable
         var s = Marshal.PtrToStringAnsi(pS);
         return s;
     }
+}
 
+internal sealed class ViewString : IDisposable
+{
+    internal nint HandleViewString { get; private set; }
+
+    public ViewString()
+    {
+        var pViewString = Marshal.AllocHGlobal(Marshal.SizeOf<ZViewString>());
+        ZenohC.z_view_string_empty(pViewString);
+        HandleViewString = pViewString;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~ViewString() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandleViewString == nint.Zero) return;
+
+        Marshal.FreeHGlobal(HandleViewString);
+        HandleViewString = nint.Zero;
+    }
+
+    public override string? ToString()
+    {
+        var pLoanedString = ZenohC.z_view_string_loan(HandleViewString);
+        var pS = ZenohC.z_string_data(pLoanedString);
+        return Marshal.PtrToStringAnsi(pS);
+    }
 }
 
 public sealed class ZBytes : IDisposable

@@ -317,4 +317,18 @@ public sealed class Encoding : IDisposable
         return r;
     }
 
+    public string GetSchema()
+    {
+        var pLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
+        var encodingData = ZenohC.zc_internal_encoding_get_data(pLoanedEncoding);
+        return Marshal.PtrToStringAnsi(encodingData.schema_ptr, (int)encodingData.schema_len);
+    }
+
+    public EncodingId GetEncodingId()
+    {
+        var pLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
+        var encodingData = ZenohC.zc_internal_encoding_get_data(pLoanedEncoding);
+        return (EncodingId)encodingData.id;
+    }
+
 }
