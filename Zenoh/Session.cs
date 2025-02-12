@@ -85,7 +85,7 @@ public sealed class Session : IDisposable
     /// <returns>
     /// ZResult.Ok in case of success
     /// </returns>
-    public ZResult Open(Config config, in OpenOptions openOptions)
+    public ZResult Open(Config config, OpenOptions openOptions)
     {
         return ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
     }
@@ -100,6 +100,39 @@ public sealed class Session : IDisposable
     {
         return ZenohC.z_session_is_closed(HandleZOwnedSession);
     }
+
+    /// <summary>
+    /// Constructs and declares a publisher for the given key expression.
+    /// </summary>
+    /// <param name="keyexpr">The key expression to publish</param>
+    /// <param name="options">Additional options for the publisher.</param>
+    /// <returns></returns>
+    public Publisher? DeclarePublisher(Keyexpr keyexpr, PublisherOptions options)
+    {
+        if (IsClosed()) return null;
+        
+        var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
+        var pOwnedPublisher = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedPublisher>());
+        var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
+        var pPublisherOptions = options.AllocUnmanagedMem();
+
+        Publisher? o;
+        var r = ZenohC.z_declare_publisher(pLoanedSession, pOwnedPublisher, pLoanedKeyexpr, pPublisherOptions);
+        if (r == ZResult.Ok)
+        {
+            o = new Publisher(pOwnedPublisher);
+        }
+        else
+        {
+            ZenohC.z_publisher_drop(pOwnedPublisher);
+            Marshal.FreeHGlobal(pOwnedPublisher);
+            o = null;
+        }
+
+        PublisherOptions.FreeUnmanagedMem(pPublisherOptions);
+        return o;
+    }
+
 
 }
 

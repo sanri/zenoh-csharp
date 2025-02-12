@@ -1093,11 +1093,14 @@ internal unsafe struct ZPublisherDeleteOptions
 // zenoh_commons.h
 // z_publisher_put_options_t 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZPublisherPutOptions
+internal struct ZPublisherPutOptions
 {
-    internal ZMovedEncoding* encoding;
-    internal ZTimestamp* timestamp;
-    internal ZMovedBytes* attachment;
+    // z_moved_encoding_t*
+    internal nint encoding;
+    // z_timestamp_t*
+    internal nint timestamp;
+    // z_moved_bytes_t*
+    internal nint attachment;
 }
 
 // zenoh_commons.h
@@ -1734,14 +1737,16 @@ internal static unsafe class ZenohC
         ZLoanedKeyexpr* keyexpr
     );
 
+    /// z_result_t
+    /// z_declare_publisher(
+    ///     const struct z_loaned_session_t *session,
+    ///     struct z_owned_publisher_t *publisher,
+    ///     const struct z_loaned_keyexpr_t *key_expr,
+    ///     struct z_publisher_options_t *options
+    /// )
     [DllImport(DllName, EntryPoint = "z_declare_publisher", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_declare_publisher(
-        ZLoanedSession* session,
-        ZOwnedPublisher* publisher,
-        ZLoanedKeyexpr* keyexpr,
-        ZPublisherOptions* options
-    );
+    internal static extern ZResult z_declare_publisher(nint session, nint publisher, nint keyexpr, nint options);
 
     [DllImport(DllName, EntryPoint = "z_declare_queryable", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -2582,14 +2587,22 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_internal_mutex_null(ZOwnedMutex* mutex);
 
+    /// bool
+    /// z_internal_publisher_check(
+    ///     const struct z_owned_publisher_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_publisher_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_internal_publisher_check(ZOwnedPublisher* publisher);
+    internal static extern bool z_internal_publisher_check(nint publisher);
 
+    /// void
+    /// z_internal_publisher_null(
+    ///     struct z_owned_publisher_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_internal_publisher_null", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_internal_publisher_null(ZOwnedPublisher* publisher);
+    internal static extern void z_internal_publisher_null(nint publisher);
 
     [DllImport(DllName, EntryPoint = "z_internal_query_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -3005,7 +3018,7 @@ internal static unsafe class ZenohC
     /// )
     [DllImport(DllName, EntryPoint = "z_publisher_keyexpr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedKeyexpr* z_publisher_keyexpr(ZLoanedPublisher* publisher);
+    internal static extern nint z_publisher_keyexpr(nint publisher);
 
     /// const struct z_loaned_publisher_t*
     /// z_publisher_loan(
@@ -3640,26 +3653,43 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern byte* z_time_now_as_str(byte* buf, nuint len);
 
+    /// struct z_id_t
+    /// z_timestamp_id(
+    ///     const struct z_timestamp_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_timestamp_id", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZId z_timestamp_id(ZTimestamp* timestamp);
+    internal static extern ZId z_timestamp_id(nint timestamp);
 
+    /// z_result_t
+    /// z_timestamp_new(
+    ///     struct z_timestamp_t *this_,
+    ///     const struct z_loaned_session_t *session
+    /// )
     [DllImport(DllName, EntryPoint = "z_timestamp_new", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_timestamp_new(ZTimestamp* timestamp, ZLoanedSession* session);
+    internal static extern ZResult z_timestamp_new(nint timestamp, nint session);
 
+    /// uint64_t
+    /// z_timestamp_ntp64_time(
+    ///     const struct z_timestamp_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_timestamp_ntp64_time", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U8)]
-    internal static extern ulong z_timestamp_ntp64_time(ZTimestamp* timestamp);
+    internal static extern ulong z_timestamp_ntp64_time(nint timestamp);
 
     [DllImport(DllName, EntryPoint = "z_undeclare_keyexpr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     internal static extern ZResult z_undeclare_keyexpr(ZLoanedSession* session, ZMovedKeyexpr* keyexpr);
 
+    /// z_result_t
+    /// z_undeclare_publisher(
+    ///     struct z_moved_publisher_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_undeclare_publisher", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZResult z_undeclare_publisher(ZMovedPublisher* publisher);
+    internal static extern ZResult z_undeclare_publisher(nint publisher);
 
     [DllImport(DllName, EntryPoint = "z_undeclare_queryable", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

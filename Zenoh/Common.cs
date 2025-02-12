@@ -17,6 +17,11 @@ public sealed class ZString : IDisposable
 
     public ZString(ZString other)
     {
+        if (other.HandleZOwnedString == nint.Zero)
+        {
+            throw new ArgumentException("Object 'other' has been destroyed");
+        }
+        
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
         var pLoanedString = ZenohC.z_string_loan(other.HandleZOwnedString);
         ZenohC.z_string_clone(pOwnedString, pLoanedString);
@@ -190,4 +195,55 @@ public sealed class ZSlice : IDisposable
         return ZenohC.z_slice_len(pLoanedSlice);
     }
 
+}
+
+public sealed class Timestamp : IDisposable
+{
+    // z_timestamp_t*
+    internal nint HandleTimestamp { get; private set; }
+    
+    private Timestamp(){}
+
+    internal Timestamp(nint handle)
+    {
+        HandleTimestamp = handle;
+    }
+
+    public Timestamp(Timestamp other)
+    {
+        if (other.HandleTimestamp == nint.Zero)
+        {
+            throw new ArgumentException("Object 'other' has been destroyed");
+        }
+
+        var timestamp = Marshal.PtrToStructure<ZTimestamp>(other.HandleTimestamp);
+        var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
+        Marshal.StructureToPtr(timestamp, pTimestamp, false);
+        HandleTimestamp = pTimestamp;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    ~Timestamp() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandleTimestamp == nint.Zero) return;
+        
+        Marshal.FreeHGlobal(HandleTimestamp);
+        HandleTimestamp = nint.Zero;
+    }
+
+    public byte[] Id()
+    {
+        if (HandleTimestamp == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
+    }
 }

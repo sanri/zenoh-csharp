@@ -19,10 +19,23 @@ public sealed class Keyexpr : IDisposable
 
     public Keyexpr(Keyexpr other)
     {
+        if (other.HandleZOwnedKeyexpr == nint.Zero)
+        {
+            throw new ArgumentException("Object 'other' has been destroyed");
+        }
+
         var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
         var pOtherKeyexpr = ZenohC.z_keyexpr_loan(other.HandleZOwnedKeyexpr);
         ZenohC.z_keyexpr_clone(pOwnedKeyexpr, pOtherKeyexpr);
         HandleZOwnedKeyexpr = pOwnedKeyexpr;
+    }
+
+    /// <param name="other">z_loaned_keyexpr*</param>
+    internal static Keyexpr FromLoanedKeyexpr(nint other)
+    {
+        var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
+        ZenohC.z_keyexpr_clone(pOwnedKeyexpr,other);
+        return new Keyexpr(pOwnedKeyexpr);
     }
 
     public static Keyexpr? Create(string keyexpr)

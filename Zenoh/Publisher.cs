@@ -127,14 +127,29 @@ public sealed class PublisherOptions : IDisposable
 
 }
 
+public sealed class PublisherPutOptions : IDisposable
+{
+    public void Dispose()
+    {
+        // todo
+    }
+}
 
 public sealed class Publisher : IDisposable
 {
     // z_owned_publisher_t*
     internal nint HandleZOwnedPublisher { get; private set; }
+
+    private Publisher()
+    {
+    }
+
+    internal Publisher(nint handle)
+    {
+        HandleZOwnedPublisher = handle;
+    }
     
-    private Publisher(){}
-    
+    private Publisher(Publisher other){}
 
     public void Dispose()
     {
@@ -146,6 +161,24 @@ public sealed class Publisher : IDisposable
 
     private void Dispose(bool disposing)
     {
+        if (HandleZOwnedPublisher == nint.Zero) return;
+
+        ZenohC.z_publisher_drop(HandleZOwnedPublisher);
+        Marshal.FreeHGlobal(HandleZOwnedPublisher);
+        HandleZOwnedPublisher = IntPtr.Zero;
+    }
+
+
+    public Keyexpr GetKeyexpr()
+    {
+        var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
+        var pLoanedKeyexpr = ZenohC.z_publisher_keyexpr(pLoanedPublisher);
+        return Keyexpr.FromLoanedKeyexpr(pLoanedKeyexpr);
+    }
+
+    public ZResult Put()
+    {
         // todo
     }
+
 }
