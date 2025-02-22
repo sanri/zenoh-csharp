@@ -57,18 +57,33 @@ public sealed class ZString : IDisposable
 
     public bool IsEmpty()
     {
+        if (HandleZOwnedString == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_is_empty(pLoanedString);
     }
 
     public nuint Length()
     {
+        if (HandleZOwnedString == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_len(pLoanedString);
     }
 
     public override string? ToString()
     {
+        if (HandleZOwnedString == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         var pS = ZenohC.z_string_data(pLoanedString);
         var s = Marshal.PtrToStringAnsi(pS);
@@ -105,6 +120,11 @@ internal sealed class ViewString : IDisposable
 
     public override string? ToString()
     {
+        if (HandleViewString == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
         var pLoanedString = ZenohC.z_view_string_loan(HandleViewString);
         var pS = ZenohC.z_string_data(pLoanedString);
         return Marshal.PtrToStringAnsi(pS);
@@ -140,14 +160,26 @@ public sealed class ZBytes : IDisposable
         HandleZOwnedBytes = nint.Zero;
     }
 
+    internal void CheckDisposed()
+    {
+        if (HandleZOwnedBytes == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+    }
+
     public bool IsEmpty()
     {
+        CheckDisposed();
+        
         var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
         return ZenohC.z_bytes_is_empty(pLoanedBytes);
     }
 
     public nuint Length()
     {
+        CheckDisposed();
+        
         var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
         return ZenohC.z_bytes_len(pLoanedBytes);
     }
@@ -185,12 +217,22 @@ public sealed class ZSlice : IDisposable
 
     public bool IsEmpty()
     {
+        if (HandleZOwnedSlice == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
         var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
         return ZenohC.z_slice_is_empty(pLoanedSlice);
     }
 
     public nuint Length()
     {
+        if (HandleZOwnedSlice == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+        
         var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
         return ZenohC.z_slice_len(pLoanedSlice);
     }
@@ -201,8 +243,10 @@ public sealed class Timestamp : IDisposable
 {
     // z_timestamp_t*
     internal nint HandleTimestamp { get; private set; }
-    
-    private Timestamp(){}
+
+    private Timestamp()
+    {
+    }
 
     internal Timestamp(nint handle)
     {
@@ -227,13 +271,13 @@ public sealed class Timestamp : IDisposable
         Dispose(true);
         GC.SuppressFinalize(this);
     }
-    
+
     ~Timestamp() => Dispose(false);
 
     private void Dispose(bool disposing)
     {
         if (HandleTimestamp == nint.Zero) return;
-        
+
         Marshal.FreeHGlobal(HandleTimestamp);
         HandleTimestamp = nint.Zero;
     }
@@ -244,6 +288,18 @@ public sealed class Timestamp : IDisposable
         {
             throw new ArgumentException("Object has been destroyed");
         }
-        
+
+        var zid = ZenohC.z_timestamp_id(HandleTimestamp);
+        return zid.GetId();
+    }
+
+    public ulong Ntp64Time()
+    {
+        if (HandleTimestamp == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
+        return ZenohC.z_timestamp_ntp64_time(HandleTimestamp);
     }
 }

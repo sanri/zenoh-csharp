@@ -87,6 +87,11 @@ public sealed class Session : IDisposable
     /// </returns>
     public ZResult Open(Config config, OpenOptions openOptions)
     {
+        if (HandleZOwnedSession == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
         return ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
     }
 
@@ -98,7 +103,37 @@ public sealed class Session : IDisposable
     /// </returns>
     public bool IsClosed()
     {
+        if (HandleZOwnedSession == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
         return ZenohC.z_session_is_closed(HandleZOwnedSession);
+    }
+
+    /// <summary>
+    /// Create uhlc timestamp from session id.
+    /// </summary>
+    /// <returns></returns>
+    public Timestamp? NewTimestamp()
+    {
+        if (IsClosed()) return null;
+
+        var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
+        var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
+        var r = ZenohC.z_timestamp_new(pTimestamp, pLoanedSession);
+        Timestamp? o;
+        if (r == ZResult.Ok)
+        {
+            o = new Timestamp(pTimestamp);
+        }
+        else
+        {
+            Marshal.FreeHGlobal(pTimestamp);
+            o = null;
+        }
+
+        return o;
     }
 
     /// <summary>

@@ -520,6 +520,17 @@ internal struct ZMovedClosureSample
 internal unsafe struct ZId
 {
     private fixed byte id[16];
+
+    internal byte[] GetId()
+    {
+        var o = new byte[16];
+        for (var i = 0; i < 16; i++)
+        {
+            o[i] = id[i];
+        }
+
+        return o;
+    }
 }
 
 // zenoh_commons.h
@@ -3037,8 +3048,8 @@ internal static unsafe class ZenohC
     internal static extern nint z_publisher_loan_mut(nint publisher);
 
     /// void
-    /// z_publisher_put_options_default(
-    ///     struct z_publisher_put_options_t *this_
+    /// z_publisher_options_default(
+    ///     struct z_publisher_options_t *this_
     /// )
     [DllImport(DllName, EntryPoint = "z_publisher_options_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

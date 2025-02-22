@@ -129,9 +129,69 @@ public sealed class PublisherOptions : IDisposable
 
 public sealed class PublisherPutOptions : IDisposable
 {
+    // z_publisher_put_options_t*
+    internal nint HandlePublisherPutOptions { get; private set; }
+    private Encoding? _encoding;
+    private Timestamp? _timestamp;
+    private ZBytes? _attachment;
+
+    public PublisherPutOptions()
+    {
+        var pPublisherPutOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZPublisherPutOptions>());
+        ZenohC.z_publisher_options_default(pPublisherPutOptions);
+        HandlePublisherPutOptions = pPublisherPutOptions;
+        _encoding = null;
+        _timestamp = null;
+        _attachment = null;
+    }
+
     public void Dispose()
     {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~PublisherPutOptions() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (HandlePublisherPutOptions == nint.Zero) return;
+
+        if (disposing)
+        {
+            _encoding?.Dispose();
+            _encoding = null;
+            _timestamp?.Dispose();
+            _timestamp = null;
+            _attachment?.Dispose();
+            _attachment = null;
+        }
+        
+        Marshal.FreeHGlobal(HandlePublisherPutOptions);
+        HandlePublisherPutOptions = nint.Zero;
+    }
+
+    internal void CheckDisposed()
+    {
+        if (HandlePublisherPutOptions == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+    }
+
+    public void SetEncoding(Encoding? encoding)
+    {
+        CheckDisposed();
+        
         // todo
+        
+        // if (encoding is null)
+        // {
+        //     _encoding = null;
+        //     return;
+        // }
+        //
+        // var zPublisherPutOptions = Marshal.PtrToStructure<ZPublisherPutOptions>(HandlePublisherPutOptions);
     }
 }
 
@@ -148,8 +208,10 @@ public sealed class Publisher : IDisposable
     {
         HandleZOwnedPublisher = handle;
     }
-    
-    private Publisher(Publisher other){}
+
+    private Publisher(Publisher other)
+    {
+    }
 
     public void Dispose()
     {
@@ -168,9 +230,21 @@ public sealed class Publisher : IDisposable
         HandleZOwnedPublisher = IntPtr.Zero;
     }
 
+    /// <summary>
+    /// Undeclare the publisher and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
+    {
+        Dispose();
+    }
 
     public Keyexpr GetKeyexpr()
     {
+        if (HandleZOwnedPublisher == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
         var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
         var pLoanedKeyexpr = ZenohC.z_publisher_keyexpr(pLoanedPublisher);
         return Keyexpr.FromLoanedKeyexpr(pLoanedKeyexpr);
@@ -178,6 +252,11 @@ public sealed class Publisher : IDisposable
 
     public ZResult Put()
     {
+        if (HandleZOwnedPublisher == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+
         // todo
     }
 
