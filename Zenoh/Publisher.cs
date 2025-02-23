@@ -145,6 +145,30 @@ public sealed class PublisherPutOptions : IDisposable
         _attachment = null;
     }
 
+    public PublisherPutOptions(PublisherPutOptions other)
+    {
+        other.CheckDisposed();
+
+        var pPublisherPutOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZPublisherPutOptions>());
+        ZPublisherPutOptions zPublisherPutOptions;
+
+        var encoding = other.GetEncoding();
+        zPublisherPutOptions.encoding = encoding?.HandleZOwnedEncoding ?? nint.Zero;
+
+        var timestamp = other.GetTimestamp();
+        zPublisherPutOptions.timestamp = timestamp?.HandleTimestamp ?? nint.Zero;
+
+        var attachment = other.GetAttachment();
+        zPublisherPutOptions.attachment = attachment?.HandleZOwnedBytes ?? nint.Zero;
+
+        Marshal.StructureToPtr(zPublisherPutOptions, pPublisherPutOptions, false);
+
+        HandlePublisherPutOptions = pPublisherPutOptions;
+        _encoding = encoding;
+        _timestamp = timestamp;
+        _attachment = attachment;
+    }
+
     public void Dispose()
     {
         Dispose(true);
@@ -166,7 +190,7 @@ public sealed class PublisherPutOptions : IDisposable
             _attachment?.Dispose();
             _attachment = null;
         }
-        
+
         Marshal.FreeHGlobal(HandlePublisherPutOptions);
         HandlePublisherPutOptions = nint.Zero;
     }
@@ -182,17 +206,82 @@ public sealed class PublisherPutOptions : IDisposable
     public void SetEncoding(Encoding? encoding)
     {
         CheckDisposed();
-        
-        // todo
-        
-        // if (encoding is null)
-        // {
-        //     _encoding = null;
-        //     return;
-        // }
-        //
-        // var zPublisherPutOptions = Marshal.PtrToStructure<ZPublisherPutOptions>(HandlePublisherPutOptions);
+
+        var zPublisherPutOptions = Marshal.PtrToStructure<ZPublisherPutOptions>(HandlePublisherPutOptions);
+
+        if (encoding is null)
+        {
+            zPublisherPutOptions.encoding = nint.Zero;
+        }
+        else
+        {
+            encoding.CheckDisposed();
+            zPublisherPutOptions.encoding = encoding.HandleZOwnedEncoding;
+        }
+
+        Marshal.StructureToPtr(zPublisherPutOptions, HandlePublisherPutOptions, false);
+        _encoding?.Dispose();
+        _encoding = encoding;
     }
+
+    public Encoding? GetEncoding()
+    {
+        return _encoding is null ? null : new Encoding(_encoding);
+    }
+
+    public void SetTimestamp(Timestamp? timestamp)
+    {
+        CheckDisposed();
+
+        var zPublisherPutOptions = Marshal.PtrToStructure<ZPublisherPutOptions>(HandlePublisherPutOptions);
+
+        if (timestamp is null)
+        {
+            zPublisherPutOptions.timestamp = nint.Zero;
+        }
+        else
+        {
+            timestamp.CheckDisposed();
+            zPublisherPutOptions.timestamp = timestamp.HandleTimestamp;
+        }
+
+        Marshal.StructureToPtr(zPublisherPutOptions, HandlePublisherPutOptions, false);
+        _timestamp?.Dispose();
+        _timestamp = timestamp;
+
+    }
+
+    public Timestamp? GetTimestamp()
+    {
+        return _timestamp is null ? null : new Timestamp(_timestamp);
+    }
+
+    public void SetAttachment(ZBytes? attachment)
+    {
+        CheckDisposed();
+
+        var zPublisherPutOptions = Marshal.PtrToStructure<ZPublisherPutOptions>(HandlePublisherPutOptions);
+
+        if (attachment is null)
+        {
+            zPublisherPutOptions.attachment = nint.Zero;
+        }
+        else
+        {
+            attachment.CheckDisposed();
+            zPublisherPutOptions.attachment = attachment.HandleZOwnedBytes;
+        }
+
+        Marshal.StructureToPtr(zPublisherPutOptions, HandlePublisherPutOptions, false);
+        _attachment?.Dispose();
+        _attachment = attachment;
+    }
+
+    public ZBytes? GetAttachment()
+    {
+        return _attachment is null ? null : new ZBytes(_attachment);
+    }
+
 }
 
 public sealed class Publisher : IDisposable
@@ -230,6 +319,14 @@ public sealed class Publisher : IDisposable
         HandleZOwnedPublisher = IntPtr.Zero;
     }
 
+    internal void CheckDisposed()
+    {
+        if (HandleZOwnedPublisher == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+    }
+
     /// <summary>
     /// Undeclare the publisher and free memory. This is equivalent to calling the "Dispose()".
     /// </summary>
@@ -240,22 +337,16 @@ public sealed class Publisher : IDisposable
 
     public Keyexpr GetKeyexpr()
     {
-        if (HandleZOwnedPublisher == nint.Zero)
-        {
-            throw new ArgumentException("Object has been destroyed");
-        }
+        CheckDisposed();
 
         var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
         var pLoanedKeyexpr = ZenohC.z_publisher_keyexpr(pLoanedPublisher);
         return Keyexpr.FromLoanedKeyexpr(pLoanedKeyexpr);
     }
 
-    public ZResult Put()
+    public ZResult Put(ZBytes payload, PublisherPutOptions options)
     {
-        if (HandleZOwnedPublisher == nint.Zero)
-        {
-            throw new ArgumentException("Object has been destroyed");
-        }
+        CheckDisposed();
 
         // todo
     }

@@ -17,11 +17,8 @@ public sealed class ZString : IDisposable
 
     public ZString(ZString other)
     {
-        if (other.HandleZOwnedString == nint.Zero)
-        {
-            throw new ArgumentException("Object 'other' has been destroyed");
-        }
-        
+        other.CheckDisposed();
+
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
         var pLoanedString = ZenohC.z_string_loan(other.HandleZOwnedString);
         ZenohC.z_string_clone(pOwnedString, pLoanedString);
@@ -55,35 +52,34 @@ public sealed class ZString : IDisposable
         HandleZOwnedString = nint.Zero;
     }
 
-    public bool IsEmpty()
+    internal void CheckDisposed()
     {
         if (HandleZOwnedString == nint.Zero)
         {
             throw new ArgumentException("Object has been destroyed");
         }
-        
+    }
+
+    public bool IsEmpty()
+    {
+        CheckDisposed();
+
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_is_empty(pLoanedString);
     }
 
     public nuint Length()
     {
-        if (HandleZOwnedString == nint.Zero)
-        {
-            throw new ArgumentException("Object has been destroyed");
-        }
-        
+        CheckDisposed();
+
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         return ZenohC.z_string_len(pLoanedString);
     }
 
     public override string? ToString()
     {
-        if (HandleZOwnedString == nint.Zero)
-        {
-            throw new ArgumentException("Object has been destroyed");
-        }
-        
+        CheckDisposed();
+
         var pLoanedString = ZenohC.z_string_loan(HandleZOwnedString);
         var pS = ZenohC.z_string_data(pLoanedString);
         var s = Marshal.PtrToStringAnsi(pS);
@@ -117,13 +113,18 @@ internal sealed class ViewString : IDisposable
         Marshal.FreeHGlobal(HandleViewString);
         HandleViewString = nint.Zero;
     }
-
-    public override string? ToString()
+    
+    internal void CheckDisposed()
     {
         if (HandleViewString == nint.Zero)
         {
             throw new ArgumentException("Object has been destroyed");
         }
+    }
+
+    public override string? ToString()
+    {
+        CheckDisposed();
 
         var pLoanedString = ZenohC.z_view_string_loan(HandleViewString);
         var pS = ZenohC.z_string_data(pLoanedString);
@@ -140,6 +141,15 @@ public sealed class ZBytes : IDisposable
     {
         var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
         ZenohC.z_bytes_empty(pOwnedBytes);
+        HandleZOwnedBytes = pOwnedBytes;
+    }
+
+    public ZBytes(ZBytes other)
+    {
+        other.CheckDisposed();
+        
+        var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
+        ZenohC.z_bytes_clone(pOwnedBytes, other.HandleZOwnedBytes);   
         HandleZOwnedBytes = pOwnedBytes;
     }
     
@@ -282,12 +292,17 @@ public sealed class Timestamp : IDisposable
         HandleTimestamp = nint.Zero;
     }
 
-    public byte[] Id()
+    public void CheckDisposed()
     {
         if (HandleTimestamp == nint.Zero)
         {
             throw new ArgumentException("Object has been destroyed");
         }
+    }
+
+    public byte[] Id()
+    {
+        CheckDisposed();
 
         var zid = ZenohC.z_timestamp_id(HandleTimestamp);
         return zid.GetId();
@@ -295,10 +310,7 @@ public sealed class Timestamp : IDisposable
 
     public ulong Ntp64Time()
     {
-        if (HandleTimestamp == nint.Zero)
-        {
-            throw new ArgumentException("Object has been destroyed");
-        }
+        CheckDisposed();
 
         return ZenohC.z_timestamp_ntp64_time(HandleTimestamp);
     }

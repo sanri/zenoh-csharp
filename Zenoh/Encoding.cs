@@ -181,6 +181,8 @@ public sealed class Encoding : IDisposable
 
     public Encoding(Encoding other)
     {
+        other.CheckDisposed();
+        
         var pZOwnedEncoding = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedEncoding>());
         var pZLoanedEncoding = ZenohC.z_encoding_loan(other.HandleZOwnedEncoding);
         ZenohC.z_encoding_clone(pZOwnedEncoding, pZLoanedEncoding);
@@ -269,6 +271,14 @@ public sealed class Encoding : IDisposable
         Marshal.FreeHGlobal(HandleZOwnedEncoding);
         HandleZOwnedEncoding = nint.Zero;
     }
+    
+    internal void CheckDisposed()
+    {
+        if (HandleZOwnedEncoding == nint.Zero)
+        {
+            throw new ArgumentException("Object has been destroyed");
+        }
+    }
 
     /// <summary>
     /// Checking encoding for equality.
@@ -277,6 +287,9 @@ public sealed class Encoding : IDisposable
     /// <returns>true if `this` equals to `other`, false otherwise.</returns>
     public bool Equals(Encoding other)
     {
+        CheckDisposed();
+        other.CheckDisposed();
+        
         var pThis = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
         var pOther = ZenohC.z_encoding_loan(other.HandleZOwnedEncoding);
         return ZenohC.z_encoding_equals(pThis, pOther);
@@ -284,6 +297,8 @@ public sealed class Encoding : IDisposable
 
     public ZString ToZString()
     {
+        CheckDisposed();
+        
         var pZLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
         var zString = new ZString();
         ZenohC.z_encoding_to_string(pZLoanedEncoding, zString.HandleZOwnedString);
@@ -292,6 +307,8 @@ public sealed class Encoding : IDisposable
 
     public override string? ToString()
     {
+        CheckDisposed();
+        
         var zString = ToZString();
         return zString.ToString();
     }
@@ -310,6 +327,8 @@ public sealed class Encoding : IDisposable
     /// <param name="schema"></param>
     public ZResult SetSchema(string schema)
     {
+        CheckDisposed();
+        
         var pS = Marshal.StringToHGlobalAnsi(schema);
         var pLoanedEncoding = ZenohC.z_encoding_loan_mut(HandleZOwnedEncoding);
         var r = ZenohC.z_encoding_set_schema_from_str(pLoanedEncoding, pS);
@@ -319,6 +338,8 @@ public sealed class Encoding : IDisposable
 
     public string GetSchema()
     {
+        CheckDisposed();
+        
         var pLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
         var encodingData = ZenohC.zc_internal_encoding_get_data(pLoanedEncoding);
         return Marshal.PtrToStringAnsi(encodingData.schema_ptr, (int)encodingData.schema_len);
@@ -326,6 +347,8 @@ public sealed class Encoding : IDisposable
 
     public EncodingId GetEncodingId()
     {
+        CheckDisposed();
+        
         var pLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);
         var encodingData = ZenohC.zc_internal_encoding_get_data(pLoanedEncoding);
         return (EncodingId)encodingData.id;
