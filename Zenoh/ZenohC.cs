@@ -3323,54 +3323,111 @@ internal static unsafe class ZenohC
     internal static extern ZResult z_ring_handler_sample_try_recv(ZLoanedRingHandlerSample* handler,
         ZOwnedSample* sample);
 
+    /// const struct z_loaned_bytes_t*
+    /// z_sample_attachment(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_attachment", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedBytes* z_sample_attachment(ZLoanedSample* sample);
+    internal static extern nint z_sample_attachment(nint sample);
 
+    /// void
+    /// z_sample_clone(
+    ///     struct z_owned_sample_t *dst,
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_clone", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_sample_clone(ZLoanedSample* sample);
+    internal static extern void z_sample_clone(nint dst, nint other);
 
+    /// void
+    /// z_sample_drop(
+    ///     struct z_moved_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_drop", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_sample_drop(ZMovedSample* sample);
+    internal static extern void z_sample_drop(nint sample);
 
+    /// enum z_congestion_control_t
+    /// z_sample_congestion_control(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_congestion_control", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZCongestionControl z_sample_congestion_control(ZLoanedSample* sample);
+    internal static extern ZCongestionControl z_sample_congestion_control(nint sample);
 
+    /// const struct z_loaned_encoding_t*
+    /// z_sample_encoding(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_encoding", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedEncoding* z_sample_encoding(ZLoanedSample* sample);
+    internal static extern nint z_sample_encoding(nint sample);
 
+    /// bool
+    /// z_sample_express(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_express", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
     [return: MarshalAs(UnmanagedType.U1)]
-    internal static extern bool z_sample_express(ZLoanedSample* sample);
+    internal static extern bool z_sample_express(nint sample);
 
+    /// const struct z_loaned_keyexpr_t*
+    /// z_sample_keyexpr(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_keyexpr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedKeyexpr* z_sample_keyexpr(ZLoanedSample* sample);
+    internal static extern nint z_sample_keyexpr(nint sample);
 
+    /// enum z_sample_kind_t
+    /// z_sample_kind(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_kind", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZSampleKind z_sample_kind(ZLoanedSample* sample);
+    internal static extern ZSampleKind z_sample_kind(nint sample);
 
+    /// const struct z_loaned_sample_t*
+    /// z_sample_loan_mut(
+    ///     struct z_owned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_loan", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedSample* z_sample_loan(ZOwnedSample* sample);
+    internal static extern nint z_sample_loan(nint sample);
+    
+    /// struct z_loaned_sample_t*
+    /// z_sample_loan_mut(
+    ///     struct z_owned_sample_t *this_
+    /// )
+    [DllImport(DllName, EntryPoint = "z_sample_loan_mut", CallingConvention = CallingConvention.Cdecl,
+        ExactSpelling = true)]
+    internal static extern nint z_sample_loan_mut(nint sample);
 
+    /// const struct z_loaned_bytes_t*
+    /// z_sample_payload(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_payload", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedBytes* z_sample_payload(ZLoanedSample* sample);
+    internal static extern nint z_sample_payload(nint sample);
 
+    /// enum z_priority_t
+    /// z_sample_priority(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_priority", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZPriority z_sample_priority(ZLoanedSample* sample);
+    internal static extern ZPriority z_sample_priority(nint sample);
 
+    /// const struct z_timestamp_t*
+    /// z_sample_timestamp(
+    ///     const struct z_loaned_sample_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_sample_timestamp", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZTimestamp* z_sample_timestamp(ZLoanedSample* sample);
+    internal static extern nint z_sample_timestamp(nint sample);
 
     [DllImport(DllName, EntryPoint = "z_scout", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

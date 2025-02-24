@@ -199,7 +199,7 @@ public sealed class PublisherPutOptions : IDisposable
     {
         if (HandlePublisherPutOptions == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
@@ -291,6 +291,7 @@ public sealed class Publisher : IDisposable
 
     private Publisher()
     {
+        throw new InvalidCastException();
     }
 
     internal Publisher(nint handle)
@@ -300,6 +301,7 @@ public sealed class Publisher : IDisposable
 
     private Publisher(Publisher other)
     {
+        throw new InvalidCastException();
     }
 
     public void Dispose()
@@ -323,7 +325,7 @@ public sealed class Publisher : IDisposable
     {
         if (HandleZOwnedPublisher == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
@@ -341,14 +343,32 @@ public sealed class Publisher : IDisposable
 
         var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
         var pLoanedKeyexpr = ZenohC.z_publisher_keyexpr(pLoanedPublisher);
-        return Keyexpr.FromLoanedKeyexpr(pLoanedKeyexpr);
+        return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
     }
 
+    /// <summary>
+    /// <para>
+    /// Sends a "PUT" message onto the publisher's key expression, transfering the payload ownership.
+    /// </para>
+    /// <para>
+    /// Do not use the "payload" and "options" after calling this function.
+    /// payload.Dispose() and options.Dispose() is called inside this function.
+    /// </para>
+    /// </summary>
+    /// <param name="payload">The data to publish. Will be consumed.</param>
+    /// <param name="options">The publisher put options. Will be consumed.</param>
+    /// <returns>ZResult.Ok in case of success.</returns>
     public ZResult Put(ZBytes payload, PublisherPutOptions options)
     {
         CheckDisposed();
+        payload.CheckDisposed();
+        options.CheckDisposed();
 
-        // todo
+        var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
+        var r = ZenohC.z_publisher_put(pLoanedPublisher, payload.HandleZOwnedBytes, options.HandlePublisherPutOptions);
+        payload.Dispose();
+        options.Dispose();
+        return r;
     }
 
 }

@@ -3,94 +3,186 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-// 这是一个引用类型, 不释放引用的内存.
-public class Sample
+public sealed class Sample : IDisposable
 {
-    private readonly unsafe ZSample* _native;
+    // 'true' in case z_owned_sample_t, 'false' in case z_loaned_sample_t 
+    internal bool Owned { get; }
 
-    internal unsafe Sample(ZSample* sample)
+    // z_loaned_sample_t*  or  z_owned_sample_t*
+    internal nint HandleZSample { get; private set; }
+
+    private Sample()
     {
-        _native = sample;
+        throw new InvalidOperationException();
     }
 
-    public string GetKeyexpr()
+    internal Sample(Sample other)
     {
-        unsafe
-        {
-            return ZenohC.ZKeyexprToString(_native->keyexpr);
-        }
+        var pOwnedSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSample>());
+        var pLoanedSample = other.Owned ? ZenohC.z_sample_loan(other.HandleZSample) : other.HandleZSample;
+        ZenohC.z_sample_clone(pOwnedSample, pLoanedSample);
+        Owned = true;
+        HandleZSample = pOwnedSample;
     }
 
-    public ZEncodingPrefix GetEncodingPrefix()
+    private Sample(nint handle, bool owned)
     {
-        unsafe
-        {
-            return _native->encoding.prefix;
-        }
+        Owned = owned;
+        HandleZSample = handle;
     }
 
-    public byte[] GetEncodingSuffix()
+    internal static Sample CreateLoanedSample(nint handle)
     {
-        unsafe
-        {
-            nuint len = _native->encoding.suffix.len;
-            nint start = (nint)_native->encoding.suffix.start;
-            byte[] data = new byte[len];
-            Marshal.Copy(start, data, 0, (int)len);
-            return data;
-        }
+        return new Sample(handle, false);
     }
 
-    public ZSampleKind GetSampleKind()
+    ~Sample()
     {
-        unsafe
-        {
-            return _native->kind;
-        }
+        Dispose(false);
     }
 
-    public byte[] GetPayload()
+    public void Dispose()
     {
-        unsafe
-        {
-            if (ZenohC.z_bytes_check(&_native->payload) != 1)
-                return Array.Empty<byte>();
-            var len = _native->payload.len;
-            byte[] data = new byte[len];
-            Marshal.Copy((nint)_native->payload.start, data, 0, (int)len);
-            return data;
-        }
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
-    public string? GetString()
+    private void Dispose(bool disposing)
     {
-        unsafe
+        if (HandleZSample == nint.Zero) return;
+
+        if (Owned)
         {
-            if (ZenohC.z_bytes_check(&_native->payload) != 1)
-                return null;
-            return Marshal.PtrToStringUTF8((nint)_native->payload.start, (int)_native->payload.len);
+            ZenohC.z_sample_drop(HandleZSample);
+            Marshal.FreeHGlobal(HandleZSample);
         }
+
+        HandleZSample = nint.Zero;
     }
 
-    public long? GetInteger()
+    public void CheckDisposed()
     {
-        var str = GetString();
-        if (!Int64.TryParse(str, out long n))
+        if (HandleZSample == nint.Zero)
         {
-            return null;
+            throw new InvalidOperationException("Object is disposed");
         }
+    }
+    
+    /// <summary>
+    /// Returns sample attachment.
+    /// </summary>
+    /// <returns>
+    /// Returns 'null', if sample does not contain any attachment.
+    /// </returns>
+    public ZBytes? GetAttachment()
+    {
+        CheckDisposed();
 
-        return n;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedBytes = ZenohC.z_sample_attachment(pLoanedSample);
+        return pLoanedBytes == nint.Zero ? null : ZBytes.CloneFromLoaned(pLoanedBytes);
     }
 
-    public double? GetDouble()
+    /// <summary>
+    /// Returns sample qos congestion control value.
+    /// </summary>
+    /// <returns></returns>
+    public ZCongestionControl GetCongestionControl()
     {
-        var str = GetString();
-        if (!Double.TryParse(str, out double n))
-        {
-            return null;
-        }
+        CheckDisposed();
 
-        return n;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        return ZenohC.z_sample_congestion_control(pLoanedSample);
+    }
+
+    /// <summary>
+    /// Returns the encoding associated with the sample data.
+    /// </summary>
+    /// <returns></returns>
+    public Encoding GetEncoding()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedEncoding = ZenohC.z_sample_encoding(pLoanedSample);
+        return Encoding.CloneFromLoaned(pLoanedEncoding);
+    }
+
+    /// <summary>
+    /// <para>Gets the express flag value.</para>
+    /// <para>
+    /// If true, the message is not batched during transmission, in order to reduce latency.
+    /// </para>
+    /// </summary>
+    public bool GetExpress()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        return ZenohC.z_sample_express(pLoanedSample);
+    }
+
+    /// <summary>
+    /// Returns the key expression of the sample.
+    /// </summary>
+    public Keyexpr GetKeyexpr()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedKeyexpr = ZenohC.z_sample_keyexpr(pLoanedSample);
+        return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
+    }
+
+    /// <summary>
+    /// Returns the sample kind.
+    /// </summary>
+    /// <returns></returns>
+    public ZSampleKind GetKind()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        return ZenohC.z_sample_kind(pLoanedSample);
+    }
+
+    /// <summary>
+    /// Returns the sample payload data.
+    /// </summary>
+    /// <returns></returns>
+    public ZBytes GetPayload()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedBytes = ZenohC.z_sample_payload(pLoanedSample);
+        return ZBytes.CloneFromLoaned(pLoanedBytes);
+    }
+
+    /// <summary>
+    /// Returns sample qos priority value.
+    /// </summary>
+    /// <returns></returns>
+    public ZPriority GetPriority()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        return ZenohC.z_sample_priority(pLoanedSample);
+    }
+
+    /// <summary>
+    /// Returns the sample timestamp.
+    /// </summary>
+    /// <returns>
+    /// Will return 'null', if sample is not associated with a timestamp.
+    /// </returns>
+    public Timestamp? GetTimestamp()
+    {
+        CheckDisposed();
+
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pTimestamp = ZenohC.z_sample_timestamp(pLoanedSample);
+        return pTimestamp == nint.Zero ? null : Timestamp.CloneFromPointer(pTimestamp);
     }
 }

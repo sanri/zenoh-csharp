@@ -179,6 +179,11 @@ public sealed class Encoding : IDisposable
         HandleZOwnedEncoding = pZOwnedEncoding;
     }
 
+    private Encoding(nint handle)
+    {
+        HandleZOwnedEncoding = handle;
+    }
+
     public Encoding(Encoding other)
     {
         other.CheckDisposed();
@@ -187,6 +192,15 @@ public sealed class Encoding : IDisposable
         var pZLoanedEncoding = ZenohC.z_encoding_loan(other.HandleZOwnedEncoding);
         ZenohC.z_encoding_clone(pZOwnedEncoding, pZLoanedEncoding);
         HandleZOwnedEncoding = pZOwnedEncoding;
+    }
+    
+
+    // 'handle' z_loaned_encoding_t*
+    internal static Encoding CloneFromLoaned(nint handle)
+    {
+        var pZOwnedEncoding = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedEncoding>());
+        ZenohC.z_encoding_clone(pZOwnedEncoding, handle);
+        return new Encoding(pZOwnedEncoding);
     }
 
     public Encoding(EncodingId id)
@@ -276,7 +290,7 @@ public sealed class Encoding : IDisposable
     {
         if (HandleZOwnedEncoding == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 

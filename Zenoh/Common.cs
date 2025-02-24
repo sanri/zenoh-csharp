@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Zenoh;
 
@@ -56,7 +57,7 @@ public sealed class ZString : IDisposable
     {
         if (HandleZOwnedString == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
@@ -118,7 +119,7 @@ internal sealed class ViewString : IDisposable
     {
         if (HandleViewString == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
@@ -152,6 +153,19 @@ public sealed class ZBytes : IDisposable
         ZenohC.z_bytes_clone(pOwnedBytes, other.HandleZOwnedBytes);   
         HandleZOwnedBytes = pOwnedBytes;
     }
+
+    private ZBytes(nint handle)
+    {
+        HandleZOwnedBytes = handle;
+    }
+
+    // 'handle'  z_loaned_bytes_t*
+    internal static ZBytes CloneFromLoaned(nint handle)
+    {
+        var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
+        ZenohC.z_bytes_clone(pOwnedBytes, handle);
+        return new ZBytes(pOwnedBytes);
+    }
     
     public void Dispose()
     {
@@ -174,7 +188,7 @@ public sealed class ZBytes : IDisposable
     {
         if (HandleZOwnedBytes == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
@@ -229,7 +243,7 @@ public sealed class ZSlice : IDisposable
     {
         if (HandleZOwnedSlice == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
         
         var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
@@ -240,7 +254,7 @@ public sealed class ZSlice : IDisposable
     {
         if (HandleZOwnedSlice == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
         
         var pLoanedSlice = ZenohC.z_slice_loan(HandleZOwnedSlice);
@@ -256,24 +270,50 @@ public sealed class Timestamp : IDisposable
 
     private Timestamp()
     {
+        throw new InvalidOperationException();
     }
 
-    internal Timestamp(nint handle)
+    private Timestamp(nint handle)
     {
         HandleTimestamp = handle;
     }
 
     public Timestamp(Timestamp other)
     {
-        if (other.HandleTimestamp == nint.Zero)
-        {
-            throw new ArgumentException("Object 'other' has been destroyed");
-        }
+        other.CheckDisposed();
 
         var timestamp = Marshal.PtrToStructure<ZTimestamp>(other.HandleTimestamp);
         var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
         Marshal.StructureToPtr(timestamp, pTimestamp, false);
         HandleTimestamp = pTimestamp;
+    }
+
+    // 'handle' z_timestamp_t*
+    internal static Timestamp CloneFromPointer(nint handle)
+    {
+        var timestamp = Marshal.PtrToStructure<ZTimestamp>(handle);
+        var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
+        Marshal.StructureToPtr(timestamp, pTimestamp, false);
+        return new Timestamp(pTimestamp);
+    }
+
+    // 'handle' z_loaned_session_t*
+    internal static Timestamp? NewFromSession(nint handle)
+    {
+        var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
+        var r = ZenohC.z_timestamp_new(pTimestamp,handle);
+        Timestamp? o;
+        if (r == ZResult.Ok)
+        {
+            o = new Timestamp(pTimestamp);
+        }
+        else
+        {
+            Marshal.FreeHGlobal(pTimestamp);
+            o = null;
+        }
+
+        return o;
     }
 
     public void Dispose()
@@ -296,16 +336,16 @@ public sealed class Timestamp : IDisposable
     {
         if (HandleTimestamp == nint.Zero)
         {
-            throw new ArgumentException("Object has been destroyed");
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
 
-    public byte[] Id()
+    public Id GetId()
     {
         CheckDisposed();
 
         var zid = ZenohC.z_timestamp_id(HandleTimestamp);
-        return zid.GetId();
+        return new Id(zid);
     }
 
     public ulong Ntp64Time()
@@ -313,5 +353,31 @@ public sealed class Timestamp : IDisposable
         CheckDisposed();
 
         return ZenohC.z_timestamp_ntp64_time(HandleTimestamp);
+    }
+}
+
+public sealed class Id
+{
+    private byte[] _data;
+
+    private Id()
+    {
+        throw new InvalidOperationException();
+    }
+
+    internal Id(ZId zid)
+    {
+        _data = zid.GetId();
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        foreach (var b in _data)
+        {
+            sb.Append(b.ToString("x"));
+        }
+
+        return sb.ToString();
     }
 }

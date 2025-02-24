@@ -10,6 +10,7 @@ public sealed class Keyexpr : IDisposable
 
     private Keyexpr()
     {
+        throw new InvalidOperationException();
     }
 
     private Keyexpr(nint handle)
@@ -19,10 +20,7 @@ public sealed class Keyexpr : IDisposable
 
     public Keyexpr(Keyexpr other)
     {
-        if (other.HandleZOwnedKeyexpr == nint.Zero)
-        {
-            throw new ArgumentException("Object 'other' has been destroyed");
-        }
+        other.CheckDisposed();
 
         var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
         var pOtherKeyexpr = ZenohC.z_keyexpr_loan(other.HandleZOwnedKeyexpr);
@@ -30,11 +28,11 @@ public sealed class Keyexpr : IDisposable
         HandleZOwnedKeyexpr = pOwnedKeyexpr;
     }
 
-    /// <param name="other">z_loaned_keyexpr*</param>
-    internal static Keyexpr FromLoanedKeyexpr(nint other)
+    // 'handle' z_loaned_keyexpr*
+    internal static Keyexpr CloneFromLoaned(nint handle)
     {
         var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
-        ZenohC.z_keyexpr_clone(pOwnedKeyexpr,other);
+        ZenohC.z_keyexpr_clone(pOwnedKeyexpr, handle);
         return new Keyexpr(pOwnedKeyexpr);
     }
 
@@ -79,6 +77,14 @@ public sealed class Keyexpr : IDisposable
         ZenohC.z_keyexpr_drop(HandleZOwnedKeyexpr);
         Marshal.FreeHGlobal(HandleZOwnedKeyexpr);
         HandleZOwnedKeyexpr = IntPtr.Zero;
+    }
+
+    internal void CheckDisposed()
+    {
+        if (HandleZOwnedKeyexpr == nint.Zero)
+        {
+            throw new InvalidOperationException("Object has been destroyed");
+        }
     }
 
     /// <summary>

@@ -10,6 +10,7 @@ public sealed class Config : IDisposable
 
     private Config()
     {
+        throw new InvalidOperationException();
     }
 
     private Config(nint config)
@@ -19,6 +20,8 @@ public sealed class Config : IDisposable
 
     public Config(Config source)
     {
+        source.CheckDisposed();
+        
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
         ZenohC.z_internal_config_null(pOwnedConfig);
 
@@ -92,8 +95,18 @@ public sealed class Config : IDisposable
         HandleZOwnedConfig = nint.Zero;
     }
 
+    public void CheckDisposed()
+    {
+        if (HandleZOwnedConfig == nint.Zero)
+        {
+            throw new InvalidOperationException();
+        }
+    }
+
     public ZString? ToZString()
     {
+        CheckDisposed();
+        
         var zString = new ZString();
         var pLoanedConfig = ZenohC.z_config_loan(HandleZOwnedConfig);
         var r = ZenohC.zc_config_to_string(pLoanedConfig, zString.HandleZOwnedString);
