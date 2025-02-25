@@ -87,7 +87,13 @@ public sealed class Session : IDisposable
     }
 
     /// <summary>
+    /// <para>
     /// Constructs and opens a new Zenoh session.
+    /// </para>
+    /// <para>
+    /// Do not use the "config" after calling this function.
+    /// config.Dispose() is called inside this function.
+    /// </para>
     /// </summary>
     /// <param name="config">Zenoh session config</param>
     /// <param name="openOptions"></param>
@@ -98,7 +104,9 @@ public sealed class Session : IDisposable
     {
         CheckDisposed();
 
-        return ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
+        var r = ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
+        config.Dispose();
+        return r;
     }
 
     /// <summary>
@@ -135,7 +143,7 @@ public sealed class Session : IDisposable
     public Publisher? DeclarePublisher(Keyexpr keyexpr, PublisherOptions options)
     {
         if (IsClosed()) return null;
-        
+
         var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
         var pOwnedPublisher = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedPublisher>());
         var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
@@ -158,12 +166,60 @@ public sealed class Session : IDisposable
         return o;
     }
 
+    /// <summary>
+    /// Constructs and declares a callback type subscriber for a given key expression. 
+    /// </summary>
+    /// <param name="keyexpr">
+    /// The key expression to subscribe
+    /// </param>
+    /// <param name="callback">
+    /// The callback function that will be called each time a data matching the subscribed expression is received.
+    /// </param>
+    /// <returns></returns>
+    public SubscriberCallback? DeclareSubscriberCallback(Keyexpr keyexpr, SubscriberCallback.Cb callback)
+    {
+        if (IsClosed()) return null;
+        keyexpr.CheckDisposed();
+
+        var subscriber = new SubscriberCallback(callback);
+        var gcHandle = GCHandle.Alloc(subscriber);
+
+        var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
+        ZenohC.z_closure_sample(
+            pOwnedClosureSample,
+            SubscriberCallback.CallbackClosureSampleCall,
+            SubscriberCallback.CallbackClosureSampleDrop,
+            GCHandle.ToIntPtr(gcHandle)
+        );
+
+        var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
+        var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
+
+        var r = ZenohC.z_declare_subscriber(
+            pLoanedSession,
+            subscriber.HandleOwnedSubscriber,
+            pLoanedKeyexpr,
+            pOwnedClosureSample,
+            nint.Zero
+        );
+
+        Marshal.FreeHGlobal(pOwnedClosureSample);
+
+        if (r == ZResult.Ok)
+        {
+            return subscriber;
+        }
+
+        subscriber.Dispose();
+        gcHandle.Free();
+        return null;
+    }
 
 }
 
 public class OldSession : IDisposable
 {
-    internal SortedDictionary<int, Subscriber> subscribersDictionary;
+    internal SortedDictionary<int, SubscriberCallback> subscribersDictionary;
     private int _indexSubscriber = 1;
     internal SortedDictionary<int, Publisher> publishersDictionary;
     private int _indexPublisher = 1;
@@ -174,7 +230,7 @@ public class OldSession : IDisposable
 
     private unsafe OldSession(ZOwnedSession* session)
     {
-        subscribersDictionary = new SortedDictionary<int, Subscriber>();
+        subscribersDictionary = new SortedDictionary<int, SubscriberCallback>();
         publishersDictionary = new SortedDictionary<int, Publisher>();
         queryableDictionary = new SortedDictionary<int, Queryable>();
         _disposed = false;
@@ -205,7 +261,7 @@ public class OldSession : IDisposable
 
         unsafe
         {
-            foreach ((_, Subscriber subscriber) in subscribersDictionary)
+            foreach ((_, SubscriberCallback subscriber) in subscribersDictionary)
             {
                 ZenohC.z_undeclare_subscriber(subscriber.ownedSubscriber);
                 Marshal.FreeHGlobal((nint)subscriber.ownedSubscriber);
@@ -467,20 +523,20 @@ public class OldSession : IDisposable
         }
     }
 
-    public SubscriberHandle? RegisterSubscriber(Subscriber subscriber)
+    public SubscriberHandle? RegisterSubscriber(SubscriberCallback subscriberCallback)
     {
         unsafe
         {
-            if (subscriber.ownedSubscriber != null)
+            if (subscriberCallback.ownedSubscriber != null)
                 return null;
 
             ZSession session = ZenohC.z_session_loan(_session);
-            nint pKey = Marshal.StringToHGlobalAnsi(subscriber.keyexpr);
+            nint pKey = Marshal.StringToHGlobalAnsi(subscriberCallback.keyexpr);
             ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
             nint pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZSubscriberOptions>());
-            Marshal.StructureToPtr(subscriber.options, pOptions, false);
+            Marshal.StructureToPtr(subscriberCallback.options, pOptions, false);
             ZOwnedSubscriber sub =
-                ZenohC.z_declare_subscriber(session, keyexpr, subscriber.closureSample, (ZSubscriberOptions*)pOptions);
+                ZenohC.z_declare_subscriber(session, keyexpr, subscriberCallback.closureSample, (ZSubscriberOptions*)pOptions);
             Marshal.FreeHGlobal(pOptions);
             Marshal.FreeHGlobal(pKey);
 
@@ -489,10 +545,10 @@ public class OldSession : IDisposable
 
             nint pOwnedSubscriber = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSubscriber>());
             Marshal.StructureToPtr(sub, pOwnedSubscriber, false);
-            subscriber.ownedSubscriber = (ZOwnedSubscriber*)pOwnedSubscriber;
+            subscriberCallback.ownedSubscriber = (ZOwnedSubscriber*)pOwnedSubscriber;
 
             _indexSubscriber += 1;
-            subscribersDictionary.Add(_indexSubscriber, subscriber);
+            subscribersDictionary.Add(_indexSubscriber, subscriberCallback);
 
             return new SubscriberHandle
             {
@@ -508,7 +564,7 @@ public class OldSession : IDisposable
 
     private void UnregisterSubscriber(int handle)
     {
-        if (subscribersDictionary.TryGetValue(handle, out Subscriber? subscriber))
+        if (subscribersDictionary.TryGetValue(handle, out SubscriberCallback? subscriber))
         {
             unsafe
             {

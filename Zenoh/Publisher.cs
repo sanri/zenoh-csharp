@@ -291,7 +291,7 @@ public sealed class Publisher : IDisposable
 
     private Publisher()
     {
-        throw new InvalidCastException();
+        throw new InvalidOperationException();
     }
 
     internal Publisher(nint handle)
@@ -301,7 +301,7 @@ public sealed class Publisher : IDisposable
 
     private Publisher(Publisher other)
     {
-        throw new InvalidCastException();
+        throw new InvalidOperationException();
     }
 
     public void Dispose()

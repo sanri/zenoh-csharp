@@ -18,14 +18,14 @@ public sealed class Config : IDisposable
         HandleZOwnedConfig = config;
     }
 
-    public Config(Config source)
+    public Config(Config other)
     {
-        source.CheckDisposed();
+        other.CheckDisposed();
         
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
         ZenohC.z_internal_config_null(pOwnedConfig);
 
-        var pLoanedConfig = ZenohC.z_config_loan(source.HandleZOwnedConfig);
+        var pLoanedConfig = ZenohC.z_config_loan(other.HandleZOwnedConfig);
         ZenohC.z_config_clone(pOwnedConfig, pLoanedConfig);
         HandleZOwnedConfig = pOwnedConfig;
     }

@@ -45,9 +45,9 @@ class Program
 
         string key = clArgs.GetKey();
 
-        Subscriber subscriber = new Subscriber(key, userCallback);
+        SubscriberCallback subscriberCallback = new SubscriberCallback(key, userCallback);
 
-        var handle = session.RegisterSubscriber(subscriber);
+        var handle = session.RegisterSubscriber(subscriberCallback);
         if (handle is null)
         {
             Console.WriteLine($"Register Subscriber fault On '{key}'");

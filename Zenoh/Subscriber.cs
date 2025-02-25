@@ -1,78 +1,142 @@
-#pragma warning disable CS8500
-
 using System;
 using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-public struct SubscriberHandle
+/// <summary>
+/// Callback type subscriber.
+/// </summary>
+public class SubscriberCallback : IDisposable
 {
-    internal int handle;
-}
+    // z_owned_subscriber_t*
+    internal nint HandleOwnedSubscriber { get; private set; }
+    private readonly Cb _cb;
 
-public delegate void SubscriberCallback(Sample sample);
+    public delegate void Cb(Sample sample);
 
-public class Subscriber : IDisposable
-{
-    internal readonly unsafe ZOwnedClosureSample* closureSample;
-    internal unsafe ZOwnedSubscriber* ownedSubscriber;
-    internal readonly string keyexpr;
-    internal readonly ZSubscriberOptions options;
-    private readonly ZOwnedClosureSample _ownedClosureSample;
-    private GCHandle _userCallbackGcHandle;
-    private bool _disposed;
 
-    public Subscriber(string key, SubscriberCallback userCallback)
-        : this(key, userCallback, ZReliability.Reliable)
+    private SubscriberCallback()
     {
+        throw new InvalidOperationException();
     }
 
-    public Subscriber(string key, SubscriberCallback userCallback, ZReliability zReliability)
+    internal SubscriberCallback(Cb cb)
     {
-        unsafe
-        {
-            keyexpr = key;
-            _disposed = false;
-            options.reliability = zReliability;
-            _userCallbackGcHandle = GCHandle.Alloc(userCallback, GCHandleType.Normal);
-            _ownedClosureSample = new ZOwnedClosureSample
-            {
-                context = (void*)GCHandle.ToIntPtr(_userCallbackGcHandle),
-                call = Call,
-                drop = null,
-            };
-
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf(_ownedClosureSample));
-            Marshal.StructureToPtr(_ownedClosureSample, p, false);
-            closureSample = (ZOwnedClosureSample*)p;
-            ownedSubscriber = null;
-        }
+        var pOwnedSubscriber = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSubscriber>());
+        ZenohC.z_internal_subscriber_null(pOwnedSubscriber);
+        HandleOwnedSubscriber = pOwnedSubscriber;
+        _cb = cb;
     }
 
-    public void Dispose() => Dispose(true);
+    private SubscriberCallback(SubscriberCallback other)
+    {
+        throw new InvalidOperationException();
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~SubscriberCallback() => Dispose(false);
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (HandleOwnedSubscriber == nint.Zero) return;
 
-        unsafe
-        {
-            Marshal.FreeHGlobal((nint)closureSample);
-            Marshal.FreeHGlobal((nint)ownedSubscriber);
-        }
-
-        _userCallbackGcHandle.Free();
-        _disposed = true;
+        ZenohC.z_subscriber_drop(HandleOwnedSubscriber);
+        Marshal.FreeHGlobal(HandleOwnedSubscriber);
+        HandleOwnedSubscriber = nint.Zero;
     }
 
-    private static unsafe void Call(ZSample* zSample, void* context)
+    internal void CheckDisposed()
     {
-        var gch = GCHandle.FromIntPtr((nint)context);
-        var callback = (SubscriberCallback?)gch.Target;
-        var sample = new Sample(zSample);
-        if (callback != null)
+        if (HandleOwnedSubscriber == nint.Zero)
         {
-            callback(sample);
+            throw new InvalidOperationException("Object has been destroyed");
         }
+    }
+
+    /// <summary>
+    /// Returns the key expression of the subscriber.
+    /// </summary>
+    /// <returns></returns>
+    public Keyexpr GetKeyexpr()
+    {
+        CheckDisposed();
+
+        var pLoanedSubscriber = ZenohC.z_subscriber_loan(HandleOwnedSubscriber);
+        var pLoanedKeyexpr = ZenohC.z_subscriber_keyexpr(pLoanedSubscriber);
+        return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
+    }
+
+
+    /// <summary>
+    /// Undeclare the subscriber and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
+    {
+        Dispose();
+    }
+
+    internal static void CallbackClosureSampleCall(nint sample, nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        if (gcHandle.Target is not SubscriberCallback subscriber) return;
+
+        var loanedSample = Sample.CreateLoanedSample(sample);
+        subscriber._cb(loanedSample);
+    }
+
+    internal static void CallbackClosureSampleDrop(nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        gcHandle.Free();
+    }
+}
+
+/// <summary>
+/// <para>
+/// Buffer channel type subscriber. There are ring or fifo buffer channel inside.
+/// </para>
+/// <para>
+/// Ring buffer channel,
+/// a synchronous ring channel with a limited size that allows users to keep the last N data.
+/// RingChannel implements FIFO semantics with a dropping strategy when full.
+/// The oldest elements will be dropped when newer arrive.
+/// </para>
+/// <para>
+/// Fifo buffer channel,
+/// that pushing on a full FifoChannel that is full will block until a slot is available.
+/// E.g., a slow subscriber could block the underlying Zenoh thread because is not emptying the FifoChannel fast enough.
+/// In this case, you may want to look into RingChannel that will drop samples when full.
+/// </para>
+/// </summary>
+public class SubscriberBuffer : IDisposable
+{
+    // z_owned_subscriber_t*
+    internal nint HandleOwnedSubscriber { get; private set; }
+
+    // z_owned_ring_handler_sample_t*  or  z_owned_fifo_handler_sample_t*
+    internal nint HandleChannel { get; private set; }
+
+    public readonly ChannelType BufferChannelType;
+
+    internal SubscriberBuffer(ChannelType ct, uint size)
+    {
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~SubscriberBuffer() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        // todo
     }
 }
