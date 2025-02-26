@@ -36,6 +36,13 @@ public sealed class Sample : IDisposable
         return new Sample(handle, false);
     }
 
+    internal static Sample CreateOwnedSample()
+    {
+        var pOwnedSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSample>());
+        ZenohC.z_internal_sample_null(pOwnedSample);
+        return new Sample(pOwnedSample, true);
+    }
+
     ~Sample()
     {
         Dispose(false);

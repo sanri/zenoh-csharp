@@ -6,7 +6,7 @@ namespace Zenoh;
 /// <summary>
 /// Callback type subscriber.
 /// </summary>
-public class SubscriberCallback : IDisposable
+public sealed class SubscriberCallback : IDisposable
 {
     // z_owned_subscriber_t*
     internal nint HandleOwnedSubscriber { get; private set; }
@@ -59,6 +59,14 @@ public class SubscriberCallback : IDisposable
     }
 
     /// <summary>
+    /// Undeclare the subscriber and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
+    {
+        Dispose();
+    }
+
+    /// <summary>
     /// Returns the key expression of the subscriber.
     /// </summary>
     /// <returns></returns>
@@ -69,15 +77,6 @@ public class SubscriberCallback : IDisposable
         var pLoanedSubscriber = ZenohC.z_subscriber_loan(HandleOwnedSubscriber);
         var pLoanedKeyexpr = ZenohC.z_subscriber_keyexpr(pLoanedSubscriber);
         return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
-    }
-
-
-    /// <summary>
-    /// Undeclare the subscriber and free memory. This is equivalent to calling the "Dispose()".
-    /// </summary>
-    public void Undeclare()
-    {
-        Dispose();
     }
 
     internal static void CallbackClosureSampleCall(nint sample, nint context)
@@ -109,11 +108,11 @@ public class SubscriberCallback : IDisposable
 /// <para>
 /// Fifo buffer channel,
 /// that pushing on a full FifoChannel that is full will block until a slot is available.
-/// E.g., a slow subscriber could block the underlying Zenoh thread because is not emptying the FifoChannel fast enough.
+/// E.g., a slow subscriber could block the underlying Zenoh thread because it is not emptying the FifoChannel fast enough.
 /// In this case, you may want to look into RingChannel that will drop samples when full.
 /// </para>
 /// </summary>
-public class SubscriberBuffer : IDisposable
+public sealed class SubscriberBuffer : IDisposable
 {
     // z_owned_subscriber_t*
     internal nint HandleOwnedSubscriber { get; private set; }
@@ -123,8 +122,38 @@ public class SubscriberBuffer : IDisposable
 
     public readonly ChannelType BufferChannelType;
 
-    internal SubscriberBuffer(ChannelType ct, uint size)
+    private SubscriberBuffer()
     {
+        throw new InvalidOperationException();
+    }
+
+    private SubscriberBuffer(SubscriberBuffer other)
+    {
+        throw new InvalidOperationException();
+    }
+
+    internal SubscriberBuffer(ChannelType ct)
+    {
+        var pOwnedSubscriber = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSubscriber>());
+        ZenohC.z_internal_subscriber_null(pOwnedSubscriber);
+        nint pChannel;
+        switch (ct)
+        {
+            case ChannelType.Ring:
+                pChannel = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedRingHandlerSample>());
+                ZenohC.z_internal_ring_handler_sample_null(pChannel);
+                break;
+            case ChannelType.Fifo:
+                pChannel = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedFifoHandlerSample>());
+                ZenohC.z_internal_fifo_handler_sample_null(pChannel);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(ct), ct, null);
+        }
+
+        BufferChannelType = ct;
+        HandleOwnedSubscriber = pOwnedSubscriber;
+        HandleChannel = pChannel;
     }
 
     public void Dispose()
@@ -137,6 +166,147 @@ public class SubscriberBuffer : IDisposable
 
     private void Dispose(bool disposing)
     {
-        // todo
+        if (HandleOwnedSubscriber == nint.Zero) return;
+
+        ZenohC.z_subscriber_drop(HandleOwnedSubscriber);
+        Marshal.FreeHGlobal(HandleOwnedSubscriber);
+        HandleOwnedSubscriber = nint.Zero;
+
+        if (HandleChannel == nint.Zero) return;
+
+        switch (BufferChannelType)
+        {
+            case ChannelType.Ring:
+                ZenohC.z_ring_handler_sample_drop(HandleChannel);
+                break;
+            case ChannelType.Fifo:
+                ZenohC.z_fifo_handler_sample_drop(HandleChannel);
+                break;
+            default:
+                return;
+        }
+
+        Marshal.FreeHGlobal(HandleChannel);
+        HandleChannel = nint.Zero;
+    }
+
+    internal void CheckDisposed()
+    {
+        if (HandleOwnedSubscriber == nint.Zero)
+        {
+            throw new InvalidOperationException("Object has been destroyed");
+        }
+
+        if (HandleChannel == nint.Zero)
+        {
+            throw new InvalidOperationException("Object has been destroyed");
+        }
+    }
+
+    /// <summary>
+    /// Undeclare the subscriber and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
+    {
+        Dispose();
+    }
+
+    /// <summary>
+    /// Returns the key expression of the subscriber.
+    /// </summary>
+    /// <returns></returns>
+    public Keyexpr GetKeyexpr()
+    {
+        CheckDisposed();
+
+        var pLoanedSubscriber = ZenohC.z_subscriber_loan(HandleOwnedSubscriber);
+        var pLoanedKeyexpr = ZenohC.z_subscriber_keyexpr(pLoanedSubscriber);
+        return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
+    }
+
+    /// <summary>
+    /// <para>
+    /// Returns sample from the buffer channel.
+    /// </para>
+    /// <para>
+    /// If there are no more pending replies will block until next sample is received,
+    /// or until the channel is dropped (normally when there are no more samples to receive).
+    /// </para>
+    /// </summary>
+    /// <param name="sample"></param>
+    /// <returns>
+    /// <para>"ZResult.Ok" in case of success.</para>
+    /// <para>"ZResult.ChannelDisconnected" if channel was dropped (the sample will be set to "null").</para>
+    /// </returns>
+    public ZResult Recv(out Sample? sample)
+    {
+        CheckDisposed();
+
+        ZResult r;
+        sample = Sample.CreateOwnedSample();
+
+        switch (BufferChannelType)
+        {
+            case ChannelType.Ring:
+                var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
+                r = ZenohC.z_ring_handler_sample_recv(pLoanedRingHandlerSample, sample.HandleZSample);
+                if (r == ZResult.Ok) return r;
+                break;
+            case ChannelType.Fifo:
+                var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
+                r = ZenohC.z_fifo_handler_sample_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
+                if (r == ZResult.Ok) return r;
+                break;
+            default:
+                r = ZResult.ErrorGeneric;
+                break;
+        }
+
+        sample.Dispose();
+        sample = null;
+        return r;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Returns sample from the buffer channel.
+    /// </para>
+    /// <para>
+    /// If there are no more pending replies will return immediately (with sample set to null).
+    /// </para>
+    /// </summary>
+    /// <param name="sample"></param>
+    /// <returns>
+    /// <para>"ZResult.Ok" in case of success.</para>
+    /// <para>"ZResult.ChannelDisconnected" if channel was dropped (the sample will be set to "null").</para>
+    /// <para>"ZResult.ChannelNodata" if the channel is still alive, but its buffer is empty (the sample will be set to "null").</para>
+    /// </returns>
+    public ZResult TryRecv(out Sample? sample)
+    {
+        CheckDisposed();
+
+        ZResult r;
+        sample = Sample.CreateOwnedSample();
+
+        switch (BufferChannelType)
+        {
+            case ChannelType.Ring:
+                var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
+                r = ZenohC.z_ring_handler_sample_try_recv(pLoanedRingHandlerSample, sample.HandleZSample);
+                if (r == ZResult.Ok) return r;
+                break;
+            case ChannelType.Fifo:
+                var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
+                r = ZenohC.z_fifo_handler_sample_try_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
+                if (r == ZResult.Ok) return r;
+                break;
+            default:
+                r = ZResult.ErrorGeneric;
+                break;
+        }
+
+        sample.Dispose();
+        sample = null;
+        return r;
     }
 }

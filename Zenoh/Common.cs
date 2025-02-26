@@ -214,6 +214,19 @@ public sealed class ZBytes : IDisposable
         return ZenohC.z_bytes_len(pLoanedBytes);
     }
 
+    internal nint AllocUnmanagedMem()
+    {
+        var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
+        var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
+        ZenohC.z_bytes_clone(pOwnedBytes, pLoanedBytes);
+        return pOwnedBytes;
+    }
+
+    internal static void FreeUnmanagedMem(nint handle)
+    {
+        ZenohC.z_bytes_drop(handle);
+        Marshal.FreeHGlobal(handle);
+    }
 }
 
 public sealed class ZSlice : IDisposable
@@ -360,6 +373,21 @@ public sealed class Timestamp : IDisposable
 
         return ZenohC.z_timestamp_ntp64_time(HandleTimestamp);
     }
+
+
+    internal nint AllocUnmanagedMem()
+    {
+        var zTimestamp = Marshal.PtrToStructure<ZTimestamp>(HandleTimestamp);
+        var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
+        Marshal.StructureToPtr(zTimestamp, pTimestamp, false);
+        return pTimestamp;
+    }
+
+    internal static void FreeUnmanagedMem(nint handle)
+    {
+        Marshal.FreeHGlobal(handle);
+    }
+    
 }
 
 public sealed class Id

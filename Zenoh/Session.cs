@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Zenoh;
 
@@ -17,10 +15,10 @@ public sealed class OpenOptions : IDisposable
         HandleZOpenOptions = pOpenOptions;
     }
 
-    public OpenOptions(OpenOptions source)
+    public OpenOptions(OpenOptions other)
     {
         var pTarget = Marshal.AllocHGlobal(Marshal.SizeOf<ZOpenOptions>());
-        var openOptions = Marshal.PtrToStructure<ZOpenOptions>(source.HandleZOpenOptions);
+        var openOptions = Marshal.PtrToStructure<ZOpenOptions>(other.HandleZOpenOptions);
         Marshal.StructureToPtr(openOptions, pTarget, false);
         HandleZOpenOptions = pTarget;
     }
@@ -47,17 +45,19 @@ public sealed class Session : IDisposable
     // z_owned_session*
     internal nint HandleZOwnedSession { get; private set; }
 
-    public Session()
+    private Session()
     {
-        var pOwnedSession = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSession>());
-        ZenohC.z_internal_session_null(pOwnedSession);
-
-        HandleZOwnedSession = pOwnedSession;
+        throw new InvalidOperationException();
     }
 
     private Session(Session session)
     {
-        throw new InvalidCastException();
+        throw new InvalidOperationException();
+    }
+
+    private Session(nint handle)
+    {
+        HandleZOwnedSession = handle;
     }
 
     public void Dispose()
@@ -72,7 +72,7 @@ public sealed class Session : IDisposable
     {
         if (HandleZOwnedSession == nint.Zero) return;
 
-        // TODO
+        ZenohC.z_session_drop(HandleZOwnedSession);
 
         Marshal.FreeHGlobal(HandleZOwnedSession);
         HandleZOwnedSession = nint.Zero;
@@ -97,29 +97,40 @@ public sealed class Session : IDisposable
     /// </summary>
     /// <param name="config">Zenoh session config</param>
     /// <param name="openOptions"></param>
+    /// <param name="session"></param>
     /// <returns>
     /// ZResult.Ok in case of success
     /// </returns>
-    public ZResult Open(Config config, OpenOptions openOptions)
+    public static ZResult Open(Config config, OpenOptions openOptions, out Session? session)
     {
-        CheckDisposed();
+        config.CheckDisposed();
 
-        var r = ZenohC.z_open(HandleZOwnedSession, config.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
-        config.Dispose();
+        session = null;
+        var pOwnedSession = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSession>());
+        ZenohC.z_internal_session_null(pOwnedSession);
+        var configCopy = new Config(config);
+
+        var r = ZenohC.z_open(pOwnedSession, configCopy.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
+        configCopy.Dispose();
+
+        if (r == ZResult.Ok)
+        {
+            session = new Session(pOwnedSession);
+        }
+        else
+        {
+            Marshal.FreeHGlobal(pOwnedSession);
+        }
+
         return r;
     }
 
     /// <summary>
-    /// Checks if zenoh session is closed.
+    /// Close the session and free memory. This is equivalent to calling the "Dispose()". 
     /// </summary>
-    /// <returns>
-    /// `true` if session is closed, `false` otherwise.
-    /// </returns>
-    public bool IsClosed()
+    public void Close()
     {
-        CheckDisposed();
-
-        return ZenohC.z_session_is_closed(HandleZOwnedSession);
+        Dispose();
     }
 
     /// <summary>
@@ -128,7 +139,7 @@ public sealed class Session : IDisposable
     /// <returns></returns>
     public Timestamp? NewTimestamp()
     {
-        if (IsClosed()) return null;
+        CheckDisposed();
 
         var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
         return Timestamp.NewFromSession(pLoanedSession);
@@ -139,10 +150,13 @@ public sealed class Session : IDisposable
     /// </summary>
     /// <param name="keyexpr">The key expression to publish</param>
     /// <param name="options">Additional options for the publisher.</param>
+    /// <param name="publisher"></param>
     /// <returns></returns>
-    public Publisher? DeclarePublisher(Keyexpr keyexpr, PublisherOptions options)
+    public ZResult DeclarePublisher(Keyexpr keyexpr, PublisherOptions options, out Publisher? publisher)
     {
-        if (IsClosed()) return null;
+        CheckDisposed();
+        
+        publisher = null;
 
         var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
         var pOwnedPublisher = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedPublisher>());
@@ -153,17 +167,18 @@ public sealed class Session : IDisposable
         var r = ZenohC.z_declare_publisher(pLoanedSession, pOwnedPublisher, pLoanedKeyexpr, pPublisherOptions);
         if (r == ZResult.Ok)
         {
-            o = new Publisher(pOwnedPublisher);
+            publisher = new Publisher(pOwnedPublisher);
         }
         else
         {
             ZenohC.z_publisher_drop(pOwnedPublisher);
             Marshal.FreeHGlobal(pOwnedPublisher);
-            o = null;
+            publisher = null;
         }
 
         PublisherOptions.FreeUnmanagedMem(pPublisherOptions);
-        return o;
+
+        return r;
     }
 
     /// <summary>
@@ -175,13 +190,17 @@ public sealed class Session : IDisposable
     /// <param name="callback">
     /// The callback function that will be called each time a data matching the subscribed expression is received.
     /// </param>
+    /// <param name="subscriber"></param>
     /// <returns></returns>
-    public SubscriberCallback? DeclareSubscriberCallback(Keyexpr keyexpr, SubscriberCallback.Cb callback)
+    public ZResult DeclareSubscriberCallback(Keyexpr keyexpr, SubscriberCallback.Cb callback,
+        out SubscriberCallback? subscriber)
     {
-        if (IsClosed()) return null;
+        CheckDisposed();
         keyexpr.CheckDisposed();
+        
+        subscriber = null;
 
-        var subscriber = new SubscriberCallback(callback);
+        subscriber = new SubscriberCallback(callback);
         var gcHandle = GCHandle.Alloc(subscriber);
 
         var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
@@ -205,513 +224,94 @@ public sealed class Session : IDisposable
 
         Marshal.FreeHGlobal(pOwnedClosureSample);
 
-        if (r == ZResult.Ok)
-        {
-            return subscriber;
-        }
+        if (r == ZResult.Ok) return ZResult.Ok;
 
         subscriber.Dispose();
         gcHandle.Free();
-        return null;
+        subscriber = null;
+
+        return r;
     }
 
+    /// <summary>
+    /// Constructs and declares a callback type subscriber for a given key expression. 
+    /// </summary>
+    /// <param name="keyexpr">The key expression to subscribe.</param>
+    /// <param name="channelType">The buffer channel type selected.</param>
+    /// <param name="channelSize">The buffer channel capacity.</param>
+    /// <param name="subscriber"></param>
+    /// <returns></returns>
+    public ZResult DeclareSubscriberBuffer(Keyexpr keyexpr, ChannelType channelType, uint channelSize,
+        out SubscriberBuffer? subscriber)
+    {
+        CheckDisposed();
+        keyexpr.CheckDisposed();
+        
+        subscriber = null;
+
+        subscriber = new SubscriberBuffer(channelType);
+        var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
+
+        switch (channelType)
+        {
+            case ChannelType.Ring:
+                ZenohC.z_ring_channel_sample_new(pOwnedClosureSample, subscriber.HandleChannel, channelSize);
+                break;
+            case ChannelType.Fifo:
+                ZenohC.z_fifo_channel_sample_new(pOwnedClosureSample, subscriber.HandleChannel, channelSize);
+                break;
+            default:
+                throw new ArgumentOutOfRangeException(nameof(channelType), channelType, null);
+        }
+
+        var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
+        var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
+
+        var r = ZenohC.z_declare_subscriber(
+            pLoanedSession,
+            subscriber.HandleOwnedSubscriber,
+            pLoanedKeyexpr,
+            pOwnedClosureSample,
+            nint.Zero
+        );
+
+        Marshal.FreeHGlobal(pOwnedClosureSample);
+
+        if (r == ZResult.Ok) return ZResult.Ok;
+
+        subscriber.Dispose();
+        return r;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Publishes data on specified key expression.
+    /// </para>
+    /// <para>
+    /// Do not use the "payload" after calling this function.
+    /// payload.Dispose() is called inside this function.
+    /// </para>
+    /// </summary>
+    /// <param name="keyexpr">The key expression to publish to.</param>
+    /// <param name="payload">The value to put.</param>
+    /// <param name="options">The put options.</param>
+    /// <returns></returns>
+    public ZResult Put(Keyexpr keyexpr, ZBytes payload, PutOptions options)
+    {
+        CheckDisposed();
+        keyexpr.CheckDisposed();
+        
+        var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
+        var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
+        var pMovedBytes = payload.HandleZOwnedBytes;
+        var pPutOptions = options.AllocUnmanagedMem();
+        
+        var r = ZenohC.z_put(pLoanedSession, pLoanedKeyexpr, pMovedBytes, pPutOptions);
+        
+        PutOptions.FreeUnmanagedMem(pPutOptions);
+        payload.Dispose();
+
+        return r;
+    }
 }
 
-public class OldSession : IDisposable
-{
-    internal SortedDictionary<int, SubscriberCallback> subscribersDictionary;
-    private int _indexSubscriber = 1;
-    internal SortedDictionary<int, Publisher> publishersDictionary;
-    private int _indexPublisher = 1;
-    internal SortedDictionary<int, Queryable> queryableDictionary;
-    private int _indexQueryable = 1;
-    private bool _disposed;
-    private readonly unsafe ZOwnedSession* _session;
-
-    private unsafe OldSession(ZOwnedSession* session)
-    {
-        subscribersDictionary = new SortedDictionary<int, SubscriberCallback>();
-        publishersDictionary = new SortedDictionary<int, Publisher>();
-        queryableDictionary = new SortedDictionary<int, Queryable>();
-        _disposed = false;
-        _session = session;
-    }
-
-    public static OldSession? Open(Config config)
-    {
-        unsafe
-        {
-            ZOwnedSession session = ZenohC.z_open(config.OwnedConfig);
-            if (ZenohC.z_session_check(&session) != 1)
-            {
-                return null;
-            }
-
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf(session));
-            Marshal.StructureToPtr(session, p, false);
-
-            return new OldSession((ZOwnedSession*)p);
-        }
-    }
-
-
-    public void Close()
-    {
-        if (_disposed) return;
-
-        unsafe
-        {
-            foreach ((_, SubscriberCallback subscriber) in subscribersDictionary)
-            {
-                ZenohC.z_undeclare_subscriber(subscriber.ownedSubscriber);
-                Marshal.FreeHGlobal((nint)subscriber.ownedSubscriber);
-                subscriber.ownedSubscriber = null;
-            }
-
-            subscribersDictionary.Clear();
-
-            ZenohC.z_close(_session);
-            Marshal.FreeHGlobal((nint)_session);
-        }
-
-        _disposed = true;
-    }
-
-    public void Dispose() => Dispose(true);
-
-    private void Dispose(bool disposing)
-    {
-        Close();
-    }
-
-    public Id LocalId()
-    {
-        unsafe
-        {
-            ZSession session = ZenohC.z_session_loan(_session);
-            ZId zid = ZenohC.z_info_zid(session);
-            return new Id(zid);
-        }
-    }
-
-    public Id[] RoutersId()
-    {
-        unsafe
-        {
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pIdBuffer = Marshal.AllocHGlobal(Marshal.SizeOf<ZIdBuffer>());
-            Marshal.WriteInt64(pIdBuffer, 0);
-            ZOwnedClosureZId ownedClosureZId = new ZOwnedClosureZId
-            {
-                context = (void*)pIdBuffer,
-                call = ZIdBuffer.z_id_call,
-                drop = null,
-            };
-            nint pOwnedClosureZId = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZId>());
-            Marshal.StructureToPtr(ownedClosureZId, pOwnedClosureZId, false);
-            ZenohC.z_info_routers_zid(session, (ZOwnedClosureZId*)pOwnedClosureZId);
-            ZIdBuffer? zIdBuffer = (ZIdBuffer?)Marshal.PtrToStructure(pIdBuffer, typeof(ZIdBuffer));
-
-            Marshal.FreeHGlobal(pOwnedClosureZId);
-            Marshal.FreeHGlobal(pIdBuffer);
-
-            return zIdBuffer is null ? Array.Empty<Id>() : zIdBuffer.Value.ToIds();
-        }
-    }
-
-    public Id[] PeersId()
-    {
-        unsafe
-        {
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pIdBuffer = Marshal.AllocHGlobal(Marshal.SizeOf<ZIdBuffer>());
-            Marshal.WriteInt64(pIdBuffer, 0);
-            ZOwnedClosureZId ownedClosureZId = new ZOwnedClosureZId
-            {
-                context = (void*)pIdBuffer,
-                call = ZIdBuffer.z_id_call,
-                drop = null,
-            };
-            nint pOwnedClosureZId = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZId>());
-            Marshal.StructureToPtr(ownedClosureZId, pOwnedClosureZId, false);
-            ZenohC.z_info_peers_zid(session, (ZOwnedClosureZId*)pOwnedClosureZId);
-            ZIdBuffer? zIdBuffer = (ZIdBuffer?)Marshal.PtrToStructure(pIdBuffer, typeof(ZIdBuffer));
-
-            Marshal.FreeHGlobal(pOwnedClosureZId);
-            Marshal.FreeHGlobal(pIdBuffer);
-
-            return zIdBuffer is null ? Array.Empty<Id>() : zIdBuffer.Value.ToIds();
-        }
-    }
-
-    public bool PutStr(string key, string value)
-    {
-        return PutStr(key, value, ZCongestionControl.Block, ZPriority.RealTime);
-    }
-
-    public bool PutStr(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
-    {
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.TextPlain);
-    }
-
-    public bool PutJson(string key, string value)
-    {
-        return PutJson(key, value, ZCongestionControl.Block, ZPriority.RealTime);
-    }
-
-    public bool PutJson(string key, string s, ZCongestionControl zCongestionControl, ZPriority zPriority)
-    {
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppJson);
-    }
-
-    public bool PutInt(string key, long value)
-    {
-        return PutInt(key, value, ZCongestionControl.Block, ZPriority.RealTime);
-    }
-
-    public bool PutInt(string key, long value, ZCongestionControl zCongestionControl, ZPriority zPriority)
-    {
-        string s = value.ToString("G");
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppInteger);
-    }
-
-    public bool PutFloat(string key, double value)
-    {
-        return PutFloat(key, value, ZCongestionControl.Block, ZPriority.RealTime);
-    }
-
-    public bool PutFloat(string key, double value, ZCongestionControl zCongestionControl, ZPriority zPriority)
-    {
-        string s = value.ToString("G");
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _put(key, data, zCongestionControl, zPriority, ZEncodingPrefix.AppFloat);
-    }
-
-    public bool PutData(string key, byte[] value, ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null)
-    {
-        return PutData(key, value, ZCongestionControl.Block, ZPriority.RealTime, zEncodingPrefix, encodingSuffix);
-    }
-
-    public bool PutData(string key, byte[] value,
-        ZCongestionControl zCongestionControl, ZPriority zPriority,
-        ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null
-    )
-    {
-        return _put(key, value, zCongestionControl, zPriority, zEncodingPrefix, encodingSuffix);
-    }
-
-    private bool _put(
-        string key, byte[] value,
-        ZCongestionControl zCongestionControl, ZPriority zPriority,
-        ZEncodingPrefix zEncodingPrefix, byte[]? encodingSuffix = null
-    )
-    {
-        if (_disposed) return false;
-        unsafe
-        {
-            int r;
-
-            fixed (byte* pv = value)
-            {
-                nuint len = (nuint)value.Length;
-                nint pKey = Marshal.StringToHGlobalAnsi(key);
-                ZSession session = ZenohC.z_session_loan(_session);
-                ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-                if (encodingSuffix is null)
-                {
-                    ZPutOptions options = new ZPutOptions
-                    {
-                        encoding = ZenohC.z_encoding(zEncodingPrefix, null),
-                        ZCongestionControl = zCongestionControl,
-                        ZPriority = zPriority,
-                    };
-                    r = ZenohC.z_put(session, keyexpr, pv, len, &options);
-                }
-                else
-                {
-                    fixed (byte* pEncodingSuffix = encodingSuffix)
-                    {
-                        ZPutOptions options = new ZPutOptions
-                        {
-                            encoding = ZenohC.z_encoding(zEncodingPrefix, pEncodingSuffix),
-                            ZCongestionControl = zCongestionControl,
-                            ZPriority = zPriority,
-                        };
-                        r = ZenohC.z_put(session, keyexpr, pv, len, &options);
-                    }
-                }
-
-                Marshal.FreeHGlobal(pKey);
-            }
-
-            return r == 0;
-        }
-    }
-
-    public bool PubStr(PublisherHandle handle, string value)
-    {
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
-        return _publisher_put(handle, data, ZEncodingPrefix.TextPlain);
-    }
-
-    public bool PubJson(PublisherHandle handle, string value)
-    {
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(value);
-        return _publisher_put(handle, data, ZEncodingPrefix.AppJson);
-    }
-
-    public bool PubInt(PublisherHandle handle, long value)
-    {
-        string s = value.ToString("G");
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _publisher_put(handle, data, ZEncodingPrefix.AppInteger);
-    }
-
-    public bool PubFloat(PublisherHandle handle, double value)
-    {
-        string s = value.ToString("G");
-        byte[] data = System.Text.Encoding.UTF8.GetBytes(s);
-        return _publisher_put(handle, data, ZEncodingPrefix.AppFloat);
-    }
-
-    public bool PubData(PublisherHandle handle, byte[] data, ZEncodingPrefix zEncodingPrefix,
-        byte[]? encodingSuffix = null)
-    {
-        return _publisher_put(handle, data, zEncodingPrefix, encodingSuffix);
-    }
-
-    private bool _publisher_put(PublisherHandle handle, byte[] value, ZEncodingPrefix zEncodingPrefix,
-        byte[]? encodingSuffix = null)
-    {
-        if (_disposed) return false;
-        unsafe
-        {
-            if (!publishersDictionary.TryGetValue(handle.handle, out Publisher? publisher))
-                return false;
-
-            ZPublisher pub = ZenohC.z_publisher_loan(publisher.ownedPublisher);
-            int r;
-            fixed (byte* pv = value)
-            {
-                if (encodingSuffix is null)
-                {
-                    ZPublisherPutOptions options = new ZPublisherPutOptions
-                    {
-                        encoding = ZenohC.z_encoding(zEncodingPrefix, null),
-                    };
-                    nuint len = (nuint)value.Length;
-                    r = ZenohC.z_publisher_put(pub, pv, len, &options);
-                }
-                else
-                {
-                    fixed (byte* pSuffix = encodingSuffix)
-                    {
-                        ZPublisherPutOptions options = new ZPublisherPutOptions
-                        {
-                            encoding = ZenohC.z_encoding(zEncodingPrefix, pSuffix),
-                        };
-                        nuint len = (nuint)value.Length;
-                        r = ZenohC.z_publisher_put(pub, pv, len, &options);
-                    }
-                }
-            }
-
-            return r == 0;
-        }
-    }
-
-    public SubscriberHandle? RegisterSubscriber(SubscriberCallback subscriberCallback)
-    {
-        unsafe
-        {
-            if (subscriberCallback.ownedSubscriber != null)
-                return null;
-
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pKey = Marshal.StringToHGlobalAnsi(subscriberCallback.keyexpr);
-            ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-            nint pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZSubscriberOptions>());
-            Marshal.StructureToPtr(subscriberCallback.options, pOptions, false);
-            ZOwnedSubscriber sub =
-                ZenohC.z_declare_subscriber(session, keyexpr, subscriberCallback.closureSample, (ZSubscriberOptions*)pOptions);
-            Marshal.FreeHGlobal(pOptions);
-            Marshal.FreeHGlobal(pKey);
-
-            if (ZenohC.z_subscriber_check(&sub) != 1)
-                return null;
-
-            nint pOwnedSubscriber = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSubscriber>());
-            Marshal.StructureToPtr(sub, pOwnedSubscriber, false);
-            subscriberCallback.ownedSubscriber = (ZOwnedSubscriber*)pOwnedSubscriber;
-
-            _indexSubscriber += 1;
-            subscribersDictionary.Add(_indexSubscriber, subscriberCallback);
-
-            return new SubscriberHandle
-            {
-                handle = _indexSubscriber,
-            };
-        }
-    }
-
-    public void UnregisterSubscriber(SubscriberHandle handle)
-    {
-        UnregisterSubscriber(handle.handle);
-    }
-
-    private void UnregisterSubscriber(int handle)
-    {
-        if (subscribersDictionary.TryGetValue(handle, out SubscriberCallback? subscriber))
-        {
-            unsafe
-            {
-                ZenohC.z_undeclare_subscriber(subscriber.ownedSubscriber);
-                Marshal.FreeHGlobal((nint)subscriber.ownedSubscriber);
-                subscriber.ownedSubscriber = null;
-            }
-
-            subscribersDictionary.Remove(handle);
-        }
-    }
-
-    public PublisherHandle? RegisterPublisher(Publisher publisher)
-    {
-        unsafe
-        {
-            if (publisher.ownedPublisher != null)
-                return null;
-
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pKey = Marshal.StringToHGlobalAnsi(publisher.keyexpr);
-            ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-            nint pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZPublisherOptions>());
-            Marshal.StructureToPtr(publisher.options, pOptions, false);
-
-            ZOwnedPublisher pub = ZenohC.z_declare_publisher(session, keyexpr, (ZPublisherOptions*)pOptions);
-
-            Marshal.FreeHGlobal(pOptions);
-            Marshal.FreeHGlobal(pKey);
-
-            if (ZenohC.z_publisher_check(&pub) != 1)
-                return null;
-
-            nint pOwnedPublisher = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedPublisher>());
-            Marshal.StructureToPtr(pub, pOwnedPublisher, false);
-            publisher.ownedPublisher = (ZOwnedPublisher*)pOwnedPublisher;
-
-            _indexPublisher += 1;
-            publishersDictionary.Add(_indexPublisher, publisher);
-
-            return new PublisherHandle
-            {
-                handle = _indexPublisher
-            };
-        }
-    }
-
-    public void UnregisterPublisher(PublisherHandle handle)
-    {
-        UnregisterPublisher(handle.handle);
-    }
-
-    private void UnregisterPublisher(int handle)
-    {
-        if (publishersDictionary.TryGetValue(handle, out Publisher? publisher))
-        {
-            unsafe
-            {
-                ZenohC.z_undeclare_publisher(publisher.ownedPublisher);
-                Marshal.FreeHGlobal((nint)publisher.ownedPublisher);
-                publisher.ownedPublisher = null;
-            }
-
-            publishersDictionary.Remove(handle);
-        }
-    }
-
-    public Querier? Query(QueryOptions options)
-    {
-        if (_disposed)
-            return null;
-
-        unsafe
-        {
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pKey = Marshal.StringToHGlobalAnsi(options.keyexpr);
-            ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-            Querier querier = new Querier();
-            ZGetOptions getOptions = new ZGetOptions();
-            getOptions.target = options.target;
-            getOptions.consolidation.mode = options.mode;
-            getOptions.value.encoding = ZenohC.z_encoding(options.ZEncodingPrefix, null);
-            getOptions.value.payload.len = (nuint)options.payload.Length;
-            sbyte r;
-            fixed (byte* data = options.payload)
-            {
-                getOptions.value.payload.start = data;
-                nint pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZGetOptions>());
-                Marshal.StructureToPtr(getOptions, pOptions, false);
-                r = ZenohC.z_get(session, keyexpr, null, &querier._channel->send, (ZGetOptions*)pOptions);
-                Marshal.FreeHGlobal(pOptions);
-                Marshal.FreeHGlobal(pKey);
-            }
-
-            return r >= 0 ? querier : null;
-        }
-    }
-
-    public QueryableHandle? RegisterQueryable(Queryable queryable)
-    {
-        unsafe
-        {
-            if (queryable.zOwnedQueryable != null)
-                return null;
-
-            ZSession session = ZenohC.z_session_loan(_session);
-            nint pKey = Marshal.StringToHGlobalAnsi(queryable.keyexpr);
-            ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-
-            ZOwnedQueryable zOwnedQueryable =
-                ZenohC.z_declare_queryable(session, keyexpr, queryable.closureQuery, queryable.options);
-            Marshal.FreeHGlobal(pKey);
-
-            if (ZenohC.z_queryable_check(&zOwnedQueryable) != 1)
-                return null;
-
-            nint pOwnedQueryable = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQueryable>());
-            Marshal.StructureToPtr(zOwnedQueryable, pOwnedQueryable, false);
-            queryable.zOwnedQueryable = (ZOwnedQueryable*)pOwnedQueryable;
-
-            _indexQueryable += 1;
-            queryableDictionary.Add(_indexQueryable, queryable);
-
-            return new QueryableHandle
-            {
-                handle = _indexQueryable,
-            };
-        }
-    }
-
-    public void UnregisterQueryable(QueryableHandle handle)
-    {
-        UnregisterQueryable(handle.handle);
-    }
-
-    private void UnregisterQueryable(int handle)
-    {
-        if (queryableDictionary.TryGetValue(handle, out Queryable? queryable))
-        {
-            unsafe
-            {
-                ZenohC.z_undeclare_queryable(queryable.zOwnedQueryable);
-                Marshal.FreeHGlobal((nint)queryable.zOwnedQueryable);
-                queryable.zOwnedQueryable = null;
-            }
-
-            queryableDictionary.Remove(handle);
-        }
-    }
-}
