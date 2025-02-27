@@ -94,7 +94,7 @@ public sealed class Sample : IDisposable
     /// Returns sample qos congestion control value.
     /// </summary>
     /// <returns></returns>
-    public ZCongestionControl GetCongestionControl()
+    public CongestionControl GetCongestionControl()
     {
         CheckDisposed();
 
@@ -145,7 +145,7 @@ public sealed class Sample : IDisposable
     /// Returns the sample kind.
     /// </summary>
     /// <returns></returns>
-    public ZSampleKind GetKind()
+    public SampleKind GetKind()
     {
         CheckDisposed();
 
@@ -170,7 +170,7 @@ public sealed class Sample : IDisposable
     /// Returns sample qos priority value.
     /// </summary>
     /// <returns></returns>
-    public ZPriority GetPriority()
+    public Priority GetPriority()
     {
         CheckDisposed();
 

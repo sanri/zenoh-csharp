@@ -339,7 +339,7 @@ public sealed class Encoding : IDisposable
     /// </para>
     /// </summary>
     /// <param name="schema"></param>
-    public ZResult SetSchema(string schema)
+    public Result SetSchema(string schema)
     {
         CheckDisposed();
 
@@ -369,7 +369,7 @@ public sealed class Encoding : IDisposable
     }
 
 
-    internal nint AllocUnmanagedMem()
+    internal nint AllocUnmanagedMemory()
     {
         var pZOwnedEncoding = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedEncoding>());
         var pZLoanedEncoding = ZenohC.z_encoding_loan(HandleZOwnedEncoding);

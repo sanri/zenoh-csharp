@@ -37,7 +37,7 @@ public sealed class ZString : IDisposable
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
         var pStr = Marshal.StringToHGlobalAnsi(str);
         var r = ZenohC.z_string_copy_from_str(pOwnedString, pStr);
-        if (r != ZResult.Ok) ZenohC.z_string_empty(pOwnedString);
+        if (r != Result.Ok) ZenohC.z_string_empty(pOwnedString);
         Marshal.FreeHGlobal(pStr);
         HandleZOwnedString = pOwnedString;
     }
@@ -214,7 +214,7 @@ public sealed class ZBytes : IDisposable
         return ZenohC.z_bytes_len(pLoanedBytes);
     }
 
-    internal nint AllocUnmanagedMem()
+    internal nint AllocUnmanagedMemory()
     {
         var pOwnedBytes = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedBytes>());
         var pLoanedBytes = ZenohC.z_bytes_loan(HandleZOwnedBytes);
@@ -322,7 +322,7 @@ public sealed class Timestamp : IDisposable
         var pTimestamp = Marshal.AllocHGlobal(Marshal.SizeOf<ZTimestamp>());
         var r = ZenohC.z_timestamp_new(pTimestamp,handle);
         Timestamp? o;
-        if (r == ZResult.Ok)
+        if (r == Result.Ok)
         {
             o = new Timestamp(pTimestamp);
         }

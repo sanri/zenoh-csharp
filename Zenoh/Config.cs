@@ -36,7 +36,7 @@ public sealed class Config : IDisposable
         ZenohC.z_internal_config_null(pOwnedConfig);
 
         var r = ZenohC.z_config_default(pOwnedConfig);
-        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
         Marshal.FreeHGlobal(pOwnedConfig);
         return null;
     }
@@ -47,7 +47,7 @@ public sealed class Config : IDisposable
         ZenohC.z_internal_config_null(pOwnedConfig);
 
         var r = ZenohC.zc_config_from_env(pOwnedConfig);
-        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
         Marshal.FreeHGlobal(pOwnedConfig);
         return null;
     }
@@ -60,7 +60,7 @@ public sealed class Config : IDisposable
         var pPath = Marshal.StringToHGlobalAnsi(path);
         var r = ZenohC.zc_config_from_file(pOwnedConfig, pPath);
         Marshal.FreeHGlobal(pPath);
-        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
         Marshal.FreeHGlobal(pOwnedConfig);
         return null;
     }
@@ -73,7 +73,7 @@ public sealed class Config : IDisposable
         var pS = Marshal.StringToHGlobalAnsi(s);
         var r = ZenohC.zc_config_from_str(pOwnedConfig, pS);
         Marshal.FreeHGlobal(pS);
-        if (r == ZResult.Ok) return new Config(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
         Marshal.FreeHGlobal(pOwnedConfig);
         return null;
     }
@@ -110,6 +110,6 @@ public sealed class Config : IDisposable
         var zString = new ZString();
         var pLoanedConfig = ZenohC.z_config_loan(HandleZOwnedConfig);
         var r = ZenohC.zc_config_to_string(pLoanedConfig, zString.HandleZOwnedString);
-        return r == ZResult.Ok ? zString : null;
+        return r == Result.Ok ? zString : null;
     }
 }

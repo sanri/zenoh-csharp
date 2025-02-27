@@ -101,7 +101,7 @@ public sealed class Session : IDisposable
     /// <returns>
     /// ZResult.Ok in case of success
     /// </returns>
-    public static ZResult Open(Config config, OpenOptions openOptions, out Session? session)
+    public static Result Open(Config config, OpenOptions openOptions, out Session? session)
     {
         config.CheckDisposed();
 
@@ -113,7 +113,7 @@ public sealed class Session : IDisposable
         var r = ZenohC.z_open(pOwnedSession, configCopy.HandleZOwnedConfig, openOptions.HandleZOpenOptions);
         configCopy.Dispose();
 
-        if (r == ZResult.Ok)
+        if (r == Result.Ok)
         {
             session = new Session(pOwnedSession);
         }
@@ -152,7 +152,7 @@ public sealed class Session : IDisposable
     /// <param name="options">Additional options for the publisher.</param>
     /// <param name="publisher"></param>
     /// <returns></returns>
-    public ZResult DeclarePublisher(Keyexpr keyexpr, PublisherOptions options, out Publisher? publisher)
+    public Result DeclarePublisher(Keyexpr keyexpr, PublisherOptions options, out Publisher? publisher)
     {
         CheckDisposed();
         
@@ -161,11 +161,11 @@ public sealed class Session : IDisposable
         var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
         var pOwnedPublisher = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedPublisher>());
         var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
-        var pPublisherOptions = options.AllocUnmanagedMem();
+        var pPublisherOptions = options.AllocUnmanagedMemory();
 
         Publisher? o;
         var r = ZenohC.z_declare_publisher(pLoanedSession, pOwnedPublisher, pLoanedKeyexpr, pPublisherOptions);
-        if (r == ZResult.Ok)
+        if (r == Result.Ok)
         {
             publisher = new Publisher(pOwnedPublisher);
         }
@@ -176,7 +176,7 @@ public sealed class Session : IDisposable
             publisher = null;
         }
 
-        PublisherOptions.FreeUnmanagedMem(pPublisherOptions);
+        PublisherOptions.FreeUnmanagedMemory(pPublisherOptions);
 
         return r;
     }
@@ -192,7 +192,7 @@ public sealed class Session : IDisposable
     /// </param>
     /// <param name="subscriber"></param>
     /// <returns></returns>
-    public ZResult DeclareSubscriberCallback(Keyexpr keyexpr, SubscriberCallback.Cb callback,
+    public Result DeclareSubscriberCallback(Keyexpr keyexpr, SubscriberCallback.Cb callback,
         out SubscriberCallback? subscriber)
     {
         CheckDisposed();
@@ -224,7 +224,7 @@ public sealed class Session : IDisposable
 
         Marshal.FreeHGlobal(pOwnedClosureSample);
 
-        if (r == ZResult.Ok) return ZResult.Ok;
+        if (r == Result.Ok) return Result.Ok;
 
         subscriber.Dispose();
         gcHandle.Free();
@@ -241,7 +241,7 @@ public sealed class Session : IDisposable
     /// <param name="channelSize">The buffer channel capacity.</param>
     /// <param name="subscriber"></param>
     /// <returns></returns>
-    public ZResult DeclareSubscriberBuffer(Keyexpr keyexpr, ChannelType channelType, uint channelSize,
+    public Result DeclareSubscriberBuffer(Keyexpr keyexpr, ChannelType channelType, uint channelSize,
         out SubscriberBuffer? subscriber)
     {
         CheckDisposed();
@@ -277,7 +277,7 @@ public sealed class Session : IDisposable
 
         Marshal.FreeHGlobal(pOwnedClosureSample);
 
-        if (r == ZResult.Ok) return ZResult.Ok;
+        if (r == Result.Ok) return Result.Ok;
 
         subscriber.Dispose();
         return r;
@@ -296,7 +296,7 @@ public sealed class Session : IDisposable
     /// <param name="payload">The value to put.</param>
     /// <param name="options">The put options.</param>
     /// <returns></returns>
-    public ZResult Put(Keyexpr keyexpr, ZBytes payload, PutOptions options)
+    public Result Put(Keyexpr keyexpr, ZBytes payload, PutOptions options)
     {
         CheckDisposed();
         keyexpr.CheckDisposed();
@@ -304,14 +304,25 @@ public sealed class Session : IDisposable
         var pLoanedSession = ZenohC.z_session_loan(HandleZOwnedSession);
         var pLoanedKeyexpr = ZenohC.z_keyexpr_loan(keyexpr.HandleZOwnedKeyexpr);
         var pMovedBytes = payload.HandleZOwnedBytes;
-        var pPutOptions = options.AllocUnmanagedMem();
+        var pPutOptions = options.AllocUnmanagedMemory();
         
         var r = ZenohC.z_put(pLoanedSession, pLoanedKeyexpr, pMovedBytes, pPutOptions);
         
-        PutOptions.FreeUnmanagedMem(pPutOptions);
+        PutOptions.FreeUnmanagedMemory(pPutOptions);
         payload.Dispose();
 
         return r;
+    }
+
+
+
+    /// <summary>
+    /// Query data from the matching queryable in the system.
+    /// </summary>
+    /// <returns></returns>
+    public Result Get()
+    {
+        
     }
 }
 

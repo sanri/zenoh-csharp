@@ -6,8 +6,8 @@ namespace Zenoh;
 public sealed class PutOptions : IDisposable
 {
     private Encoding? _encoding;
-    private ZCongestionControl _congestionControl;
-    private ZPriority _priority;
+    private CongestionControl _congestionControl;
+    private Priority _priority;
     private bool _isExpress;
     private Timestamp? _timestamp;
     private ZBytes? _attachment;
@@ -89,22 +89,22 @@ public sealed class PutOptions : IDisposable
         return _encoding is null ? null : new Encoding(_encoding);
     }
 
-    public void SetCongestionControl(ZCongestionControl congestionControl)
+    public void SetCongestionControl(CongestionControl congestionControl)
     {
         _congestionControl = congestionControl;
     }
 
-    public ZCongestionControl GetCongestionControl()
+    public CongestionControl GetCongestionControl()
     {
         return _congestionControl;
     }
 
-    public void SetPriority(ZPriority priority)
+    public void SetPriority(Priority priority)
     {
         _priority = priority;
     }
 
-    public ZPriority GetPriority()
+    public Priority GetPriority()
     {
         return _priority;
     }
@@ -139,7 +139,7 @@ public sealed class PutOptions : IDisposable
         return _attachment is null ? null : new ZBytes(_attachment);
     }
 
-    internal nint AllocUnmanagedMem()
+    internal nint AllocUnmanagedMemory()
     {
         var options = new ZPutOptions()
         {
@@ -150,7 +150,7 @@ public sealed class PutOptions : IDisposable
 
         if (_encoding is not null)
         {
-            options.encoding = _encoding.AllocUnmanagedMem();
+            options.encoding = _encoding.AllocUnmanagedMemory();
         }
 
         if (_timestamp is not null)
@@ -160,7 +160,7 @@ public sealed class PutOptions : IDisposable
 
         if (_attachment is not null)
         {
-            options.attachment = _attachment.AllocUnmanagedMem();
+            options.attachment = _attachment.AllocUnmanagedMemory();
         }
 
         options.congestion_control = _congestionControl;
@@ -173,7 +173,7 @@ public sealed class PutOptions : IDisposable
         return pOptions;
     }
 
-    internal static void FreeUnmanagedMem(nint handle)
+    internal static void FreeUnmanagedMemory(nint handle)
     {
         var options = Marshal.PtrToStructure<ZPutOptions>(handle);
 
@@ -200,8 +200,8 @@ public sealed class PutOptions : IDisposable
 public sealed class PublisherOptions : IDisposable
 {
     private Encoding? _encoding;
-    private ZCongestionControl _congestionControl;
-    private ZPriority _priority;
+    private CongestionControl _congestionControl;
+    private Priority _priority;
     private bool _isExpress;
 
     public PublisherOptions()
@@ -255,22 +255,22 @@ public sealed class PublisherOptions : IDisposable
         return _encoding is null ? null : new Encoding(_encoding);
     }
 
-    public void SetCongestionControl(ZCongestionControl congestionControl)
+    public void SetCongestionControl(CongestionControl congestionControl)
     {
         _congestionControl = congestionControl;
     }
 
-    public ZCongestionControl GetCongestionControl()
+    public CongestionControl GetCongestionControl()
     {
         return _congestionControl;
     }
 
-    public void SetPriority(ZPriority priority)
+    public void SetPriority(Priority priority)
     {
         _priority = priority;
     }
 
-    public ZPriority GetPriority()
+    public Priority GetPriority()
     {
         return _priority;
     }
@@ -285,7 +285,7 @@ public sealed class PublisherOptions : IDisposable
         return _isExpress;
     }
 
-    internal nint AllocUnmanagedMem()
+    internal nint AllocUnmanagedMemory()
     {
         var options = new ZPublisherOptions
         {
@@ -294,7 +294,7 @@ public sealed class PublisherOptions : IDisposable
 
         if (_encoding is not null)
         {
-            options.encoding = _encoding.AllocUnmanagedMem();
+            options.encoding = _encoding.AllocUnmanagedMemory();
         }
 
         options.congestion_control = _congestionControl;
@@ -307,7 +307,7 @@ public sealed class PublisherOptions : IDisposable
         return pOptions;
     }
 
-    internal static void FreeUnmanagedMem(nint handle)
+    internal static void FreeUnmanagedMemory(nint handle)
     {
         var options = Marshal.PtrToStructure<ZPublisherOptions>(handle);
 
@@ -414,7 +414,7 @@ public sealed class PublisherPutOptions : IDisposable
         return _attachment is null ? null : new ZBytes(_attachment);
     }
 
-    internal nint AllocUnmanagedMem()
+    internal nint AllocUnmanagedMemory()
     {
         var options = new ZPublisherPutOptions
         {
@@ -425,7 +425,7 @@ public sealed class PublisherPutOptions : IDisposable
 
         if (_encoding is not null)
         {
-            options.encoding = _encoding.AllocUnmanagedMem();
+            options.encoding = _encoding.AllocUnmanagedMemory();
         }
 
         if (_timestamp is not null)
@@ -435,7 +435,7 @@ public sealed class PublisherPutOptions : IDisposable
 
         if (_attachment is not null)
         {
-            options.attachment = _attachment.AllocUnmanagedMem();
+            options.attachment = _attachment.AllocUnmanagedMemory();
         }
 
         var pPublisherPutOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZPublisherPutOptions>());
@@ -444,7 +444,7 @@ public sealed class PublisherPutOptions : IDisposable
         return pPublisherPutOptions;
     }
 
-    internal static void FreeUnmanagedMem(nint handle)
+    internal static void FreeUnmanagedMemory(nint handle)
     {
         var options = Marshal.PtrToStructure<ZPublisherPutOptions>(handle);
 
@@ -541,17 +541,17 @@ public sealed class Publisher : IDisposable
     /// <param name="payload">The data to publish. Will be consumed.</param>
     /// <param name="options">The publisher put options.</param>
     /// <returns>ZResult.Ok in case of success.</returns>
-    public ZResult Put(ZBytes payload, PublisherPutOptions options)
+    public Result Put(ZBytes payload, PublisherPutOptions options)
     {
         CheckDisposed();
         payload.CheckDisposed();
 
-        var pPublisherPutOptions = options.AllocUnmanagedMem();
+        var pPublisherPutOptions = options.AllocUnmanagedMemory();
         var pLoanedPublisher = ZenohC.z_publisher_loan(HandleZOwnedPublisher);
 
         var r = ZenohC.z_publisher_put(pLoanedPublisher, payload.HandleZOwnedBytes, pPublisherPutOptions);
 
-        PublisherPutOptions.FreeUnmanagedMem(pPublisherPutOptions);
+        PublisherPutOptions.FreeUnmanagedMemory(pPublisherPutOptions);
         payload.Dispose();
         return r;
     }

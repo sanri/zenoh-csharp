@@ -238,11 +238,11 @@ public sealed class SubscriberBuffer : IDisposable
     /// <para>"ZResult.Ok" in case of success.</para>
     /// <para>"ZResult.ChannelDisconnected" if channel was dropped (the sample will be set to "null").</para>
     /// </returns>
-    public ZResult Recv(out Sample? sample)
+    public Result Recv(out Sample? sample)
     {
         CheckDisposed();
 
-        ZResult r;
+        Result r;
         sample = Sample.CreateOwnedSample();
 
         switch (BufferChannelType)
@@ -250,15 +250,15 @@ public sealed class SubscriberBuffer : IDisposable
             case ChannelType.Ring:
                 var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
                 r = ZenohC.z_ring_handler_sample_recv(pLoanedRingHandlerSample, sample.HandleZSample);
-                if (r == ZResult.Ok) return r;
+                if (r == Result.Ok) return r;
                 break;
             case ChannelType.Fifo:
                 var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
                 r = ZenohC.z_fifo_handler_sample_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
-                if (r == ZResult.Ok) return r;
+                if (r == Result.Ok) return r;
                 break;
             default:
-                r = ZResult.ErrorGeneric;
+                r = Result.ErrorGeneric;
                 break;
         }
 
@@ -281,11 +281,11 @@ public sealed class SubscriberBuffer : IDisposable
     /// <para>"ZResult.ChannelDisconnected" if channel was dropped (the sample will be set to "null").</para>
     /// <para>"ZResult.ChannelNodata" if the channel is still alive, but its buffer is empty (the sample will be set to "null").</para>
     /// </returns>
-    public ZResult TryRecv(out Sample? sample)
+    public Result TryRecv(out Sample? sample)
     {
         CheckDisposed();
 
-        ZResult r;
+        Result r;
         sample = Sample.CreateOwnedSample();
 
         switch (BufferChannelType)
@@ -293,15 +293,15 @@ public sealed class SubscriberBuffer : IDisposable
             case ChannelType.Ring:
                 var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
                 r = ZenohC.z_ring_handler_sample_try_recv(pLoanedRingHandlerSample, sample.HandleZSample);
-                if (r == ZResult.Ok) return r;
+                if (r == Result.Ok) return r;
                 break;
             case ChannelType.Fifo:
                 var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
                 r = ZenohC.z_fifo_handler_sample_try_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
-                if (r == ZResult.Ok) return r;
+                if (r == Result.Ok) return r;
                 break;
             default:
-                r = ZResult.ErrorGeneric;
+                r = Result.ErrorGeneric;
                 break;
         }
 

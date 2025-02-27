@@ -42,7 +42,7 @@ public sealed class Keyexpr : IDisposable
         var pKeyexpr = Marshal.StringToHGlobalAnsi(keyexpr);
         var r = ZenohC.z_keyexpr_from_str_autocanonize(pOwnedKeyexpr, pKeyexpr);
         Marshal.FreeHGlobal(pKeyexpr);
-        if (r == ZResult.Ok) return new Keyexpr(pOwnedKeyexpr);
+        if (r == Result.Ok) return new Keyexpr(pOwnedKeyexpr);
 
         Marshal.FreeHGlobal(pOwnedKeyexpr);
         return null;
@@ -56,7 +56,7 @@ public sealed class Keyexpr : IDisposable
         var pLeft = ZenohC.z_keyexpr_loan(left.HandleZOwnedKeyexpr);
         var pRight = ZenohC.z_keyexpr_loan(right.HandleZOwnedKeyexpr);
         var r = ZenohC.z_keyexpr_join(pOwnedKeyexpr, pLeft, pRight);
-        if (r == ZResult.Ok) return new Keyexpr(pOwnedKeyexpr);
+        if (r == Result.Ok) return new Keyexpr(pOwnedKeyexpr);
 
         Marshal.FreeHGlobal(pOwnedKeyexpr);
         return null;
@@ -92,11 +92,11 @@ public sealed class Keyexpr : IDisposable
     /// </summary>
     /// <param name="keyexpr"></param>
     /// <returns></returns>
-    public static ZResult IsCanon(string keyexpr)
+    public static Result IsCanon(string keyexpr)
     {
         var bytes = System.Text.Encoding.UTF8.GetBytes(keyexpr);
         var len = (nuint)bytes.Length;
-        ZResult r;
+        Result r;
         unsafe
         {
             fixed (byte* ptr = bytes)
