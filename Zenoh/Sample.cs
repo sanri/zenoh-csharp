@@ -9,7 +9,7 @@ public sealed class Sample : IDisposable
     internal bool Owned { get; }
 
     // z_loaned_sample_t*  or  z_owned_sample_t*
-    internal nint HandleZSample { get; private set; }
+    internal nint Handle { get; private set; }
 
     private Sample()
     {
@@ -19,16 +19,16 @@ public sealed class Sample : IDisposable
     internal Sample(Sample other)
     {
         var pOwnedSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSample>());
-        var pLoanedSample = other.Owned ? ZenohC.z_sample_loan(other.HandleZSample) : other.HandleZSample;
+        var pLoanedSample = other.Owned ? ZenohC.z_sample_loan(other.Handle) : other.Handle;
         ZenohC.z_sample_clone(pOwnedSample, pLoanedSample);
         Owned = true;
-        HandleZSample = pOwnedSample;
+        Handle = pOwnedSample;
     }
 
     private Sample(nint handle, bool owned)
     {
         Owned = owned;
-        HandleZSample = handle;
+        Handle = handle;
     }
 
     internal static Sample CreateLoanedSample(nint handle)
@@ -56,20 +56,20 @@ public sealed class Sample : IDisposable
 
     private void Dispose(bool disposing)
     {
-        if (HandleZSample == nint.Zero) return;
+        if (Handle == nint.Zero) return;
 
         if (Owned)
         {
-            ZenohC.z_sample_drop(HandleZSample);
-            Marshal.FreeHGlobal(HandleZSample);
+            ZenohC.z_sample_drop(Handle);
+            Marshal.FreeHGlobal(Handle);
         }
 
-        HandleZSample = nint.Zero;
+        Handle = nint.Zero;
     }
 
     public void CheckDisposed()
     {
-        if (HandleZSample == nint.Zero)
+        if (Handle == nint.Zero)
         {
             throw new InvalidOperationException("Object is disposed");
         }
@@ -85,7 +85,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         var pLoanedBytes = ZenohC.z_sample_attachment(pLoanedSample);
         return pLoanedBytes == nint.Zero ? null : ZBytes.CloneFromLoaned(pLoanedBytes);
     }
@@ -98,7 +98,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         return ZenohC.z_sample_congestion_control(pLoanedSample);
     }
 
@@ -110,7 +110,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         var pLoanedEncoding = ZenohC.z_sample_encoding(pLoanedSample);
         return Encoding.CloneFromLoaned(pLoanedEncoding);
     }
@@ -125,7 +125,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         return ZenohC.z_sample_express(pLoanedSample);
     }
 
@@ -136,7 +136,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         var pLoanedKeyexpr = ZenohC.z_sample_keyexpr(pLoanedSample);
         return Keyexpr.CloneFromLoaned(pLoanedKeyexpr);
     }
@@ -149,7 +149,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         return ZenohC.z_sample_kind(pLoanedSample);
     }
 
@@ -161,7 +161,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         var pLoanedBytes = ZenohC.z_sample_payload(pLoanedSample);
         return ZBytes.CloneFromLoaned(pLoanedBytes);
     }
@@ -174,7 +174,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         return ZenohC.z_sample_priority(pLoanedSample);
     }
 
@@ -188,7 +188,7 @@ public sealed class Sample : IDisposable
     {
         CheckDisposed();
 
-        var pLoanedSample = Owned ? ZenohC.z_sample_loan(HandleZSample) : HandleZSample;
+        var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
         var pTimestamp = ZenohC.z_sample_timestamp(pLoanedSample);
         return pTimestamp == nint.Zero ? null : Timestamp.CloneFromPointer(pTimestamp);
     }

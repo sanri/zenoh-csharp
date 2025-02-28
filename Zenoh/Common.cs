@@ -4,11 +4,6 @@ using System.Text;
 
 namespace Zenoh;
 
-public enum ChannelType
-{
-    Ring,
-    Fifo
-}
 
 public sealed class ZString : IDisposable
 {

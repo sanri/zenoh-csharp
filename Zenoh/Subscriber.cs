@@ -249,12 +249,12 @@ public sealed class SubscriberBuffer : IDisposable
         {
             case ChannelType.Ring:
                 var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
-                r = ZenohC.z_ring_handler_sample_recv(pLoanedRingHandlerSample, sample.HandleZSample);
+                r = ZenohC.z_ring_handler_sample_recv(pLoanedRingHandlerSample, sample.Handle);
                 if (r == Result.Ok) return r;
                 break;
             case ChannelType.Fifo:
                 var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
-                r = ZenohC.z_fifo_handler_sample_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
+                r = ZenohC.z_fifo_handler_sample_recv(pLoanedFifoHandlerSample, sample.Handle);
                 if (r == Result.Ok) return r;
                 break;
             default:
@@ -292,12 +292,12 @@ public sealed class SubscriberBuffer : IDisposable
         {
             case ChannelType.Ring:
                 var pLoanedRingHandlerSample = ZenohC.z_ring_handler_sample_loan(HandleChannel);
-                r = ZenohC.z_ring_handler_sample_try_recv(pLoanedRingHandlerSample, sample.HandleZSample);
+                r = ZenohC.z_ring_handler_sample_try_recv(pLoanedRingHandlerSample, sample.Handle);
                 if (r == Result.Ok) return r;
                 break;
             case ChannelType.Fifo:
                 var pLoanedFifoHandlerSample = ZenohC.z_fifo_handler_sample_loan(HandleChannel);
-                r = ZenohC.z_fifo_handler_sample_try_recv(pLoanedFifoHandlerSample, sample.HandleZSample);
+                r = ZenohC.z_fifo_handler_sample_try_recv(pLoanedFifoHandlerSample, sample.Handle);
                 if (r == Result.Ok) return r;
                 break;
             default:
