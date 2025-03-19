@@ -401,6 +401,7 @@ public sealed class Query : Loanable
     public Result ReplyErr(ZBytes payload, QueryReplyErrOptions options)
     {
         // todo
+        return Result.ErrorGeneric;
     }
 }
 
