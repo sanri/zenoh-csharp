@@ -1,0 +1,25 @@
+{
+  // id: "1234567890abcdef",
+
+  mode: "client",
+
+  metadata: {
+    name: "strawberry",
+    location: "Penny Lane",
+  },
+
+  connect: {
+    timeout_ms: { router: -1, peer: -1, client: 0 },
+    endpoints: [
+       "tcp/127.0.0.1:7447"
+    ],
+    exit_on_failure: { router: false, peer: false, client: true },
+  },
+
+  /// Configuration of data messages timestamps management.
+  timestamping: {
+    enabled: { router: true, peer: false, client: false },
+    drop_future_timestamp: false,
+  },
+
+}

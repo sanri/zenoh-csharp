@@ -1,136 +1,99 @@
-﻿#nullable enable
-
-using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System;
 using CommandLine;
 using Zenoh;
 
 namespace ZSub;
 
-class Program
+public class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
-        var r = Parser.Default.ParseArguments<ClArgs>(args);
-        bool ok = true;
-        r.WithNotParsed(e => { ok = false; });
-        if (!ok) return;
+        var arguments = Parser.Default.ParseArguments<Args>(args);
+        var isOk = true;
+        arguments.WithNotParsed(e => { isOk = false; });
+        if (!isOk) return;
 
-        ClArgs clArgs = r.Value;
-        Config? config = clArgs.ToConfig();
-        if (config is null)
-            return;
+        var config = arguments.Value.ToConfig();
+        if (config is null) return;
 
         Console.WriteLine("Opening session...");
-        var session = Session.Open(config);
+        var r = Session.Open(config, out var session);
         if (session is null)
         {
-            Console.WriteLine("Opening session fault!");
+            Console.WriteLine($"Opening session unsuccessful! result: {r}");
             return;
         }
 
-        Thread.Sleep(200);
-        Console.WriteLine("Opening session successful!");
+        Console.WriteLine("Opening session successful!\n");
 
+        string keyexprStr = "demo/example/**";
+        var keyexpr = Keyexpr.FromString(keyexprStr);
+        if (keyexpr is null) goto Exit;
 
-        void Callback(Sample sample)
+        r = session.DeclareSubscriber(keyexpr, Callback, out Subscriber? subscriber);
+        if (subscriber is null)
         {
-            string key = sample.GetKeyexpr();
-            string value = sample.GetString() ?? "";
-            Console.WriteLine($">> [Subscriber] Received PUT ('{key}': '{value}')");
+            Console.WriteLine($"Declare subscriber unsuccessful! result: {r}");
+            goto Exit;
         }
 
-        SubscriberCallback userCallback = Callback;
+        Console.WriteLine($"Declaring subscriber on {keyexpr}");
 
-        string key = clArgs.GetKey();
-
-        Subscriber subscriber = new Subscriber(key, userCallback);
-
-        var handle = session.RegisterSubscriber(subscriber);
-        if (handle is null)
-        {
-            Console.WriteLine($"Register Subscriber fault On '{key}'");
-            return;
-        }
-
-        Console.WriteLine($"Registered Subscriber On '{key}'");
-
-
-        Console.WriteLine("Enter 'q' to quit...");
+        Console.WriteLine("Input 'q' to quit.");
         while (true)
         {
-            var input = Console.ReadKey();
-            if (input.Key == ConsoleKey.Q)
-            {
-                break;
-            }
+            var input = Console.ReadLine();
+            if (input == "q") break;
         }
 
-        session.UnregisterSubscriber(handle.Value);
+        subscriber.Undeclare();
 
+        Exit:
         session.Close();
+        Console.WriteLine("exit");
+    }
+
+    static void Callback(Sample sample)
+    {
+        var keyexpr = sample.GetKeyexpr();
+        var keyexprStr = keyexpr.ToString();
+        var encoding = sample.GetEncoding();
+        var encodingStr = encoding.ToString();
+        var payload = sample.GetPayload();
+
+        string payloadStr;
+        switch (encoding.GetEncodingId())
+        {
+            case EncodingId.ZenohString:
+            case EncodingId.TextPlain:
+            case EncodingId.ApplicationJson:
+            case EncodingId.TextJson:
+            case EncodingId.TextJson5:
+                var zString = payload.ToZString() ?? new ZString();
+                payloadStr = zString.ToString() ?? "";
+                break;
+            default:
+                payloadStr = "";
+                break;
+        }
+
+        Console.WriteLine(
+            $">> [Subscriber] Received PUT key: {keyexprStr}, encoding: {encodingStr}, length: {payload.Length()}, payload:");
+        Console.WriteLine($"   {payloadStr}");
     }
 }
 
-class ClArgs
+public class Args
 {
-    [Option('c', "config", Required = false, HelpText = "A configuration file.")]
+    [Option('c', "config", Required = false, HelpText = "Zenoh config file.")]
     public string? ConfigFilePath { get; set; } = null;
 
-    [Option('e', "connect", Required = false, HelpText = "Endpoints to connect to. example: tcp/127.0.0.1:7447")]
-    public IEnumerable<string> Connects { get; set; } = new List<string>();
-
-    [Option('l', "listen", Required = false, HelpText = "Endpoints to listen on. example: tcp/127.0.0.1:8447")]
-    public IEnumerable<string> Listens { get; set; } = new List<string>();
-
-    [Option('m', "mode", Required = false,
-        HelpText = "The zenoh session mode (peer by default) [possible values: peer, client]")]
-    public string Mode { get; set; } = "peer";
-
-    [Option('k', "key", Required = false,
-        HelpText = "The key expression to subscribe to. [default: demo/example/**]")]
-    public string? Keyexpr { get; set; } = null;
-
-    internal Config? ToConfig()
+    public Config? ToConfig()
     {
-        if (ConfigFilePath != null)
-        {
-            Config? c = Config.LoadFromFile(ConfigFilePath);
-            if (c is null)
-            {
-                Console.WriteLine("load config file error!");
-                return null;
-            }
+        var config = ConfigFilePath == null ? Config.Default() : Config.FromFile(ConfigFilePath);
 
-            return c;
-        }
-
-        Config config = new Config();
-
-        config.SetMode(Mode == "client" ? Config.Mode.Client : Config.Mode.Peer);
-
-        List<string> connects = new List<string>();
-        foreach (string s in Connects)
-        {
-            connects.Add(s);
-        }
-
-        config.SetConnect(connects.ToArray());
-
-        List<string> listens = new List<string>();
-        foreach (string s in Listens)
-        {
-            listens.Add(s);
-        }
-
-        config.SetListen(listens.ToArray());
-
-        return config;
-    }
-
-    public string GetKey()
-    {
-        return Keyexpr ?? "demo/example/**";
+        if (config is not null) return config;
+        Console.WriteLine("load config file error!");
+        return null;
     }
 }

@@ -4,7 +4,8 @@
         <PackageId>ZQueryable</PackageId>
         <OutputType>Exe</OutputType>
         <EnableDefaultItems>false</EnableDefaultItems>
-        <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+        <LangVersion>12</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Configurations>Debug;Release</Configurations>
         <Platforms>ARM64;x64</Platforms>

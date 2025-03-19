@@ -1,78 +1,89 @@
-#pragma warning disable CS8500
-
 using System;
 using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-public struct SubscriberHandle
+public sealed class Subscriber : IDisposable
 {
-    internal int handle;
-}
+    // z_owned_subscriber_t*
+    internal nint Handle { get; private set; }
 
-public delegate void SubscriberCallback(Sample sample);
+    public delegate void Cb(Sample sample);
 
-public class Subscriber : IDisposable
-{
-    internal readonly unsafe ZOwnedClosureSample* closureSample;
-    internal unsafe ZOwnedSubscriber* ownedSubscriber;
-    internal readonly string keyexpr;
-    internal readonly ZSubscriberOptions options;
-    private readonly ZOwnedClosureSample _ownedClosureSample;
-    private GCHandle _userCallbackGcHandle;
-    private bool _disposed;
-
-    public Subscriber(string key, SubscriberCallback userCallback)
-        : this(key, userCallback, Reliability.Reliable)
+    internal Subscriber()
     {
+        var pOwnedSubscriber = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSubscriber>());
+        ZenohC.z_internal_subscriber_null(pOwnedSubscriber);
+        Handle = pOwnedSubscriber;
     }
-
-    public Subscriber(string key, SubscriberCallback userCallback, Reliability reliability)
+    
+    private Subscriber(Subscriber other)
     {
-        unsafe
-        {
-            keyexpr = key;
-            _disposed = false;
-            options.reliability = reliability;
-            _userCallbackGcHandle = GCHandle.Alloc(userCallback, GCHandleType.Normal);
-            _ownedClosureSample = new ZOwnedClosureSample
-            {
-                context = (void*)GCHandle.ToIntPtr(_userCallbackGcHandle),
-                call = Call,
-                drop = null,
-            };
-
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf(_ownedClosureSample));
-            Marshal.StructureToPtr(_ownedClosureSample, p, false);
-            closureSample = (ZOwnedClosureSample*)p;
-            ownedSubscriber = null;
-        }
+        throw new InvalidOperationException();
     }
+    
 
-    public void Dispose() => Dispose(true);
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    ~Subscriber()=>Dispose(false);
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (Handle == nint.Zero) return;
 
-        unsafe
-        {
-            Marshal.FreeHGlobal((nint)closureSample);
-            Marshal.FreeHGlobal((nint)ownedSubscriber);
-        }
-
-        _userCallbackGcHandle.Free();
-        _disposed = true;
+        ZenohC.z_subscriber_drop(Handle);
+        Marshal.FreeHGlobal(Handle);
+        Handle = nint.Zero;
     }
-
-    private static unsafe void Call(ZSample* zSample, void* context)
+    
+    internal void CheckDisposed()
     {
-        var gch = GCHandle.FromIntPtr((nint)context);
-        var callback = (SubscriberCallback?)gch.Target;
-        var sample = new Sample(zSample);
-        if (callback != null)
+        if (Handle == nint.Zero)
         {
-            callback(sample);
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
+    
+    /// <summary>
+    /// Undeclare the subscriber and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
+    {
+        Dispose();
+    }
+    
+    /// <summary>
+    /// Returns the key expression of the subscriber.
+    /// </summary>
+    /// <returns>
+    /// The return Keyexpr is loaned.
+    /// </returns>
+    public Keyexpr GetKeyexpr()
+    {
+        CheckDisposed();
+
+        var pLoanedSubscriber = ZenohC.z_subscriber_loan(Handle);
+        var pLoanedKeyexpr = ZenohC.z_subscriber_keyexpr(pLoanedSubscriber);
+        return Keyexpr.CreateLoaned(pLoanedKeyexpr);
+    }
+    
+    internal static void CallbackClosureSampleCall(nint sample, nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        if (gcHandle.Target is not Cb callback) return;
+
+        var loanedSample = Sample.CreateLoaned(sample);
+        callback(loanedSample);
+    }
+
+    internal static void CallbackClosureSampleDrop(nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        gcHandle.Free();
+    }
+    
 }

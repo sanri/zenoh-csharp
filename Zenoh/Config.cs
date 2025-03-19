@@ -1,166 +1,116 @@
-#nullable enable
-
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
 
 namespace Zenoh;
 
-public class Config : IDisposable
+public sealed class Config : IDisposable
 {
-    public enum Mode
+    // z_owned_config*
+    internal nint Handle { get; private set; }
+
+    private Config()
     {
-        Peer,
-        Client,
+        throw new InvalidOperationException();
     }
 
-    internal unsafe ZOwnedConfig* ownedConfig;
-    private bool _disposed;
-
-
-    public Config()
+    private Config(nint config)
     {
-        unsafe
-        {
-            ZOwnedConfig config = ZenohC.z_config_default();
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf(config));
-            Marshal.StructureToPtr(config, p, false);
-            ownedConfig = (ZOwnedConfig*)p;
-        }
-    
-        _disposed = false;
+        Handle = config;
     }
 
-    public static Config? LoadFromFile(string path)
+    public Config(Config other)
     {
-        unsafe
-        {
-            ZOwnedConfig config = ZenohC.zc_config_from_file(path);
-            int b = ZenohC.z_config_check(&config);
-            // if (!ZenohC.z_config_check(&config))
-            if (b==0)
-            {
-                ZenohC.z_config_drop(&config);
-                return null;
-            }
+        other.CheckDisposed();
 
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf(config));
-            Marshal.StructureToPtr(config, p, false);
-            return new Config
-            {
-                ownedConfig = (ZOwnedConfig*)p,
-                _disposed = false,
-            };
-        }
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
+        var pLoanedConfig = ZenohC.z_config_loan(other.Handle);
+        ZenohC.z_config_clone(pOwnedConfig, pLoanedConfig);
+        Handle = pOwnedConfig;
     }
 
-    public void Dispose() => Dispose(true);
+    public static Config? Default()
+    {
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
+        var r = ZenohC.z_config_default(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
+    }
+
+    public static Config? FromEnv()
+    {
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
+        var r = ZenohC.zc_config_from_env(pOwnedConfig);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
+    }
+
+    public static Config? FromFile(string path)
+    {
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
+        var pPath = Marshal.StringToHGlobalAnsi(path);
+        var r = ZenohC.zc_config_from_file(pOwnedConfig, pPath);
+        Marshal.FreeHGlobal(pPath);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
+
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
+    }
+
+    public static Config? FromStr(string s)
+    {
+        var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
+        ZenohC.z_internal_config_null(pOwnedConfig);
+
+        var pS = Marshal.StringToHGlobalAnsi(s);
+        var r = ZenohC.zc_config_from_str(pOwnedConfig, pS);
+        Marshal.FreeHGlobal(pS);
+        if (r == Result.Ok) return new Config(pOwnedConfig);
+        Marshal.FreeHGlobal(pOwnedConfig);
+        return null;
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Config() => Dispose(false);
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
+        if (Handle == nint.Zero) return;
 
-        unsafe
-        {
-            ZenohC.z_config_drop(ownedConfig);
-            Marshal.FreeHGlobal((nint)ownedConfig);
-        }
-
-        _disposed = true;
+        ZenohC.z_config_drop(Handle);
+        Marshal.FreeHGlobal(Handle);
+        Handle = nint.Zero;
     }
 
-    public string ToStr()
+    public void CheckDisposed()
     {
-        if (_disposed) return "";
-
-        unsafe
+        if (Handle == nint.Zero)
         {
-            ZConfig config = ZenohC.z_config_loan(ownedConfig);
-            ZOwnedStr str = ZenohC.zc_config_to_string(config);
-            string o = ZenohC.ZOwnedStrToString(&str);
-            ZenohC.z_str_drop(&str);
-            return o;
+            throw new InvalidOperationException();
         }
     }
 
-
-    public bool SetMode(Mode mode)
+    public ZString? ToZString()
     {
-        if (_disposed) return false;
+        CheckDisposed();
 
-        string value = "";
-        switch (mode)
-        {
-            case Mode.Client:
-                value = "\"client\"";
-                break;
-            case Mode.Peer:
-                value = "\"peer\"";
-                break;
-        }
-
-        unsafe
-        {
-            ZConfig config = ZenohC.z_config_loan(ownedConfig);
-            sbyte r = ZenohC.zc_config_insert_json(config, ZenohC.zConfigModeKey, value);
-            return r == 0;
-        }
-    }
-
-    // The v such as "tcp/172.30.1.1:7447"
-    public bool SetConnect(string[] v)
-    {
-        if (_disposed) return false;
-
-        StringBuilder value = new StringBuilder("[");
-        foreach (var ele in v)
-        {
-            value.Append($"\"{ele}\",");
-        }
-
-        value.Append("]");
-
-        unsafe
-        {
-            ZConfig config = ZenohC.z_config_loan(ownedConfig);
-            sbyte r = ZenohC.zc_config_insert_json(config, ZenohC.zConfigConnectKey, value.ToString());
-            return r == 0;
-        }
-    }
-
-    // The v such as "tcp/127.0.0.1:7888"
-    public bool SetListen(string[] v)
-    {
-        if (_disposed) return false;
-
-        StringBuilder value = new StringBuilder("[");
-        foreach (var ele in v)
-        {
-            value.Append($"\"{ele}\",");
-        }
-
-        value.Append("]");
-
-        unsafe
-        {
-            ZConfig config = ZenohC.z_config_loan(ownedConfig);
-            sbyte r = ZenohC.zc_config_insert_json(config, ZenohC.zConfigListenKey, value.ToString());
-            return r == 0;
-        }
-    }
-
-    // Whether data messages should be timestamped
-    public bool SetTimestamp(bool b)
-    {
-        if (_disposed) return false;
-
-        string value = b ? "true" : "false";
-
-        unsafe
-        {
-            ZConfig config = ZenohC.z_config_loan(ownedConfig);
-            sbyte r = ZenohC.zc_config_insert_json(config, ZenohC.zConfigAddTimestampKey, value);
-            return r == 0;
-        }
+        var zString = new ZString();
+        var pLoanedConfig = ZenohC.z_config_loan(Handle);
+        var r = ZenohC.zc_config_to_string(pLoanedConfig, zString.Handle);
+        return r == Result.Ok ? zString : null;
     }
 }

@@ -1,172 +1,512 @@
-#pragma warning disable CS8500
-
 using System;
 using System.Runtime.InteropServices;
-using System.Text;
-
 
 namespace Zenoh;
 
-public struct QueryableHandle
+public sealed class QueryReplyOptions : IDisposable
 {
-    internal int handle;
-}
+    private CongestionControl _congestionControl;
+    private Priority _priority;
+    private bool _isExpress;
+    private Encoding? _encoding;
+    private Timestamp? _timestamp;
+    private ZBytes? _attachment;
 
-public delegate void QueryableCallback(Query query);
-
-public class Queryable : IDisposable
-{
-    internal string keyexpr;
-    internal unsafe ZOwnedQueryable* zOwnedQueryable;
-    internal unsafe ZOwnedClosureQuery* closureQuery;
-    internal unsafe ZQueryableOptions* options;
-    private readonly ZOwnedClosureQuery _ownedClosureQuery;
-    private GCHandle _userCallbackGcHandle;
-    private bool _disposed;
-
-    public Queryable(string keyexpr, QueryableCallback userCallback, bool complete = false)
+    public QueryReplyOptions()
     {
-        unsafe
-        {
-            this.keyexpr = keyexpr;
-            _disposed = false;
-            zOwnedQueryable = null;
-            _userCallbackGcHandle = GCHandle.Alloc(userCallback);
+        var pQueryReplyOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyOptions>());
+        ZenohC.z_query_reply_options_default(pQueryReplyOptions);
+        var options = Marshal.PtrToStructure<ZQueryReplyOptions>(pQueryReplyOptions);
+        Marshal.FreeHGlobal(pQueryReplyOptions);
 
-            _ownedClosureQuery = new ZOwnedClosureQuery
-            {
-                context = (void*)GCHandle.ToIntPtr(_userCallbackGcHandle),
-                call = Call,
-                drop = null,
-            };
-            nint p = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureQuery>());
-            Marshal.StructureToPtr(_ownedClosureQuery, p, false);
-            closureQuery = (ZOwnedClosureQuery*)p;
-
-            nint pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryableOptions>());
-            Marshal.WriteByte(pOptions, complete ? (byte)1 : (byte)0);
-            options = (ZQueryableOptions*)pOptions;
-        }
+        _congestionControl = options.congestion_control;
+        _priority = options.priority;
+        _isExpress = options.is_express;
+        _encoding = null;
+        _timestamp = null;
+        _attachment = null;
     }
 
-    public void Dispose() => Dispose(true);
+    public QueryReplyOptions(QueryReplyOptions other)
+    {
+        _congestionControl = other._congestionControl;
+        _priority = other._priority;
+        _isExpress = other._isExpress;
+        _encoding = other._encoding is null ? null : new Encoding(other._encoding);
+        _timestamp = other._timestamp is null ? null : new Timestamp(other._timestamp);
+        _attachment = other._attachment is null ? null : new ZBytes(other._attachment);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~QueryReplyOptions() => Dispose(false);
 
     private void Dispose(bool disposing)
     {
-        if (_disposed) return;
-
-        unsafe
+        if (_encoding is not null)
         {
-            Marshal.FreeHGlobal((nint)closureQuery);
-            Marshal.FreeHGlobal((nint)options);
-            Marshal.FreeHGlobal((nint)zOwnedQueryable);
+            if (disposing)
+            {
+                _encoding.Dispose();
+            }
+
+            _encoding = null;
         }
 
-        _userCallbackGcHandle.Free();
-        _disposed = true;
+        if (_timestamp is not null)
+        {
+            if (disposing)
+            {
+                _timestamp.Dispose();
+            }
+
+            _timestamp = null;
+        }
+
+        if (_attachment is not null)
+        {
+            if (disposing)
+            {
+                _attachment.Dispose();
+            }
+
+            _attachment = null;
+        }
     }
 
-    private static unsafe void Call(ZQuery* zQuery, void* context)
+    public void SetCongestionControl(CongestionControl congestionControl)
     {
-        var gch = GCHandle.FromIntPtr((nint)context);
-        var callback = (QueryableCallback?)gch.Target;
-        var query = new Query(zQuery);
-        if (callback != null)
+        _congestionControl = congestionControl;
+    }
+
+    public CongestionControl GetCongestionControl()
+    {
+        return _congestionControl;
+    }
+
+    public void SetPriority(Priority priority)
+    {
+        _priority = priority;
+    }
+
+    public Priority GetPriority()
+    {
+        return _priority;
+    }
+
+    public void SetIsExpress(bool isExpress)
+    {
+        _isExpress = isExpress;
+    }
+
+    public bool GetIsExpress()
+    {
+        return _isExpress;
+    }
+
+    public void SetEncoding(Encoding? encoding)
+    {
+        _encoding = encoding is null ? null : new Encoding(encoding);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>
+    /// Return Encoding is loaned.
+    /// </returns>
+    public Encoding? GetEncoding()
+    {
+        return _encoding is null ? null : Encoding.CreateLoaned(_encoding.LoanedPointer());
+    }
+
+    public void SetTimestamp(Timestamp? timestamp)
+    {
+        _timestamp = timestamp is null ? null : new Timestamp(timestamp);
+    }
+
+    public Timestamp? GetTimestamp()
+    {
+        return _timestamp is null ? null : new Timestamp(_timestamp);
+    }
+
+    public void SetAttachment(ZBytes? attachment)
+    {
+        _attachment = attachment is null ? null : new ZBytes(attachment);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>
+    /// Return ZBytes is loaned.
+    /// </returns>
+    public ZBytes? GetAttachment()
+    {
+        return _attachment is null ? null : ZBytes.CreateLoaned(_attachment.LoanedPointer());
+    }
+
+    internal nint AllocUnmanagedMemory()
+    {
+        var options = new ZQueryReplyOptions
         {
-            callback(query);
+            encoding = nint.Zero,
+            timestamp = nint.Zero,
+            attachment = nint.Zero,
+            congestion_control = _congestionControl,
+            priority = _priority,
+            is_express = _isExpress,
+        };
+
+        if (_encoding is not null)
+        {
+            options.encoding = _encoding.AllocUnmanagedMemory();
         }
+
+        if (_timestamp is not null)
+        {
+            options.timestamp = _timestamp.AllocUnmanagedMem();
+        }
+
+        if (_attachment is not null)
+        {
+            options.attachment = _attachment.AllocUnmanagedMemory();
+        }
+
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyOptions>());
+        Marshal.StructureToPtr(options, pOptions, false);
+
+        return pOptions;
+    }
+
+    internal static void FreeUnmanagedMemory(nint handle)
+    {
+        var options = Marshal.PtrToStructure<ZQueryReplyOptions>(handle);
+
+        if (options.encoding != nint.Zero)
+        {
+            Encoding.FreeUnmanagedMem(options.encoding);
+        }
+
+        if (options.timestamp != nint.Zero)
+        {
+            Timestamp.FreeUnmanagedMem(options.timestamp);
+        }
+
+        if (options.attachment != nint.Zero)
+        {
+            ZBytes.FreeUnmanagedMem(options.attachment);
+        }
+
+        Marshal.FreeHGlobal(handle);
     }
 }
 
-public class Query
+public sealed class QueryReplyErrOptions : IDisposable
 {
-    private unsafe ZQuery* _query;
-
-    internal unsafe Query(ZQuery* query)
+    public void Dispose()
     {
-        _query = query;
+        throw new NotImplementedException();
+    }
+}
+
+// z_owned_query_t
+public sealed class Query : Loanable
+{
+    internal Query()
+    {
+        var pOwnedQuery = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQuery>());
+        ZenohC.z_internal_query_null(pOwnedQuery);
+        Handle = pOwnedQuery;
+        Owned = true;
     }
 
-    public string GetKeyexpr()
+    public Query(Query other)
     {
-        unsafe
+        other.CheckDisposed();
+
+        var pOwnedQuery = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQuery>());
+        var pLoanedQuery = other.LoanedPointer();
+        ZenohC.z_query_clone(pOwnedQuery, pLoanedQuery);
+        Handle = pOwnedQuery;
+        Owned = true;
+    }
+
+    private Query(nint handle, bool owned)
+    {
+        Handle = handle;
+        Owned = owned;
+    }
+
+    internal static Query CreateLoaned(nint handle)
+    {
+        return new Query(handle, false);
+    }
+
+    public override void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Query() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (Handle == nint.Zero) return;
+
+        if (Owned)
         {
-            ZKeyexpr keyexpr = ZenohC.z_query_keyexpr(_query);
-            string keyStr = ZenohC.ZKeyexprToString(keyexpr);
-            return keyStr;
+            ZenohC.z_query_drop(Handle);
+            Marshal.FreeHGlobal(Handle);
+        }
+
+        Handle = nint.Zero;
+    }
+
+    public override void ToOwned()
+    {
+        var pOwnedQuery = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQuery>());
+        var pLoanedQuery = LoanedPointer();
+        ZenohC.z_query_clone(pOwnedQuery, pLoanedQuery);
+        Handle = pOwnedQuery;
+        Owned = true;
+    }
+
+    internal override nint LoanedPointer()
+    {
+        return Owned ? ZenohC.z_query_loan(Handle) : Handle;
+    }
+
+    /// <summary>
+    /// Gets query attachment.
+    /// </summary>
+    /// <returns></returns>
+    public ZBytes? GetAttachment()
+    {
+        CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedBytes = ZenohC.z_query_attachment(pLoanedQuery);
+
+        return pLoanedBytes == nint.Zero ? null : ZBytes.CreateLoaned(pLoanedBytes);
+    }
+
+    /// <summary>
+    /// Gets query payload encoding.
+    /// </summary>
+    /// <returns></returns>
+    public Encoding? GetEncoding()
+    {
+        CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedEncoding = ZenohC.z_query_encoding(pLoanedQuery);
+
+        return pLoanedEncoding == nint.Zero ? null : Encoding.CreateLoaned(pLoanedEncoding);
+    }
+
+    /// <summary>
+    /// Gets query payload.
+    /// </summary>
+    /// <returns>
+    /// Return ZBytes is loaned.
+    /// </returns>
+    public ZBytes? GetPayload()
+    {
+        CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedBytes = ZenohC.z_query_payload(pLoanedQuery);
+
+        return pLoanedBytes == nint.Zero ? null : ZBytes.CreateLoaned(pLoanedBytes);
+    }
+
+    /// <summary>
+    /// Gets query key expression.
+    /// </summary>
+    /// <returns></returns>
+    public Keyexpr GetKeyexpr()
+    {
+        CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedKeyexpr = ZenohC.z_query_keyexpr(pLoanedQuery);
+
+        return Keyexpr.CreateLoaned(pLoanedKeyexpr);
+    }
+
+    /// <summary>
+    /// <para>
+    /// Gets query value selector.
+    /// </para>
+    /// </summary>
+    /// <returns></returns>
+    public string? GetParameters()
+    {
+        CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var viewString = new ViewString();
+        ZenohC.z_query_parameters(pLoanedQuery, viewString.Handle);
+        var r = viewString.ToString();
+        viewString.Dispose();
+        return r;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Sends a reply to a query.
+    /// </para>
+    /// <para>
+    /// This function must be called inside of a Queryable callback passing the query received as parameters of the callback function.
+    /// This function can be called multiple times to send multiple replies to a query.
+    /// The reply will be considered complete when the Queryable callback returns.
+    /// </para>
+    /// <para>
+    /// Do not use the "payload" after calling this function.
+    /// payload.Dispose() is called inside this function.
+    /// </para>
+    /// </summary>
+    /// <param name="keyexpr">The key of this reply</param>
+    /// <param name="payload">The payload of this reply.</param>
+    /// <param name="options">The options of this reply</param>
+    /// <returns>
+    /// Result.Ok in case of success.
+    /// </returns>
+    public Result Reply(Keyexpr keyexpr, ZBytes payload, QueryReplyOptions options)
+    {
+        CheckDisposed();
+        keyexpr.CheckDisposed();
+        payload.CheckDisposed();
+        payload.ToOwned();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedKeyexpr = keyexpr.LoanedPointer();
+        var pMovedBytes = payload.Handle;
+        var pQueryReplyOptions = options.AllocUnmanagedMemory();
+
+        var r = ZenohC.z_query_reply(pLoanedQuery, pLoanedKeyexpr, pMovedBytes, pQueryReplyOptions);
+
+        QueryReplyOptions.FreeUnmanagedMemory(pQueryReplyOptions);
+        payload.Dispose();
+
+        return r;
+    }
+
+    public Result ReplyErr(ZBytes payload, QueryReplyErrOptions options)
+    {
+        // todo
+    }
+}
+
+
+public sealed class QueryableOptions
+{
+    public bool Complete;
+
+    public QueryableOptions()
+    {
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryableOptions>());
+        ZenohC.z_queryable_options_default(pOptions);
+        var options = Marshal.PtrToStructure<ZQueryableOptions>(pOptions);
+        Marshal.FreeHGlobal(pOptions);
+        Complete = options.complete;
+    }
+
+    public QueryableOptions(QueryableOptions other)
+    {
+        Complete = other.Complete;
+    }
+
+    internal nint AllocUnmanagedMem()
+    {
+        var options = new ZQueryableOptions
+        {
+            complete = Complete
+        };
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryableOptions>());
+        Marshal.StructureToPtr(options, pOptions, false);
+        return pOptions;
+    }
+
+    internal static void FreeUnmanagedMem(nint handle)
+    {
+        Marshal.FreeHGlobal(handle);
+    }
+    
+}
+
+// z_owned_queryable_t
+public sealed class Queryable : IDisposable
+{
+    internal nint Handle { get;private set; }
+    
+    public delegate void Cb(Query query);
+
+    internal Queryable()
+    {
+        var pOwnedQueryable = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQueryable>());
+        ZenohC.z_internal_queryable_null(pOwnedQueryable);
+        Handle = pOwnedQueryable;
+    }
+
+    private Queryable(Queryable other)
+    {
+        throw new InvalidOperationException();
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~Queryable() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (Handle == nint.Zero) return;
+        
+        ZenohC.z_queryable_drop(Handle);
+        Marshal.FreeHGlobal(Handle);
+        Handle = nint.Zero;
+    }
+    
+    internal void CheckDisposed()
+    {
+        if (Handle == nint.Zero)
+        {
+            throw new InvalidOperationException("Object has been destroyed");
         }
     }
-
-    public Value GetValue()
+    
+    /// <summary>
+    /// Undeclare the queryable and free memory. This is equivalent to calling the "Dispose()".
+    /// </summary>
+    public void Undeclare()
     {
-        unsafe
-        {
-            ZValue zValue = ZenohC.z_query_value(_query);
-            return new Value(zValue);
-        }
+        Dispose();
     }
 
-    public bool Reply(string key, byte[] payload, EncodingPrefix encodingPrefix, byte[]? encodingSuffix)
+    // void (*call)(struct z_loaned_query_t *query, void *context)
+    internal static void CallbackClosureQueryCall(nint query, nint context)
     {
-        unsafe
-        {
-            sbyte r;
-            fixed (byte* pv = payload)
-            {
-                nint pKey = Marshal.StringToHGlobalAnsi(key);
-                ZKeyexpr keyexpr = ZenohC.z_keyexpr((byte*)pKey);
-                if (encodingSuffix is null)
-                {
-                    ZQueryReplyOptions options = new ZQueryReplyOptions
-                    {
-                        encoding = ZenohC.z_encoding(encodingPrefix, null),
-                    };
-                    nuint len = (nuint)payload.Length;
-                    r = ZenohC.z_query_reply(_query, keyexpr, pv, len, &options);
-                }
-                else
-                {
-                    fixed (byte* suffix = encodingSuffix)
-                    {
-                        ZQueryReplyOptions options = new ZQueryReplyOptions
-                        {
-                            encoding = ZenohC.z_encoding(encodingPrefix, suffix),
-                        };
-                        nuint len = (nuint)payload.Length;
-                        r = ZenohC.z_query_reply(_query, keyexpr, pv, len, &options);
-                    }
-                }
-
-                Marshal.FreeHGlobal(pKey);
-            }
-
-            return r == 0;
-        }
+        var gcHandle = GCHandle.FromIntPtr(context);
+        if (gcHandle.Target is not Cb callback) return;
+        
+        var loanedQuery = Query.CreateLoaned(query);
+        callback(loanedQuery);
     }
 
-    public bool ReplyStr(string key, string value)
+    // void (*drop)(void *context)
+    internal static void CallbackClosureQueryDrop(nint context)
     {
-        byte[] payload = Encoding.UTF8.GetBytes(value);
-        return Reply(key, payload, EncodingPrefix.TextPlain, null);
-    }
-
-    public bool ReplyJson(string key, string value)
-    {
-        byte[] payload = Encoding.UTF8.GetBytes(value);
-        return Reply(key, payload, EncodingPrefix.AppJson, null);
-    }
-
-    public bool ReplyInt(string key, long value)
-    {
-        string s = value.ToString("G");
-        byte[] payload = Encoding.UTF8.GetBytes(s);
-        return Reply(key, payload, EncodingPrefix.AppInteger, null);
-    }
-
-    public bool ReplyFloat(string key, double value)
-    {
-        string s = value.ToString("G");
-        byte[] payload = Encoding.UTF8.GetBytes(s);
-        return Reply(key, payload, EncodingPrefix.AppFloat, null);
+        var gcHandle = GCHandle.FromIntPtr(context);
+        gcHandle.Free();
     }
 }
