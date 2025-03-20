@@ -553,17 +553,18 @@ internal unsafe struct ZId
 }
 
 // zenoh_commons.h
-// z_owned_closure_zid_t
+// typedef struct z_owned_closure_zid_t {
+//     void *_context;
+//     void (*_call)(const struct z_id_t *z_id, void *context);
+//     void (*_drop)(void *context);
+// } z_owned_closure_zid_t;
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZOwnedClosureZid
+internal struct ZOwnedClosureZid
 {
-    internal void* context;
-    internal delegate* unmanaged[Cdecl]<ZId*, void*, void> call;
-    internal delegate* unmanaged[Cdecl]<void*, void> drop;
+    internal nint context;
+    internal nint call;
+    internal nint drop;
 }
-
-// internal unsafe delegate void ZOwnedClosureZidCall(ZId* zId, void* context);
-// internal unsafe delegate void ZOwnedClosureZidDrop(void* context);
 
 // zenoh_opaque.h
 // z_loaned_closure_zid_t
@@ -1138,40 +1139,19 @@ internal struct ZSubscriberOptions
     internal byte option;
 }
 
-#if PLATFORM_ARM64
-// --------------------------------
-//  typedef struct ALIGN(16) z_owned_reply_t {
-//      uint64_t _0[24];
-//  } z_owned_reply_t;
-// --------------------------------
-[StructLayout(LayoutKind.Sequential, Pack = 16)]
-internal unsafe struct ZOwnedReply{
-    private fixed ulong _[24];
-}
-#elif PLATFORM_x64
-// --------------------------------
-//  typedef struct ALIGN(8) z_owned_reply_t {
-//      uint64_t _0[22];
-//  } z_owned_reply_t;
-// --------------------------------
-// [StructLayout(LayoutKind.Sequential, Pack = 8)]
-// internal unsafe struct ZOwnedReply
-// {
-//     private fixed ulong _[22];
-// }
-#else
-#error  PLATFORM_ARM64 or PLATFORM_x64
-#endif
-
 // zenoh_commons.h
 // z_delete_options_t 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZDeleteOptions
+internal struct ZDeleteOptions
 {
-    internal CongestionControl CongestionControl;
-    internal Priority Priority;
+    internal CongestionControl congestion_control;
+    
+    internal Priority priority;
+    
     [MarshalAs(UnmanagedType.U1)] internal bool is_express;
-    internal ZTimestamp* timestamp;
+    
+    // z_timestamp_t*
+    internal nint timestamp;
 }
 
 // zenoh_commons.h
@@ -1254,21 +1234,28 @@ internal struct ZQueryReplyOptions
 // zenoh_commons.h
 // z_query_reply_del_options_t 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZQueryReplyDelOptions
+internal struct ZQueryReplyDelOptions
 {
-    internal CongestionControl CongestionControl;
-    internal Priority Priority;
+    internal CongestionControl congestion_control;
+    
+    internal Priority priority;
+    
     [MarshalAs(UnmanagedType.U1)] internal bool is_express;
-    internal ZTimestamp* timestamp;
-    internal ZMovedBytes* attachment;
+    
+    // timestamp*
+    internal nint timestamp;
+    
+    // z_moved_bytes_t*
+    internal nint attachment;
 }
 
 // zenoh_commons.h
 // z_query_reply_err_options_t 
 [StructLayout(LayoutKind.Sequential)]
-internal unsafe struct ZQueryReplyErrOptions
+internal struct ZQueryReplyErrOptions
 {
-    internal ZMovedEncoding* encoding;
+    // struct z_moved_encoding_t*
+    internal nint encoding;
 }
 
 // zenoh_commons.h
@@ -1763,30 +1750,62 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern nint z_closure_sample_loan_mut(nint closure);
 
+    /// void
+    /// (*call) (
+    ///     struct z_id_t *z_id,
+    ///     void *context
+    /// )
+    internal delegate void CbClosureZidCall(nint sample, nint context);
+    
+    /// void
+    /// (*drop) (
+    ///     void *context
+    /// )
+    internal delegate void CbClosureZidDrop(nint context);
+    
+    /// void
+    /// z_closure_zid(
+    ///     struct z_owned_closure_zid_t *this_,
+    ///     void (*call)(const struct z_id_t *z_id, void *context),
+    ///     void (*drop)(void *context),
+    ///     void *context
+    /// )
     [DllImport(DllName, EntryPoint = "z_closure_zid", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_closure_zid(
-        ZOwnedClosureZid* closure,
-        delegate*<ZId*, void*, void> call,
-        delegate*<void*, void> drop,
-        void* context
-    );
+    internal static extern void z_closure_zid(nint closure, CbClosureZidCall call, CbClosureZidDrop drop, nint context);
 
+    /// void
+    /// z_closure_zid_call(
+    ///     const struct z_loaned_closure_zid_t *closure,
+    ///     const struct z_id_t *z_id
+    /// )
     [DllImport(DllName, EntryPoint = "z_closure_zid_call", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_closure_zid_call(ZLoanedClosureZid* closure, ZId* zId);
+    internal static extern void z_closure_zid_call(nint closure, nint zId);
 
+    /// void
+    /// z_closure_zid_drop(
+    ///     struct z_moved_closure_zid_t *closure_
+    /// )
     [DllImport(DllName, EntryPoint = "z_closure_zid_drop", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_closure_zid_drop(ZMovedClosureZid* closure);
+    internal static extern void z_closure_zid_drop(nint closure);
 
+    /// const struct z_loaned_closure_zid_t*
+    /// z_closure_zid_loan(
+    ///     const struct z_owned_closure_zid_t *closure
+    /// )
     [DllImport(DllName, EntryPoint = "z_closure_zid_loan", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedClosureZid* z_closure_zid_loan(ZOwnedClosureZid* closure);
+    internal static extern nint z_closure_zid_loan(nint closure);
 
+    /// const struct z_loaned_closure_zid_t*
+    /// z_closure_zid_loan_mut(
+    ///     const struct z_owned_closure_zid_t *closure
+    /// )
     [DllImport(DllName, EntryPoint = "z_closure_zid_loan_mut", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZLoanedClosureZid* z_closure_zid_loan_mut(ZOwnedClosureZid* closure);
+    internal static extern nint z_closure_zid_loan_mut(nint closure);
 
     [DllImport(DllName, EntryPoint = "z_condvar_drop", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
@@ -1917,13 +1936,23 @@ internal static unsafe class ZenohC
     internal static extern Result z_declare_subscriber(nint session, nint subscriber, nint keyexpr, nint callback,
         nint options);
 
+    /// z_result_t
+    /// z_delete(
+    ///     const struct z_loaned_session_t *session,
+    ///     const struct z_loaned_keyexpr_t *key_expr,
+    ///     struct z_delete_options_t *options
+    /// )
     [DllImport(DllName, EntryPoint = "z_delete", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern Result z_delete(ZLoanedSession* session, ZLoanedKeyexpr* keyexpr, ZDeleteOptions* options);
+    internal static extern Result z_delete(nint session, nint keyexpr, nint options);
 
+    /// void
+    /// z_delete_options_default(
+    ///     struct z_delete_options_t *this_
+    /// )
     [DllImport(DllName, EntryPoint = "z_delete_options_default", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern void z_delete_options_default(ZDeleteOptions* options);
+    internal static extern void z_delete_options_default(nint options);
 
     /// const struct z_loaned_encoding_t*
     /// z_encoding_application_cbor(
@@ -2631,17 +2660,31 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern void z_id_to_string(nint id, nint dst);
 
+    /// z_result_t
+    /// z_info_peers_zid(
+    ///     const struct z_loaned_session_t *session,
+    ///     struct z_moved_closure_zid_t *callback
+    /// )
     [DllImport(DllName, EntryPoint = "z_info_peers_zid", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern Result z_info_peers_zid(ZLoanedSession* session, ZMovedClosureZid* callback);
+    internal static extern Result z_info_peers_zid(nint session, nint callback);
 
+    /// z_result_t
+    /// z_info_routers_zid(
+    ///     const struct z_loaned_session_t *session,
+    ///     struct z_moved_closure_zid_t *callback
+    /// )
     [DllImport(DllName, EntryPoint = "z_info_routers_zid", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern Result z_info_routers_zid(ZLoanedSession* session, ZMovedClosureZid* callback);
+    internal static extern Result z_info_routers_zid(nint session, nint callback);
 
+    /// struct z_id_t
+    /// z_info_zid(
+    ///     const struct z_loaned_session_t *session
+    /// )
     [DllImport(DllName, EntryPoint = "z_info_zid", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern ZId z_info_zid(ZLoanedSession* session);
+    internal static extern ZId z_info_zid(nint session);
 
     [DllImport(DllName, EntryPoint = "z_internal_bytes_check", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]

@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
+// z_query_reply_options_t
 public sealed class QueryReplyOptions : IDisposable
 {
     private CongestionControl _congestionControl;
@@ -206,11 +207,250 @@ public sealed class QueryReplyOptions : IDisposable
     }
 }
 
+// z_query_reply_err_options_t
 public sealed class QueryReplyErrOptions : IDisposable
 {
+    private Encoding? _encoding;
+
+    public QueryReplyErrOptions()
+    {
+        _encoding = null;
+    }
+
+    public QueryReplyErrOptions(QueryReplyErrOptions other)
+    {
+        _encoding = other._encoding is null ? null : new Encoding(other._encoding);
+    }
+
     public void Dispose()
     {
-        throw new NotImplementedException();
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~QueryReplyErrOptions() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (_encoding is not null)
+        {
+            if (disposing)
+            {
+                _encoding.Dispose();
+            }
+
+            _encoding = null;
+        }
+    }
+
+    public void SetEncoding(Encoding? encoding)
+    {
+        _encoding = encoding is null ? null : new Encoding(encoding);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>
+    /// Return Encoding is loaned.
+    /// </returns>
+    public Encoding? GetEncoding()
+    {
+        return _encoding is null ? null : Encoding.CreateLoaned(_encoding.LoanedPointer());
+    }
+
+    internal nint AllocUnmanagedMemory()
+    {
+        var options = new ZQueryReplyErrOptions
+        {
+            encoding = nint.Zero,
+        };
+
+        if (_encoding is not null)
+        {
+            options.encoding = _encoding.AllocUnmanagedMemory();
+        }
+
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyErrOptions>());
+        Marshal.StructureToPtr(options, pOptions, false);
+
+        return pOptions;
+    }
+
+    internal static void FreeUnmanagedMemory(nint handle)
+    {
+        var options = Marshal.PtrToStructure<ZQueryReplyErrOptions>(handle);
+
+        if (options.encoding != nint.Zero)
+        {
+            Encoding.FreeUnmanagedMem(options.encoding);
+        }
+
+        Marshal.FreeHGlobal(handle);
+    }
+}
+
+// z_query_reply_del_options_t
+public sealed class QueryReplyDelOptions : IDisposable
+{
+    private CongestionControl _congestionControl;
+    private Priority _priority;
+    private bool _isExpress;
+    private Timestamp? _timestamp;
+    private ZBytes? _attachment;
+
+    public QueryReplyDelOptions()
+    {
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyDelOptions>());
+        ZenohC.z_query_reply_del_options_default(pOptions);
+        var options = Marshal.PtrToStructure<ZQueryReplyDelOptions>(pOptions);
+        Marshal.FreeHGlobal(pOptions);
+
+        _congestionControl = options.congestion_control;
+        _priority = options.priority;
+        _isExpress = options.is_express;
+        _timestamp = null;
+        _attachment = null;
+    }
+
+    public QueryReplyDelOptions(QueryReplyDelOptions other)
+    {
+        _congestionControl = other._congestionControl;
+        _priority = other._priority;
+        _isExpress = other._isExpress;
+        _timestamp = other._timestamp is null ? null : new Timestamp(other._timestamp);
+        _attachment = other._attachment is null ? null : new ZBytes(other._attachment);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    ~QueryReplyDelOptions() => Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (_timestamp is not null)
+        {
+            if (disposing)
+            {
+                _timestamp.Dispose();
+            }
+
+            _timestamp = null;
+        }
+
+        if (_attachment is not null)
+        {
+            if (disposing)
+            {
+                _attachment.Dispose();
+            }
+
+            _attachment = null;
+        }
+    }
+
+    public void SetCongestionControl(CongestionControl congestionControl)
+    {
+        _congestionControl = congestionControl;
+    }
+
+    public CongestionControl GetCongestionControl()
+    {
+        return _congestionControl;
+    }
+
+    public void SetPriority(Priority priority)
+    {
+        _priority = priority;
+    }
+
+    public Priority GetPriority()
+    {
+        return _priority;
+    }
+
+    public void SetIsExpress(bool isExpress)
+    {
+        _isExpress = isExpress;
+    }
+
+    public bool GetIsExpress()
+    {
+        return _isExpress;
+    }
+
+    public void SetTimestamp(Timestamp? timestamp)
+    {
+        _timestamp = timestamp is null ? null : new Timestamp(timestamp);
+    }
+
+    public Timestamp? GetTimestamp()
+    {
+        return _timestamp is null ? null : new Timestamp(_timestamp);
+    }
+
+    public void SetAttachment(ZBytes? attachment)
+    {
+        _attachment = attachment is null ? null : new ZBytes(attachment);
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns>
+    /// Return ZBytes is loaned.
+    /// </returns>
+    public ZBytes? GetAttachment()
+    {
+        return _attachment is null ? null : ZBytes.CreateLoaned(_attachment.LoanedPointer());
+    }
+
+    internal nint AllocUnmanagedMemory()
+    {
+        var options = new ZQueryReplyDelOptions
+        {
+            congestion_control = _congestionControl,
+            priority = _priority,
+            is_express = _isExpress,
+            timestamp = nint.Zero,
+            attachment = nint.Zero
+        };
+
+        if (_timestamp is not null)
+        {
+            options.timestamp = _timestamp.AllocUnmanagedMem();
+        }
+
+        if (_attachment is not null)
+        {
+            options.attachment = _attachment.AllocUnmanagedMemory();
+        }
+
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyDelOptions>());
+        Marshal.StructureToPtr(options, pOptions, false);
+
+        return pOptions;
+    }
+
+    internal static void FreeUnmanagedMemory(nint handle)
+    {
+        var options = Marshal.PtrToStructure<ZQueryReplyDelOptions>(handle);
+
+        if (options.timestamp != nint.Zero)
+        {
+            Timestamp.FreeUnmanagedMem(options.timestamp);
+        }
+
+        if (options.attachment != nint.Zero)
+        {
+            ZBytes.FreeUnmanagedMem(options.attachment);
+        }
+
+        Marshal.FreeHGlobal(handle);
     }
 }
 
@@ -398,13 +638,72 @@ public sealed class Query : Loanable
         return r;
     }
 
+    /// <summary>
+    /// <para>
+    /// Sends a error reply to a query.
+    /// </para>
+    /// <para>
+    /// This function must be called inside of a Queryable callback passing the
+    /// query received as parameters of the callback function. This function can
+    /// be called multiple times to send multiple replies to a query. The reply
+    /// will be considered complete when the Queryable callback returns.
+    /// </para>
+    /// <para>
+    /// Do not use the "payload" after calling this function.
+    /// payload.Dispose() is called inside this function.
+    /// </para>
+    /// </summary>
+    /// <param name="payload"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
     public Result ReplyErr(ZBytes payload, QueryReplyErrOptions options)
     {
-        // todo
-        return Result.ErrorGeneric;
+        CheckDisposed();
+        payload.CheckDisposed();
+        payload.ToOwned();
+
+        var pLoanedQuery = LoanedPointer();
+        var pMovedBytes = payload.Handle;
+        var pQueryReplyErrOptions = options.AllocUnmanagedMemory();
+
+        var r = ZenohC.z_query_reply_err(pLoanedQuery, pMovedBytes, pQueryReplyErrOptions);
+
+        QueryReplyErrOptions.FreeUnmanagedMemory(pQueryReplyErrOptions);
+        payload.Dispose();
+
+        return r;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Sends a delete reply to a query.
+    /// </para>
+    /// <para>
+    /// This function must be called inside of a Queryable callback passing the
+    /// query received as parameters of the callback function. This function can
+    /// be called multiple times to send multiple replies to a query. The reply
+    /// will be considered complete when the Queryable callback returns.
+    /// </para>
+    /// </summary>
+    /// <param name="keyexpr"></param>
+    /// <param name="options"></param>
+    /// <returns></returns>
+    public Result ReplyDel(Keyexpr keyexpr, QueryReplyDelOptions options)
+    {
+        CheckDisposed();
+        keyexpr.CheckDisposed();
+
+        var pLoanedQuery = LoanedPointer();
+        var pLoanedKeyexpr = keyexpr.LoanedPointer();
+        var pQueryReplyDelOptions = options.AllocUnmanagedMemory();
+
+        var r = ZenohC.z_query_reply_del(pLoanedQuery, pLoanedKeyexpr, pQueryReplyDelOptions);
+
+        QueryReplyDelOptions.FreeUnmanagedMemory(pQueryReplyDelOptions);
+
+        return r;
     }
 }
-
 
 public sealed class QueryableOptions
 {
@@ -439,14 +738,13 @@ public sealed class QueryableOptions
     {
         Marshal.FreeHGlobal(handle);
     }
-    
 }
 
 // z_owned_queryable_t
 public sealed class Queryable : IDisposable
 {
-    internal nint Handle { get;private set; }
-    
+    internal nint Handle { get; private set; }
+
     public delegate void Cb(Query query);
 
     internal Queryable()
@@ -460,7 +758,7 @@ public sealed class Queryable : IDisposable
     {
         throw new InvalidOperationException();
     }
-    
+
     public void Dispose()
     {
         Dispose(true);
@@ -472,12 +770,12 @@ public sealed class Queryable : IDisposable
     private void Dispose(bool disposing)
     {
         if (Handle == nint.Zero) return;
-        
+
         ZenohC.z_queryable_drop(Handle);
         Marshal.FreeHGlobal(Handle);
         Handle = nint.Zero;
     }
-    
+
     internal void CheckDisposed()
     {
         if (Handle == nint.Zero)
@@ -485,7 +783,7 @@ public sealed class Queryable : IDisposable
             throw new InvalidOperationException("Object has been destroyed");
         }
     }
-    
+
     /// <summary>
     /// Undeclare the queryable and free memory. This is equivalent to calling the "Dispose()".
     /// </summary>
@@ -499,7 +797,7 @@ public sealed class Queryable : IDisposable
     {
         var gcHandle = GCHandle.FromIntPtr(context);
         if (gcHandle.Target is not Cb callback) return;
-        
+
         var loanedQuery = Query.CreateLoaned(query);
         callback(loanedQuery);
     }

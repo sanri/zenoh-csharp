@@ -417,4 +417,106 @@ public sealed class Session : IDisposable
         channel = null;
         return r;
     }
+
+    /// <summary>
+    /// Sends request to delete data on specified key expression
+    /// (used when working with <a href="https://zenoh.io/docs/manual/abstractions/#storage"> Zenoh storages </a>).
+    /// </summary>
+    /// <param name="keyexpr">The key expression to delete.</param>
+    /// <param name="options">The delete options.</param>
+    /// <returns></returns>
+    public Result Delete(Keyexpr keyexpr, DeleteOptions options)
+    {
+        CheckDisposed();
+        keyexpr.CheckDisposed();
+
+        var pLoanedSession = ZenohC.z_session_loan(Handle);
+        var pLoanedKeyexpr = keyexpr.LoanedPointer();
+        var pDeleteOptions = options.AllocUnmanagedMemory();
+
+        var r = ZenohC.z_delete(pLoanedSession, pLoanedKeyexpr, pDeleteOptions);
+        DeleteOptions.FreeUnmanagedMemory(pDeleteOptions);
+
+        return r;
+    }
+
+    /// <summary>
+    /// Returns the session's Zenoh ID.
+    /// </summary>
+    /// <returns></returns>
+    public Id GetId()
+    {
+        CheckDisposed();
+
+        var pLoanedSession = ZenohC.z_session_loan(Handle);
+        var zid = ZenohC.z_info_zid(pLoanedSession);
+
+        return new Id(zid);
+    }
+
+    /// <summary>
+    /// <para>
+    /// Fetches the Zenoh IDs of all connected routers.
+    /// </para>
+    /// <para>
+    /// `callback` will be called once for each ID, is guaranteed to never be called concurrently,
+    /// and is guaranteed to be dropped before this function exits.
+    /// </para>
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns>
+    /// Result.Ok on success, others values on failure.
+    /// </returns>
+    public Result RoutersId(Id.Cb callback)
+    {
+        CheckDisposed();
+
+        var gcHandle = GCHandle.Alloc(callback);
+        var pOwnedClosureZid = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZid>());
+        ZenohC.z_closure_zid(pOwnedClosureZid, Id.CallbackClosureIdCall, Id.CallbackClosureIdDrop,
+            GCHandle.ToIntPtr(gcHandle));
+
+        var pLoanedSession = ZenohC.z_session_loan(Handle);
+        var r = ZenohC.z_info_routers_zid(pLoanedSession, pOwnedClosureZid);
+
+        Marshal.FreeHGlobal(pOwnedClosureZid);
+
+        if (r == Result.Ok) return Result.Ok;
+
+        gcHandle.Free();
+        return r;
+    }
+
+    /// <summary>
+    /// <para>
+    /// Fetches the Zenoh IDs of all connected peers.
+    /// </para>
+    /// <para>
+    /// `callback` will be called once for each ID, is guaranteed to never be called concurrently,
+    /// and is guaranteed to be dropped before this function exits.
+    /// </para>
+    /// </summary>
+    /// <param name="callback"></param>
+    /// <returns>
+    /// Result.Ok on success, others values on failure.
+    /// </returns>
+    public Result PeersId(Id.Cb callback)
+    {
+        CheckDisposed();
+
+        var gcHandle = GCHandle.Alloc(callback);
+        var pOwnedClosureZid = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZid>());
+        ZenohC.z_closure_zid(pOwnedClosureZid, Id.CallbackClosureIdCall, Id.CallbackClosureIdDrop,
+            GCHandle.ToIntPtr(gcHandle));
+
+        var pLoanedSession = ZenohC.z_session_loan(Handle);
+        var r = ZenohC.z_info_peers_zid(pLoanedSession, pOwnedClosureZid);
+
+        Marshal.FreeHGlobal(pOwnedClosureZid);
+
+        if (r == Result.Ok) return Result.Ok;
+
+        gcHandle.Free();
+        return r;
+    }
 }

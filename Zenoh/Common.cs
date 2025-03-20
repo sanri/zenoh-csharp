@@ -518,6 +518,8 @@ public sealed class Timestamp : IDisposable
 
 public sealed class Id
 {
+    public delegate void Cb(Id id);
+        
     private byte[] _data;
 
     private Id()
@@ -525,12 +527,18 @@ public sealed class Id
         throw new InvalidOperationException();
     }
 
+    public Id(Id other)
+    {
+        _data = new byte[16];
+        Array.Copy(other._data, _data, 16);
+    }
+
     internal Id(ZId zid)
     {
         _data = zid.GetId();
     }
 
-    public override string ToString()
+    public string ToHexStr()
     {
         var sb = new StringBuilder();
         foreach (var b in _data)
@@ -539,6 +547,28 @@ public sealed class Id
         }
 
         return sb.ToString();
+    }
+
+    public byte[] GetValue()
+    {
+        var b = new byte[_data.Length];
+        Array.Copy(_data, b, _data.Length);
+        return b;
+    }
+
+    internal static void CallbackClosureIdCall(nint id, nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        if(gcHandle.Target is not Cb callback) return;
+        
+        var zid = Marshal.PtrToStructure<ZId>(id);
+        callback(new Id(zid));
+    }
+
+    internal static void CallbackClosureIdDrop(nint context)
+    {
+        var gcHandle = GCHandle.FromIntPtr(context);
+        gcHandle.Free();
     }
 }
 

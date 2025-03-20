@@ -250,6 +250,129 @@ public sealed class GetOptions : IDisposable
     }
 }
 
+// z_delete_options_t
+public sealed class DeleteOptions : IDisposable
+{
+    private CongestionControl _congestionControl;
+    private Priority _priority;
+    private bool _isExpress;
+    private Timestamp? _timestamp;
+
+    public DeleteOptions()
+    {
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZDeleteOptions>());
+        ZenohC.z_delete_options_default(pOptions);
+        var options = Marshal.PtrToStructure<ZDeleteOptions>(pOptions);
+        Marshal.FreeHGlobal(pOptions);
+        
+        _congestionControl = options.congestion_control;
+        _priority = options.priority;
+        _isExpress = options.is_express;
+        _timestamp = null;
+    }
+
+    public DeleteOptions(DeleteOptions other)
+    {
+        _congestionControl = other._congestionControl;
+        _priority = other._priority;
+        _isExpress = other._isExpress;
+        _timestamp = other._timestamp is null ? null : new Timestamp(other._timestamp);
+    }
+    
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+    
+    ~DeleteOptions()=>Dispose(false);
+
+    private void Dispose(bool disposing)
+    {
+        if (_timestamp is not null)
+        {
+            if (disposing)
+            {
+                _timestamp.Dispose();
+            }
+            
+            _timestamp = null;
+        }
+    }
+    
+    public void SetCongestionControl(CongestionControl congestionControl)
+    {
+        _congestionControl = congestionControl;
+    }
+
+    public CongestionControl GetCongestionControl()
+    {
+        return _congestionControl;
+    }
+
+    public void SetPriority(Priority priority)
+    {
+        _priority = priority;
+    }
+
+    public Priority GetPriority()
+    {
+        return _priority;
+    }
+
+    public void SetIsExpress(bool isExpress)
+    {
+        _isExpress = isExpress;
+    }
+
+    public bool GetIsExpress()
+    {
+        return _isExpress;
+    }
+    
+    public void SetTimestamp(Timestamp? timestamp)
+    {
+        _timestamp = timestamp is null ? null : new Timestamp(timestamp);
+    }
+
+    public Timestamp? GetTimestamp()
+    {
+        return _timestamp is null ? null : new Timestamp(_timestamp);
+    }
+
+    internal nint AllocUnmanagedMemory()
+    {
+        var options = new ZDeleteOptions
+        {
+            congestion_control = _congestionControl,
+            priority = _priority,
+            is_express = _isExpress,
+            timestamp = nint.Zero,
+        };
+
+        if (_timestamp is not null)
+        {
+            options.timestamp = _timestamp.AllocUnmanagedMem();
+        }
+        
+        var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZDeleteOptions>());
+        Marshal.StructureToPtr(options, pOptions, false);
+        return pOptions;
+    }
+
+    internal static void FreeUnmanagedMemory(nint handle)
+    {
+        var options = Marshal.PtrToStructure<ZDeleteOptions>(handle);
+
+        if (options.timestamp != nint.Zero)
+        {
+            Timestamp.FreeUnmanagedMem(options.timestamp);
+        }
+        
+        Marshal.FreeHGlobal(handle);
+    }
+}
+
 //  z_owned_reply_err_t
 public sealed class ReplyErr : Loanable
 {
