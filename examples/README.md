@@ -5,11 +5,11 @@
 Each example accepts the `--help` option that provides a description of its arguments and their default values.
 
 If you run the tests against the zenoh router running in a Docker container, 
-you need to add the `-e tcp/localhost:7447` option to your examples. 
-That's because Docker doesn't support UDP multicast transport, 
-and therefore the zenoh scouting and discrovery mechanism cannot work with.
+you need to add the `-c` option in the examples, configuring the connection parameters. 
+That's because Docker don't support UDP multicast transport, 
+and therefore the zenoh scouting and discovery mechanism cannot work with.
 
-When building, option `--property:Platform=<>` are required.
+The example configuration file is [demo.json5](demo.json5)
 
 ## Examples description
 
@@ -19,12 +19,12 @@ Get the ID of each node in the Zenoh network.
 
 Build
 ```bash
-dotnet build ZInfo/ZInfo.csproj --configuration Release --property:Platform=x64  
+dotnet build ZInfo/ZInfo.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZInfo 
+./ZInfo -c <zenoh_config_file> 
 ```
 
 ### ZGet
@@ -34,12 +34,12 @@ The queryables with a matching path or selector (for instance ZQueryable ) will 
 
 Build
 ```bash
-dotnet build ZGet/ZGet.csproj --configuration Release --property:Platform=x64  
+dotnet build ZGet/ZGet.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZGet 
+./ZGet -c <zenoh_config_file> 
 ```
 
 ### ZQueryable
@@ -49,12 +49,12 @@ This queryable function will be triggered by each call to get with a selector th
 
 Build
 ```bash
-dotnet build ZQueryable/ZQueryable.csproj --configuration Release --property:Platform=x64  
+dotnet build ZQueryable/ZQueryable.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZQueryable
+./ZQueryable -c <zenoh_config_file>
 ```
 
 
@@ -65,12 +65,12 @@ The path/value will be received by all matching subscribers, for instance the [Z
 
 Build
 ```bash
-dotnet build ZPut/ZPut.csproj --configuration Release --property:Platform=x64  
+dotnet build ZPut/ZPut.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZPut
+./ZPut -c <zenoh_config_file>
 ```
 
 ### ZPub
@@ -80,14 +80,13 @@ Compared to ZPut, this example is optimized for keys that publish data frequentl
 
 Build
 ```bash
-dotnet build ZPub/ZPub.csproj --configuration Release --property:Platform=x64  
+dotnet build ZPub/ZPub.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZPub
+./ZPub -c <zenoh_config_file>
 ```
-
 
 ### ZSub
 
@@ -97,10 +96,10 @@ and will print this notification.
 
 Build
 ```bash
-dotnet build ZSub/ZSub.csproj --configuration Release --property:Platform=x64  
+dotnet build ZSub/ZSub.csproj --configuration Release 
 ```
 
 Run
 ```bash
-./ZSub
+./ZSub -c <zenoh_config_file>
 ```
