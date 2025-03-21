@@ -1,12 +1,11 @@
-﻿using System;
-using CommandLine;
+﻿using CommandLine;
 using Zenoh;
 
-namespace ZSub;
+namespace ZPull;
 
 public class Program
 {
-    public static void Main(string[] args)
+    static void Main(string[] args)
     {
         var arguments = Parser.Default.ParseArguments<Args>(args);
         var isOk = true;
@@ -30,20 +29,39 @@ public class Program
         var keyexpr = Keyexpr.FromString(keyexprStr);
         if (keyexpr is null) goto Exit;
 
-        r = session.DeclareSubscriber(keyexpr, Callback, out Subscriber? subscriber);
-        if (subscriber is null)
+        r = session.DeclareSubscriber(keyexpr, ChannelType.Ring, 100, out var handle);
+        if (handle is null)
         {
             Console.WriteLine($"Declare subscriber unsuccessful! result: {r}");
             goto Exit;
         }
 
-        Console.WriteLine($"Declaring subscriber on {keyexpr}");
+        var subscriber = handle.Value.Item1;
+        var channel = handle.Value.Item2;
 
+        Console.WriteLine("Press <enter> to pull data.");
         Console.WriteLine("Input 'q' to quit.");
         while (true)
         {
-            var input = Console.ReadLine();
+            string input = Console.ReadLine() ?? "";
             if (input == "q") break;
+
+            r = channel.TryRecv(out Sample? sample);
+            if (sample is null)
+            {
+                if (r == Result.ChannelNodata)
+                {
+                    Console.WriteLine("All data of the channel has been read");
+                    continue;
+                }
+                else
+                {
+                    Console.WriteLine($"Channel recv a null sample! result: {r}");
+                    break;
+                }
+            }
+
+            PrintSample(sample);
         }
 
         subscriber.Undeclare();
@@ -53,14 +71,8 @@ public class Program
         Console.WriteLine("exit");
     }
 
-    static void Callback(Sample sample)
-    {
-        PrintSample(sample);
-    }
-    
     static void PrintSample(Sample sample)
     {
-        
         var keyexpr = sample.GetKeyexpr();
         var keyexprStr = keyexpr.ToString();
         var encoding = sample.GetEncoding();
@@ -92,7 +104,7 @@ public class Program
             _ => ""
         };
 
-        Console.WriteLine(print);
+        Console.Write(print);
     }
 }
 

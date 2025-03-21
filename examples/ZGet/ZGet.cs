@@ -45,7 +45,7 @@ public class Program
             r = channel.Recv(out Reply? reply);
             if (reply is null)
             {
-                if (r is Result.ChannelNodata or Result.ChannelDisconnected)
+                if (r is Result.ChannelDisconnected)
                 {
                     Console.WriteLine("All data of the channel has been read");
                     goto Exit;

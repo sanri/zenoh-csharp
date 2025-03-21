@@ -107,14 +107,9 @@ public class Program
         var encodingStr = encoding.ToZString()?.ToString() ?? "";
 
         var r = query.Reply(keyexpr, payload, options);
-        if (r == Result.Ok)
-        {
-            Console.WriteLine($"Responding ({KeyStr1}, {encodingStr}, {payloadStr})");
-        }
-        else
-        {
-            Console.WriteLine($"Reply error: {r}");
-        }
+        Console.WriteLine(r == Result.Ok
+            ? $"Responding ({KeyStr1}, {encodingStr}, {payloadStr})"
+            : $"Reply error: {r}");
     }
 
     static void Callback2(Query query)
@@ -139,14 +134,9 @@ public class Program
         var encodingStr = encoding.ToZString()?.ToString() ?? "";
 
         var r = query.ReplyErr(payload, options);
-        if (r == Result.Ok)
-        {
-            Console.WriteLine($"Responding err ({KeyStr2}, {encodingStr}, {payloadStr})");
-        }
-        else
-        {
-            Console.WriteLine($"Reply error: {r}");
-        }
+        Console.WriteLine(r == Result.Ok
+            ? $"Responding err ({KeyStr2}, {encodingStr}, {payloadStr})"
+            : $"Reply error: {r}");
     }
 
     static void Callback3(Query query)
@@ -166,14 +156,7 @@ public class Program
         var options = new QueryReplyDelOptions();
 
         var r = query.ReplyDel(keyexpr, options);
-        if (r == Result.Ok)
-        {
-            Console.WriteLine($"Responding del ({KeyStr3})");
-        }
-        else
-        {
-            Console.WriteLine($"Reply error: {r}");
-        }
+        Console.WriteLine(r == Result.Ok ? $"Responding del ({KeyStr3})" : $"Reply error: {r}");
     }
 }
 
