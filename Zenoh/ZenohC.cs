@@ -3213,7 +3213,7 @@ internal static unsafe class ZenohC
     /// )
     [DllImport(DllName, EntryPoint = "z_keyexpr_from_substr_autocanonize", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern Result z_keyexpr_from_substr_autocanonize(nint keyexpr, nint str, nuint len);
+    internal static extern Result z_keyexpr_from_substr_autocanonize(nint keyexpr, nint str, nint len);
 
     /// bool
     /// z_keyexpr_includes(
@@ -4238,9 +4238,15 @@ internal static unsafe class ZenohC
         ExactSpelling = true)]
     internal static extern Result z_string_copy_from_str(nint dst, nint str);
 
+    /// z_result_t
+    /// z_string_copy_from_substr(
+    ///     struct z_owned_string_t *this_,
+    ///     const char *str,
+    ///     size_t len
+    /// )
     [DllImport(DllName, EntryPoint = "z_string_copy_from_substr", CallingConvention = CallingConvention.Cdecl,
         ExactSpelling = true)]
-    internal static extern Result z_string_copy_from_substr(ZOwnedString* dst, byte* str, nuint len);
+    internal static extern Result z_string_copy_from_substr(nint dst, nint str, nuint len);
 
     /// const char*
     /// z_string_data(

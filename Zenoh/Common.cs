@@ -51,10 +51,17 @@ public sealed class ZString : Loanable
     public ZString(string str)
     {
         var pOwnedString = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedString>());
-        var pStr = Marshal.StringToHGlobalAnsi(str);
-        var r = ZenohC.z_string_copy_from_str(pOwnedString, pStr);
+        var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(str);
+        Result r;
+        unsafe
+        {
+            fixed (void* pStr = utf8Bytes)
+            {
+                r = ZenohC.z_string_copy_from_substr(pOwnedString, (nint)pStr, (nuint)utf8Bytes.Length);
+            }
+        }
+
         if (r != Result.Ok) ZenohC.z_string_empty(pOwnedString);
-        Marshal.FreeHGlobal(pStr);
         Handle = pOwnedString;
         Owned = true;
     }
@@ -128,13 +135,26 @@ public sealed class ZString : Loanable
         return ZenohC.z_string_len(pLoanedString);
     }
 
-    public override string? ToString()
+    public override string ToString()
     {
         CheckDisposed();
 
         var pLoanedString = LoanedPointer();
         var pS = ZenohC.z_string_data(pLoanedString);
-        var s = Marshal.PtrToStringAnsi(pS);
+        var sLen = ZenohC.z_string_len(pLoanedString);
+        string s;
+        try
+        {
+            unsafe
+            {
+                s = System.Text.Encoding.UTF8.GetString((byte*)pS, (int)sLen);
+            }
+        }
+        catch
+        {
+            s = "";
+        }
+
         return s;
     }
 }
@@ -174,13 +194,27 @@ internal sealed class ViewString : IDisposable
         }
     }
 
-    public override string? ToString()
+    public override string ToString()
     {
         CheckDisposed();
 
         var pLoanedString = ZenohC.z_view_string_loan(Handle);
         var pS = ZenohC.z_string_data(pLoanedString);
-        return Marshal.PtrToStringAnsi(pS);
+        var sLen = ZenohC.z_string_len(pLoanedString);
+        string s;
+        try
+        {
+            unsafe
+            {
+                s = System.Text.Encoding.UTF8.GetString((byte*)pS, (int)sLen);
+            }
+        }
+        catch
+        {
+            s = "";
+        }
+
+        return s;
     }
 }
 
@@ -292,10 +326,16 @@ public sealed class ZBytes : Loanable
     /// <returns></returns>
     public static ZBytes FromString(string str)
     {
-        var pStr = Marshal.StringToHGlobalAnsi(str);
+        var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(str);
         var zBytes = new ZBytes();
-        ZenohC.z_bytes_copy_from_str(zBytes.Handle, pStr);
-        Marshal.FreeHGlobal(pStr);
+        unsafe
+        {
+            fixed (void* pStr = utf8Bytes)
+            {
+                ZenohC.z_bytes_copy_from_buf(zBytes.Handle, (nint)pStr, (nuint)utf8Bytes.Length);
+            }
+        }
+
         return zBytes;
     }
 
@@ -316,12 +356,12 @@ public sealed class ZBytes : Loanable
     public ZString? ToZString()
     {
         CheckDisposed();
-        
+
         var zString = new ZString();
         var pLoanedBytes = LoanedPointer();
-        var r = ZenohC.z_bytes_to_string(pLoanedBytes,zString.Handle);
-        if(r == Result.Ok) return zString;
-        
+        var r = ZenohC.z_bytes_to_string(pLoanedBytes, zString.Handle);
+        if (r == Result.Ok) return zString;
+
         zString.Dispose();
         return null;
     }
@@ -519,7 +559,7 @@ public sealed class Timestamp : IDisposable
 public sealed class Id
 {
     public delegate void Cb(Id id);
-        
+
     private byte[] _data;
 
     private Id()
@@ -559,8 +599,8 @@ public sealed class Id
     internal static void CallbackClosureIdCall(nint id, nint context)
     {
         var gcHandle = GCHandle.FromIntPtr(context);
-        if(gcHandle.Target is not Cb callback) return;
-        
+        if (gcHandle.Target is not Cb callback) return;
+
         var zid = Marshal.PtrToStructure<ZId>(id);
         callback(new Id(zid));
     }
@@ -606,9 +646,18 @@ public sealed class Keyexpr : Loanable
     public static Keyexpr? FromString(string keyexpr)
     {
         var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
-        var pKeyexpr = Marshal.StringToHGlobalAnsi(keyexpr);
-        var r = ZenohC.z_keyexpr_from_str_autocanonize(pOwnedKeyexpr, pKeyexpr);
-        Marshal.FreeHGlobal(pKeyexpr);
+
+        var utf8Bytes = System.Text.Encoding.UTF8.GetBytes(keyexpr);
+        var length = (nuint)utf8Bytes.Length;
+        Result r;
+        unsafe
+        {
+            fixed (byte* pStr = utf8Bytes)
+            {
+                r = ZenohC.z_keyexpr_from_substr_autocanonize(pOwnedKeyexpr, (nint)pStr, (nint)(&length));
+            }
+        }
+
         if (r == Result.Ok) return new Keyexpr(pOwnedKeyexpr, true);
 
         Marshal.FreeHGlobal(pOwnedKeyexpr);

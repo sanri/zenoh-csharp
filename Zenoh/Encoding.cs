@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh;
 
-
 public enum EncodingId : ushort
 {
     /// Just some bytes.
@@ -356,26 +355,43 @@ public sealed class Encoding : Loanable
     /// </para>
     /// </summary>
     /// <param name="schema"></param>
-    public Result SetSchema(string schema)
+    public Result SetSchema(byte[] schema)
     {
         CheckDisposed();
 
         if (!Owned) ToOwned();
 
-        var pS = Marshal.StringToHGlobalAnsi(schema);
         var pLoanedEncoding = ZenohC.z_encoding_loan_mut(Handle);
-        var r = ZenohC.z_encoding_set_schema_from_str(pLoanedEncoding, pS);
-        Marshal.FreeHGlobal(pS);
+
+        Result r;
+        unsafe
+        {
+            fixed (void* pStr = schema)
+            {
+                r = ZenohC.z_encoding_set_schema_from_substr(pLoanedEncoding, (nint)pStr, (nuint)schema.Length);
+            }
+        }
+
         return r;
     }
 
-    public string GetSchema()
+    public byte[] GetSchema()
     {
         CheckDisposed();
 
         var pLoanedEncoding = LoanedPointer();
         var encodingData = ZenohC.zc_internal_encoding_get_data(pLoanedEncoding);
-        return Marshal.PtrToStringAnsi(encodingData.schema_ptr, (int)encodingData.schema_len);
+        var bytes = Array.Empty<byte>();
+        try
+        {
+            Marshal.Copy(encodingData.schema_ptr, bytes, 0, (int)encodingData.schema_len);
+        }
+        catch
+        {
+            // ignored
+        }
+
+        return bytes;
     }
 
     public EncodingId GetEncodingId()

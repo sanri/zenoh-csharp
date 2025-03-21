@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Zenoh;
 
@@ -57,9 +58,16 @@ public sealed class Config : IDisposable
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
         ZenohC.z_internal_config_null(pOwnedConfig);
 
-        var pPath = Marshal.StringToHGlobalAnsi(path);
-        var r = ZenohC.zc_config_from_file(pOwnedConfig, pPath);
-        Marshal.FreeHGlobal(pPath);
+        var utf8BytesPath = System.Text.Encoding.UTF8.GetBytes(path + "\0");
+        Result r;
+        unsafe
+        {
+            fixed (byte* pPath = utf8BytesPath)
+            {
+                r = ZenohC.zc_config_from_file(pOwnedConfig, (nint)pPath);
+            }
+        }
+
         if (r == Result.Ok) return new Config(pOwnedConfig);
 
         Marshal.FreeHGlobal(pOwnedConfig);
@@ -71,9 +79,16 @@ public sealed class Config : IDisposable
         var pOwnedConfig = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedConfig>());
         ZenohC.z_internal_config_null(pOwnedConfig);
 
-        var pS = Marshal.StringToHGlobalAnsi(s);
-        var r = ZenohC.zc_config_from_str(pOwnedConfig, pS);
-        Marshal.FreeHGlobal(pS);
+        var utf8BytesS = System.Text.Encoding.UTF8.GetBytes(s + "\0");
+        Result r;
+        unsafe
+        {
+            fixed (byte* pS = utf8BytesS)
+            {
+                r = ZenohC.zc_config_from_str(pOwnedConfig, (nint)pS);
+            }
+        }
+
         if (r == Result.Ok) return new Config(pOwnedConfig);
         Marshal.FreeHGlobal(pOwnedConfig);
         return null;

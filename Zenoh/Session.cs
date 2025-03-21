@@ -401,8 +401,15 @@ public sealed class Session : IDisposable
 
         var pLoanedSession = ZenohC.z_session_loan(Handle);
         var pLoanedKeyexpr = keyexpr.LoanedPointer();
-        var pParameters = Marshal.StringToHGlobalAnsi(parameters);
         var pGetOptions = options.AllocUnmanagedMemory();
+
+        var pParameters = nint.Zero;
+        if (parameters != null)
+        {
+            var utf8BytesParameters = System.Text.Encoding.UTF8.GetBytes(parameters + "\0");
+            pParameters = Marshal.AllocHGlobal(utf8BytesParameters.Length);
+            Marshal.Copy(utf8BytesParameters, 0, pParameters, utf8BytesParameters.Length);
+        }
 
         var r = ZenohC.z_get(pLoanedSession, pLoanedKeyexpr, pParameters, pOwnedClosureReply, pGetOptions);
 
