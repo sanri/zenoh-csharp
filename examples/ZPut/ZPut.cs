@@ -1,122 +1,102 @@
-﻿#nullable enable
-
-using System;
-using System.Collections.Generic;
-using System.Threading;
+﻿using System;
 using CommandLine;
 using Zenoh;
 
 namespace ZPut;
 
-class Program
+public class Program
 {
     static void Main(string[] args)
     {
-        var r = Parser.Default.ParseArguments<ClArgs>(args);
-        bool ok = true;
-        r.WithNotParsed(e => { ok = false; });
-        if (!ok) return;
+        var arguments = Parser.Default.ParseArguments<Args>(args);
+        var isOk = true;
+        arguments.WithNotParsed(e => { isOk = false; });
+        if (!isOk) return;
 
-        ClArgs clArgs = r.Value;
-        Config? config = clArgs.ToConfig();
-        if (config is null)
-            return;
+        var config = arguments.Value.ToConfig();
+        if (config is null) return;
 
         Console.WriteLine("Opening session...");
-        var session = Session.Open(config);
+        var r = Session.Open(config, out var session);
         if (session is null)
         {
-            Console.WriteLine("Opening session unsuccessful!");
+            Console.WriteLine($"Opening session unsuccessful! result: {r}");
             return;
         }
 
-        Thread.Sleep(200);
-        Console.WriteLine("Opening session successful!");
+        Console.WriteLine("Opening session successful!\n");
 
+        Keyexpr? keyexpr;
+        ZBytes payload;
+        PutOptions options;
+        string printString;
+
+        // ----------------------------------------------------------------------
         string keyStr = "demo/example/zenoh-cs-put/string";
         string dataStr = "Put from csharp !";
-        Console.WriteLine(session.PutStr(keyStr, dataStr)
-            ? $"Putting data string ('{keyStr}': '{dataStr}')"
-            : "Putting data string fault!");
+        keyexpr = Keyexpr.FromString(keyStr);
+        if (keyexpr is null) goto Exit;
+        payload = ZBytes.FromString(dataStr);
+        options = new PutOptions(EncodingId.TextPlain);
+        options.SetAttachment(ZBytes.FromString("abcd"));
 
+        r = session.Put(keyexpr, payload, options);
+
+        printString = r != Result.Ok
+            ? $"Putting data failed!\n result: {r}, key: {keyStr}\n"
+            : $"Putting data succeeded!\n key: {keyStr}, payload: {dataStr}\n";
+        Console.WriteLine(printString);
+
+        // ----------------------------------------------------------------------
         string keyJson = "demo/example/zenoh-cs-put/json";
         string dataJson = "{\"value\": \"Put from csharp\"}";
-        Console.WriteLine(session.PutJson(keyJson, dataJson)
-            ? $"Putting data json ('{keyJson}': {dataJson})"
-            : "Putting data json fault!");
+        keyexpr = Keyexpr.FromString(keyJson);
+        if (keyexpr is null) goto Exit;
+        payload = ZBytes.FromString(dataJson);
+        options = new PutOptions(EncodingId.TextJson);
+        options.SetAttachment(ZBytes.FromString("1234"));
 
-        string keyInt = "demo/example/zenoh-cs-put/int";
-        long dataInt = 965;
-        Console.WriteLine(session.PutInt(keyInt, dataInt)
-            ? $"Putting data int ('{keyInt}': {dataInt})"
-            : "Putting data int fault!");
+        r = session.Put(keyexpr, payload, options);
 
-        string keyFloat = "demo/example/zenoh-cs-put/float";
-        double dataFloat = 99.6;
-        Console.WriteLine(session.PutFloat(keyFloat, dataFloat)
-            ? $"Putting data float ('{keyFloat}': {dataFloat})"
-            : "Putting data float fault!");
+        printString = r != Result.Ok
+            ? $"Putting data failed!\n result: {r}, key: {keyJson}\n"
+            : $"Putting data succeeded!\n key: {keyJson}, payload: {dataJson}\n";
+        Console.WriteLine(printString);
 
+        // ----------------------------------------------------------------------
         string keyBin = "demo/example/zenoh-cs-put/bin";
-        byte[] dataBin = { 0x1, 0x2, 0x3, 0x4 };
-        Console.WriteLine(
-            session.PutData(keyBin, dataBin, EncodingPrefix.AppCustom)
-                ? $"Putting data bin ('{keyBin}': {dataBin.Length} Byte"
-                : "Putting data bin fault!");
+        byte[] dataBin = [0x12, 0x13, 0xa1, 0xb2];
+        keyexpr = Keyexpr.FromString(keyBin);
+        if (keyexpr is null) goto Exit;
+        payload = ZBytes.FromBytes(dataBin);
+        options = new PutOptions(EncodingId.ZenohBytes);
+        options.SetAttachment(ZBytes.FromString("bin"));
 
+        r = session.Put(keyexpr, payload, options);
+
+        printString = r != Result.Ok
+            ? $"Putting data failed!\n result: {r}, key: {keyBin}\n"
+            : $"Putting data succeeded!\n key: {keyBin}, payload(Hex): {Convert.ToHexString(dataBin)}\n";
+        Console.WriteLine(printString);
+
+        // ----------------------------------------------------------------------
+        Exit:
         session.Close();
+        Console.WriteLine("exit");
     }
 }
 
-class ClArgs
+public class Args
 {
-    [Option('c', "config", Required = false, HelpText = "A configuration file.")]
+    [Option('c', "config", Required = false, HelpText = "Zenoh config file.")]
     public string? ConfigFilePath { get; set; } = null;
 
-    [Option('e', "connect", Required = false, HelpText = "Endpoints to connect to. example: tcp/127.0.0.1:7447")]
-    public IEnumerable<string> Connects { get; set; } = new List<string>();
-
-    [Option('l', "listen", Required = false, HelpText = "Endpoints to listen on. example: tcp/127.0.0.1:8447")]
-    public IEnumerable<string> Listens { get; set; } = new List<string>();
-
-    [Option('m', "mode", Required = false,
-        HelpText = "The zenoh session mode (peer by default) [possible values: peer, client]")]
-    public string Mode { get; set; } = "peer";
-
-    internal Config? ToConfig()
+    public Config? ToConfig()
     {
-        if (ConfigFilePath != null)
-        {
-            Config? c = Config.LoadFromFile(ConfigFilePath);
-            if (c is null)
-            {
-                Console.WriteLine("load config file error!");
-                return null;
-            }
+        var config = ConfigFilePath == null ? Config.Default() : Config.FromFile(ConfigFilePath);
 
-            return c;
-        }
-
-        Config config = new Config();
-
-        config.SetMode(Mode == "client" ? Config.Mode.Client : Config.Mode.Peer);
-
-        List<string> connects = new List<string>();
-        foreach (string s in Connects)
-        {
-            connects.Add(s);
-        }
-
-        config.SetConnect(connects.ToArray());
-
-        List<string> listens = new List<string>();
-        foreach (string s in Listens)
-        {
-            listens.Add(s);
-        }
-
-        config.SetListen(listens.ToArray());
-
-        return config;
+        if (config is not null) return config;
+        Console.WriteLine("load config file error!");
+        return null;
     }
 }

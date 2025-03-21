@@ -1,13 +1,12 @@
-﻿using System;
-using System.Threading;
+using System;
 using CommandLine;
 using Zenoh;
 
-namespace ZInfo;
+namespace ZDelete;
 
 public class Program
 {
-    public static void Main(string[] args)
+    static void Main(string[] args)
     {
         var arguments = Parser.Default.ParseArguments<Args>(args);
         var isOk = true;
@@ -27,38 +26,22 @@ public class Program
 
         Console.WriteLine("Opening session successful!\n");
 
-        var id = session.GetId();
-        Console.WriteLine($"Session ID: {id.ToHexStr()}");
+        string keyexprStr = "demo/example/zenoh-cs-delete";
+        var keyexpr = Keyexpr.FromString(keyexprStr);
+        if (keyexpr is null) goto Exit;
 
-        r = session.RoutersId(PrintRoutersId);
-        if (r != Result.Ok)
-        {
-            Console.WriteLine("Getting routers ID failed!");
-            goto Exit;
-        }
+        var options = new DeleteOptions();
 
-        r = session.PeersId(PrintPeersId);
-        if (r != Result.Ok)
-        {
-            Console.WriteLine("Getting peers ID failed!");
-            goto Exit;
-        }
+        r = session.Delete(keyexpr, options);
 
-        Thread.Sleep(500);
+        var printStr = r != Result.Ok
+            ? $"Deleting data failed! result: {r}, key: {keyexprStr}"
+            : $"Deleting data succeeded! key: {keyexprStr}";
+        Console.WriteLine(printStr);
 
         Exit:
         session.Close();
         Console.WriteLine("exit");
-    }
-
-    static void PrintRoutersId(Id id)
-    {
-        Console.WriteLine($"Router ID: {id.ToHexStr()}");
-    }
-
-    static void PrintPeersId(Id id)
-    {
-        Console.WriteLine($"Peer ID: {id.ToHexStr()}");
     }
 }
 

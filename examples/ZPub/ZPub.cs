@@ -1,134 +1,82 @@
-﻿#nullable enable
-
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Threading;
 using CommandLine;
 using Zenoh;
 
 namespace ZPub;
 
-class Program
+public class Program
 {
-    static void Main(string[] args)
+    public static void Main(string[] args)
     {
-        var r = Parser.Default.ParseArguments<ClArgs>(args);
-        bool ok = true;
-        r.WithNotParsed(e => { ok = false; });
-        if (!ok) return;
+        var arguments = Parser.Default.ParseArguments<Args>(args);
+        var isOk = true;
+        arguments.WithNotParsed(e => { isOk = false; });
+        if (!isOk) return;
 
-        ClArgs clArgs = r.Value;
-        Config? config = clArgs.ToConfig();
-        if (config is null)
-            return;
+        var config = arguments.Value.ToConfig();
+        if (config is null) return;
 
         Console.WriteLine("Opening session...");
-        var session = Session.Open(config);
+        var r = Session.Open(config, out var session);
         if (session is null)
         {
-            Console.WriteLine("Opening session fault!");
+            Console.WriteLine($"Opening session unsuccessful! result: {r}");
             return;
         }
 
-        Thread.Sleep(200);
-        Console.WriteLine("Opening session successful!");
+        Console.WriteLine("Opening session successful!\n");
 
-        string key = clArgs.GetKey();
-        string value = clArgs.GetValue();
+        string keyStr = "demo/example/zenoh-cs-pub/string";
+        var keyexpr = Keyexpr.FromString(keyStr);
+        if (keyexpr is null) goto Exit;
 
-        Publisher publisher = new Publisher(key);
+        var publisherOptions = new PublisherOptions();
+        publisherOptions.SetEncoding(new Encoding(EncodingId.TextPlain));
 
-        var handle = session.RegisterPublisher(publisher);
-        if (handle is null)
+        r = session.DeclarePublisher(keyexpr, publisherOptions, out Publisher? publisher);
+        if (publisher is null)
         {
-            Console.WriteLine($"Register Publisher1 fault On '{key}'");
-            return;
+            Console.WriteLine($"Declare publisher unsuccessful! result: {r}");
+            goto Exit;
         }
 
-        Console.WriteLine($"Registered Publisher1 On '{key}'");
+        Console.WriteLine($"Declaring publisher on {keyexpr}");
 
         for (int i = 0; i < 100; i++)
         {
-            string pubValue = $"[{i}] {value}";
-            session.PubStr(handle.Value, pubValue);
-            Console.WriteLine($"Publishing Data ('{key}': '{pubValue}')..");
-
             Thread.Sleep(1000);
+            var payloadStr = $"[{i}] Pub from CS!";
+            var payload = ZBytes.FromString(payloadStr);
+            r = publisher.Put(payload, new PublisherPutOptions());
+            if (r != Result.Ok)
+            {
+                Console.WriteLine($"Publisher put unsuccessful! result: {r}");
+                goto Exit;
+            }
+
+            Console.WriteLine($"Publisher put data {payloadStr}");
         }
 
-        session.UnregisterPublisher(handle.Value);
+        publisher.Undeclare();
 
+        Exit:
         session.Close();
+        Console.WriteLine("exit");
     }
 }
 
-class ClArgs
+public class Args
 {
-    [Option('c', "config", Required = false, HelpText = "A configuration file.")]
+    [Option('c', "config", Required = false, HelpText = "Zenoh config file.")]
     public string? ConfigFilePath { get; set; } = null;
 
-    [Option('e', "connect", Required = false, HelpText = "Endpoints to connect to. example: tcp/127.0.0.1:7447")]
-    public IEnumerable<string> Connects { get; set; } = new List<string>();
-
-    [Option('l', "listen", Required = false, HelpText = "Endpoints to listen on. example: tcp/127.0.0.1:8447")]
-    public IEnumerable<string> Listens { get; set; } = new List<string>();
-
-    [Option('m', "mode", Required = false,
-        HelpText = "The zenoh session mode (peer by default) [possible values: peer, client]")]
-    public string Mode { get; set; } = "peer";
-
-    [Option('k', "key", Required = false,
-        HelpText = "The key expression to publish onto. [default: demo/example/zenoh-cs-pub]")]
-    public string? Keyexpr { get; set; } = null;
-
-    [Option('v', "value", Required = false,
-        HelpText = "The value to publish. [default: \"Pub from C#!\"]")]
-    public string? Value { get; set; } = null;
-
-    internal Config? ToConfig()
+    public Config? ToConfig()
     {
-        if (ConfigFilePath != null)
-        {
-            Config? c = Config.LoadFromFile(ConfigFilePath);
-            if (c is null)
-            {
-                Console.WriteLine("load config file error!");
-                return null;
-            }
+        var config = ConfigFilePath == null ? Config.Default() : Config.FromFile(ConfigFilePath);
 
-            return c;
-        }
-
-        Config config = new Config();
-
-        config.SetMode(Mode == "client" ? Config.Mode.Client : Config.Mode.Peer);
-
-        List<string> connects = new List<string>();
-        foreach (string s in Connects)
-        {
-            connects.Add(s);
-        }
-
-        config.SetConnect(connects.ToArray());
-
-        List<string> listens = new List<string>();
-        foreach (string s in Listens)
-        {
-            listens.Add(s);
-        }
-
-        config.SetListen(listens.ToArray());
-
-        return config;
-    }
-
-    public string GetKey()
-    {
-        return Keyexpr ?? "demo/example/zenoh-cs-pub";
-    }
-
-    public string GetValue()
-    {
-        return Value ?? "Pub from C#!";
+        if (config is not null) return config;
+        Console.WriteLine("load config file error!");
+        return null;
     }
 }

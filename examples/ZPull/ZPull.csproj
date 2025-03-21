@@ -1,19 +1,20 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
-        <AssemblyName>ZInfo</AssemblyName>
-        <PackageId>ZInfo</PackageId>
+        <AssemblyName>ZPull</AssemblyName>
+        <PackageId>ZPull</PackageId>
         <OutputType>Exe</OutputType>
         <EnableDefaultItems>false</EnableDefaultItems>
         <LangVersion>12</LangVersion>
         <TargetFramework>net8.0</TargetFramework>
-        <Configurations>Release;Debug</Configurations>
-        <Platforms>x64;ARM64</Platforms>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>ARM64;x64</Platforms>
+        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
-
+    
     <ItemGroup>
         <ProjectReference Include="..\..\Zenoh\Zenoh.csproj"/>
-        <Compile Include="ZInfo.cs"/>
+        <Compile Include="ZPull.cs"/>
     </ItemGroup>
 
     <ItemGroup>

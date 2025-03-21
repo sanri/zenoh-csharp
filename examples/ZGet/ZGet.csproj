@@ -4,19 +4,11 @@
         <PackageId>ZGet</PackageId>
         <OutputType>Exe</OutputType>
         <EnableDefaultItems>false</EnableDefaultItems>
-        <LangVersion>10</LangVersion>
-        <TargetFrameworks>net7.0;net6.0</TargetFrameworks>
+        <LangVersion>12</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64;ARM64</Platforms>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'ARM' ">
-        <DefineConstants>TRACE;PLATFORM_ARM</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'ARM64' ">
-        <DefineConstants>TRACE;PLATFORM_ARM64</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
-        <DefineConstants>TRACE;PLATFORM_x64</DefineConstants>
+        <Nullable>enable</Nullable>
     </PropertyGroup>
 
     <ItemGroup>
