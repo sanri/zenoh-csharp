@@ -11,21 +11,20 @@
 [Zenoh](http://zenoh.io) is an extremely efficient and fault-tolerant [Named Data Networking](http://named-data.net) (NDN) protocol that is able to scale down to extremely constrainded devices and networks.
 
 The C# API is for pure clients, in other terms does not support peer-to-peer communication, 
-can be easily tested against a zenoh router running in a Docker container (see https://zenoh.io/docs/getting-started/quick-test/).
+can be easily tested against a zenoh router running in a Docker container (see [quick test](https://zenoh.io/docs/getting-started/quick-test/)).
 
 
 -------------------------------
-## How to install it
+## Supported runtime environments
+The library targets.NET Standard 2.0, which means it should work on multiple runtimes.
+Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standard/net-standard?tabs=net-standard-2-0)
 
-Requirements:
-- The [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) library must be installed on your host.
-    - zenoh-c is compiled with default build options.
-    - **UNSTABLE_API**, **SHARED_MEMORY** compilation options are currently not supported.
-
-### Supported .NET Runtime
-- .NET 8.0
-- .NET 9.0 (planned, untested)
-- Unity 2022.3 (planned, untested)
+### .NET Runtime
+| .NET implementation | Version support         |
+|:--------------------|-------------------------|
+| .NET                | 5.0, 6.0, 7.0, 8.0, 9.0 |
+| .NET Framework      | 4.8, 4.8.1              |
+| Unity               | 2022.3                  |
 
 ### Supported CPU arch
 - x64
@@ -37,18 +36,43 @@ Requirements:
 | v0.7.2-rc |  v0.1.*  |
 |  v1.2.*   |  v0.2.*  |
 
+### Development and test environment composition
+| OS                  | CPU | .NET implementation  | Notes |
+|---------------------|-----|----------------------|-------|
+| macOS 15            | x64 | .NET 8.0             | main  |
+| macOS 15            | x64 | Unity 2022.3         |       |
+| Windows Server 2022 | x64 | .NET 8.0             |       |
+| Windows Server 2022 | x64 | .NET Framework 4.8.1 |       |
+| Ubuntu 24.04        | x64 | .NET 8.0             |       |
+
 
 -------------------------------
-## How to build it
+## How to install and use
 
-Requirements:  
- * The [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) library must be installed on your host
- * A .NET environment. .NET8 [SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet)
+Requirements:
+- The [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) library must be installed on your host.
+  - You need to select the zenoh-c version that corresponds to the zenoh-cs version (for example, zenoh-c V1.2.1).
+  - zenoh-c is compiled with default build options.
+  
+> :warning: **WARNING** :warning: : Currently, [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c/releases) library files compiled by zenoh are not supported.
+> **UNSTABLE_API**, **SHARED_MEMORY** compilation options are currently not supported.
+  
+### Use source code in your project
+(todo)
 
-Build:   
+### Build library files
+
+Requirements:
+- a .NET environment. .NET8 (or other compatible versions) [SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet)
+
+Run the command in directory Zenoh.
 ```shell
 dotnet build Zenoh.csproj -c Release 
 ```
+
+### Download the library using Nuget
+(todo)
+
 
 -------------------------------
 ## Running the Examples

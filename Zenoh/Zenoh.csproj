@@ -13,23 +13,13 @@
         <RepositoryType>git</RepositoryType>
         <OutputType>Library</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-        <LangVersion>12</LangVersion>
+        <LangVersion>8</LangVersion>
         <PackageVersion>0.2.0</PackageVersion>
         <PackageTags>zenoh</PackageTags>
-        <TargetFramework>net8.0</TargetFramework>
-<!--        <TargetFrameworks>net8.0;net9.0</TargetFrameworks>-->
+        <TargetFramework>netstandard2.0</TargetFramework>
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64;ARM64</Platforms>
         <Nullable>enable</Nullable>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'ARM' ">
-        <DefineConstants>TRACE;PLATFORM_ARM</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'ARM64' ">
-        <DefineConstants>TRACE;PLATFORM_ARM64</DefineConstants>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Platform)' == 'x64' ">
-        <DefineConstants>TRACE;PLATFORM_x64</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="/"/>
