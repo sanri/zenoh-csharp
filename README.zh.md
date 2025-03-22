@@ -10,41 +10,67 @@
 
 C# API是用于纯客户端的, 可以很容易地针对运行在Docker容器中的zenoh路由器进行测试 (参考[快速测试](https://zenoh.io/docs/getting-started/quick-test/)).
 
+
 -------------------------------
-## 如何安装
+## 支持的运行环境 
+库本的目标框架为 **.Net Standard 2.0** , 意味着这个库应该能在多个运行时上正常工作, 
+参考链接 [netstandard2.0](https://learn.microsoft.com/zh-cn/dotnet/standard/net-standard?tabs=net-standard-2-0)
 
-需求:
-- 库 [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被安装在你的主机上.
-    - 编译 zenoh-c 时使用默认构建选项
-    - 目前不支持 zenoh-c 的 **UNSTABLE_API**, **SHARED_MEMORY** 编译选项
-- 需要一个 .NET 运行时
-
-### 支持的 .NET 运行时 
-- .NET 8.0
-- .NET 9.0 (计划,未测试)
-- Unity 2022.3 (计划,未测试) 
+### NET 运行时
+| .NET 实现        | 版本支持                    | 
+|:---------------|-------------------------|
+| .NET           | 5.0, 6.0, 7.0, 8.0, 9.0 | 
+| .NET Framework | 4.8, 4.8.1              | 
+| Unity          | 2022.3                  | 
 
 ### 支持的CPU架构
 - x64
 - arm64 (计划,未测试)
 
-### Zenoh-CS 版本与 Zenoh-C 版本对应关系
+#### Zenoh-CS 版本与 Zenoh-C 版本对应关系
 |  Zenoh-C  | Zenoh-CS |
 |:---------:|:--------:|
 | v0.7.2-rc |  v0.1.*  |
 |  v1.2.*   |  v0.2.*  |
 
+### 开发和测试环境组合
+
+| 操作系统                | CPU | .NET 实现              | 备注   |
+|---------------------|-----|----------------------|------|
+| macOS 15            | x64 | .NET 8.0             | 主要环境 |
+| macOS 15            | x64 | Unity 2022.3         |      |
+| Windows Server 2022 | x64 | .NET 8.0             |      |
+| Windows Server 2022 | x64 | .NET Framework 4.8.1 |      |
+| Ubuntu 24.04        | x64 | .NET 8.0             |      |
+
+
 -------------------------------
-## 如何构建 
+## 如何安装使用
 
 需求:
-- 库 [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被安装在你的主机上.
-- 主机安装有 .NET8 的 [SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet)
+- [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被安装在你的主机上.
+  - 需要选择与 zenoh-cs 版本对应的 zenoh-c 版本 (例如 zenoh-c V1.2.1).
+  - 编译 zenoh-c 时使用默认构建选项.
 
-构建命令:   
+> :warning: **警告** :warning: : 目前不支持Zenoh官方编译的 [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c/releases) 库文件, 
+> 目前不支持 zenoh-c 的 **UNSTABLE_API**, **SHARED_MEMORY** 编译选项
+
+### 在项目里使用源码
+(待补充)
+
+### 构建库文件
+
+需求:
+- 主机安装有 .NET8 (或其它兼容版本) 的 [SDK](https://dotnet.microsoft.com/zh-cn/download/dotnet)
+
+在目录Zenoh内执行构建命令:
 ```shell
 dotnet build Zenoh.csproj -c Release 
 ```
+
+### 使用Nuget下载库文件
+(待补充)
+
 
 -------------------------------
 ## 运行示例
