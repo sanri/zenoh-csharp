@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using CommandLine;
 using Zenoh;
 
@@ -65,7 +66,7 @@ namespace ZPut
 
             // ----------------------------------------------------------------------
             string keyBin = "demo/example/zenoh-cs-put/bin";
-            var dataBin = new byte[] { 0x12, 0x13, 0xa1, 0xb2 };
+            var dataBin = new byte[] { 0x12, 0x03, 0xa1, 0xb2 };
             keyexpr = Keyexpr.FromString(keyBin);
             if (keyexpr is null) goto Exit;
             payload = ZBytes.FromBytes(dataBin);
@@ -76,13 +77,24 @@ namespace ZPut
 
             printString = r != Result.Ok
                 ? $"Putting data failed!\n result: {r}, key: {keyBin}\n"
-                : $"Putting data succeeded!\n key: {keyBin}, payload(Hex): {Convert.ToHexString(dataBin)}\n";
+                : $"Putting data succeeded!\n key: {keyBin}, payload(hex): {ToHexString(dataBin)}\n";
             Console.WriteLine(printString);
 
             // ----------------------------------------------------------------------
             Exit:
             session.Close();
             Console.WriteLine("exit");
+        }
+
+        static string ToHexString(byte[] data)
+        {
+            var builder = new StringBuilder();
+            foreach (var d in data)
+            {
+                builder.Append($"{d:x2} ");
+            }
+
+            return builder.ToString();
         }
     }
 

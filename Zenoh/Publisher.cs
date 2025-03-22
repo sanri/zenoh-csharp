@@ -52,7 +52,6 @@ namespace Zenoh
 
         private void Dispose(bool disposing)
         {
-            Console.WriteLine($"PutOptions Dispose({disposing})");
             if (_encoding is null == false)
             {
                 if (disposing)
