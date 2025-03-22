@@ -1,5 +1,7 @@
 .idea
+.vs
 obj
 bin
+Properties
 *.user
 package/
