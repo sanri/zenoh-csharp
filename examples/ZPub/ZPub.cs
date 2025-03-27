@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 using System.Threading;
 using CommandLine;
 using Zenoh;
@@ -32,7 +33,7 @@ namespace ZPub
             if (keyexpr is null) goto Exit;
 
             var publisherOptions = new PublisherOptions();
-            publisherOptions.SetEncoding(new Encoding(EncodingId.TextPlain));
+            publisherOptions.Encoding = new Encoding(EncodingId.TextPlain);
 
             r = session.DeclarePublisher(keyexpr, publisherOptions, out Publisher? publisher);
             if (publisher is null)

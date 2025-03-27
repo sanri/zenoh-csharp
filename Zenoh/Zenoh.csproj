@@ -20,6 +20,7 @@
         <Configurations>Release;Debug</Configurations>
         <Platforms>x64;ARM64</Platforms>
         <Nullable>enable</Nullable>
+        <DefineConstants>TRACE;UNSTABLE_API;</DefineConstants>
     </PropertyGroup>
     <ItemGroup>
         <None Include="../README.md" Pack="true" PackagePath="/"/>

@@ -90,12 +90,34 @@ namespace Zenoh
         Latest = 2
     }
 
+#if UNSTABLE_API
+    // zenoh_commons.h
+    // z_keyexpr_intersection_level_t
+    public enum KeyexprIntersectionLevel : uint
+    {
+        /// 2 key expressions do not intersect.
+        Disjoint = 0,
+
+        /// 2 key expressions intersect, i.e. there exists at least one key expression that is included by both.
+        Intersects = 1,
+
+        /// First key expression is the superset of second one.
+        Includes = 2,
+
+        /// 2 key expressions are equal.
+        Equals = 3,
+    }
+#endif
+
+#if UNSTABLE_API
+    // zenoh_commons.h
     // z_reliability_t
     public enum Reliability : uint
     {
-        BestEffort,
-        Reliable
+        BestEffort = 0,
+        Reliable = 1
     }
+#endif
 
     // zenoh_commons.h
     // z_query_target_t 
@@ -148,28 +170,32 @@ namespace Zenoh
         Error = 4,
     }
 
+#if UNSTABLE_API
+    // zenoh_commons.h
+    // zc_reply_keyexpr_t
+    /// <summary>
+    /// Key expressions types to which Queryable should reply to.
+    /// </summary>
+    public enum ReplyKeyexpr : uint
+    {
+        /// Replies to any key expression queries.
+        Any = 0,
+
+        /// Replies only to queries with intersecting key expressions.
+        MatchingQuery = 1,
+    }
+#endif
+
     // zenoh_opaque.h
     // z_owned_bytes_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedBytes
     {
+#if UNSTABLE_API
+        private fixed byte data[40];
+#else
         private fixed byte data[32];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_bytes_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedBytes
-    {
-        private fixed byte data[32];
-    }
-
-    // zenoh_commons.h
-    // z_moved_bytes_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedBytes
-    {
-        private ZOwnedBytes ownedBytes;
+#endif
     }
 
     // zenoh_opaque.h
@@ -181,27 +207,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_slice_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedSlice
-    {
-        private fixed byte data[32];
-    }
-
-    // zenoh_opaque.h
     // z_view_slice_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZViewSlice
     {
         private fixed byte data[32];
-    }
-
-    // zenoh_commons.h
-    // z_moved_slice_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedSlice
-    {
-        private ZOwnedSlice ownedSlice;
     }
 
     // zenoh_commons.h
@@ -221,27 +231,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_string_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedString
-    {
-        private fixed byte data[32];
-    }
-
-    // zenoh_opaque.h
     // z_view_string_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZViewString
     {
         private fixed byte data[32];
-    }
-
-    // zenoh_commons.h
-    // z_moved_string_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedString
-    {
-        private ZOwnedString ownedString;
     }
 
     // zenoh_opaque.h
@@ -257,32 +251,22 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedBytesWriter
     {
+#if UNSTABLE_API
+        private fixed byte data[64];
+#else
         private fixed byte data[56];
+#endif
     }
 
+#if UNSTABLE_API
     // zenoh_opaque.h
-    // z_loaned_bytes_writer_t
+    // zc_owned_concurrent_close_handle_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedBytesWriter
-    {
-        private fixed byte data[56];
-    }
-
-    // zenoh_commons.h
-    // z_moved_bytes_writer_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedBytesWriter
-    {
-        internal ZOwnedBytesWriter ownedBytesWriter;
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_session_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedSession
+    internal unsafe struct ZcOwnedConcurrentCloseHandle
     {
         private fixed byte data[8];
     }
+#endif
 
     // zenoh_opaque.h
     // z_owned_hello_t
@@ -290,22 +274,6 @@ namespace Zenoh
     internal unsafe struct ZOwnedHello
     {
         private fixed byte data[48];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_hello_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedHello
-    {
-        private fixed byte data[48];
-    }
-
-    // zenoh_commons.h
-    // z_moved_hello_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedHello
-    {
-        internal ZOwnedHello ownedHello;
     }
 
     // zenoh_commons.h
@@ -322,44 +290,43 @@ namespace Zenoh
         internal IntPtr drop;
     }
 
-    // zenoh_opaque.h
-    // z_loaned_closure_hello_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct ZLoanedClosureHello
-    {
-        private fixed ulong data[3];
-    }
-
+#if UNSTABLE_API
     // zenoh_commons.h
-    // z_moved_closure_hello_t
+    // z_matching_status_t
     [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedClosureHello
+    internal struct ZMatchingStatus
     {
-        internal ZOwnedClosureHello _ownedClosureHello;
+        internal bool matching;
     }
+#endif
+
+#if UNSTABLE_API
+    // zenoh_commons.h
+    // typedef struct z_owned_closure_matching_status_t {
+    //     void *_context;
+    //     void (*_call)(const struct z_matching_status_t *matching_status, void *context);
+    //     void (*_drop)(void *context);
+    // } z_owned_closure_matching_status_t;
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ZOwnedClosureMatchingStatus
+    {
+        internal IntPtr context;
+        internal IntPtr call;
+        internal IntPtr drop;
+    }
+#endif
 
     // zenoh_opaque.h
     // z_owned_query_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedQuery
     {
+        
+#if UNSTABLE_API
+        private fixed byte data[144];
+#else
         private fixed byte data[136];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_query_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedQuery
-    {
-        private fixed byte data[136];
-    }
-
-    // zenoh_commons.h
-    // z_moved_query_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedQuery
-    {
-        internal ZOwnedQuery ownedQuery;
+#endif
     }
 
     // zenoh_commons.h
@@ -377,43 +344,15 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_closure_query_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedClosureQuery
-    {
-        private fixed ulong data[3];
-    }
-
-    // zenoh_commons.h
-    // z_moved_closure_query_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedClosureQuery
-    {
-        internal ZOwnedClosureQuery _ownedClosureQuery;
-    }
-
-    // zenoh_opaque.h
     // z_owned_reply_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedReply
     {
+#if UNSTABLE_API
+        private fixed byte data[256];
+#else
         private fixed byte data[184];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_reply_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedReply
-    {
-        private fixed byte data[184];
-    }
-
-    // zenoh_commons.h
-    // z_moved_reply_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedReply
-    {
-        internal ZOwnedReply ownedReply;
+#endif
     }
 
     // zenoh_opaque.h
@@ -421,23 +360,11 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedReplyErr
     {
+#if UNSTABLE_API
+        private fixed byte data[88];
+#else
         private fixed byte data[72];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_reply_err_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedReplyErr
-    {
-        private fixed byte data[72];
-    }
-
-    // zenoh_commons.h
-    // z_moved_reply_err_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedReplyErr
-    {
-        internal ZOwnedReplyErr ownedReplyErr;
+#endif
     }
 
     // zenoh_commons.h
@@ -455,43 +382,15 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_closure_reply_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedClosureReply
-    {
-        private fixed ulong data[3];
-    }
-
-    // zenoh_commons.h
-    // z_moved_closure_reply_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedClosureReply
-    {
-        internal ZOwnedClosureReply _ownedClosureReply;
-    }
-
-    // zenoh_opaque.h
     // z_owned_sample_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedSample
     {
+#if UNSTABLE_API
+        private fixed byte data[232];
+#else
         private fixed byte data[184];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_sample_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedSample
-    {
-        private fixed byte data[184];
-    }
-
-    // zenoh_commons.h
-    // z_moved_sample_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedSample
-    {
-        internal ZOwnedSample ownedSample;
+#endif
     }
 
     // zenoh_commons.h
@@ -508,21 +407,15 @@ namespace Zenoh
         internal IntPtr drop;
     }
 
+#if UNSTABLE_API
     // zenoh_opaque.h
-    // z_loaned_closure_sample_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedClosureSample
+    // z_owned_source_info_t
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal unsafe struct ZOwnedSourceInfo
     {
-        private fixed ulong data[3];
+        private fixed byte data[32];
     }
-
-    // zenoh_commons.h
-    // z_owned_moved_sample_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedClosureSample
-    {
-        internal ZOwnedClosureSample _ownedClosureSample;
-    }
+#endif
 
     // zenoh_opaque.h
     // z_id_t
@@ -558,51 +451,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_closure_zid_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedClosureZid
-    {
-        private fixed ulong data[3];
-    }
-
-    // zenoh_commons.h
-    // z_moved_closure_zid_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedClosureZid
-    {
-        internal ZOwnedClosureZid owned_closure_zid;
-    }
-
-    // zenoh_opaque.h
     // z_owned_condvar_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedCondvar
     {
         private fixed byte data[24];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_condvar_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedCondvar
-    {
-        private fixed byte data[16];
-    }
-
-    // zenoh_commons.h
-    // z_moved_condvar_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedCondvar
-    {
-        internal ZOwnedCondvar owned_condvar;
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_mutex_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedMutex
-    {
-        private fixed byte data[32];
     }
 
     // zenoh_opaque.h
@@ -624,10 +477,12 @@ namespace Zenoh
     // zenoh_commons.h
     // z_clock_t
     [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct ZClock
+    internal struct ZClock
     {
         internal ulong t;
-        internal void* t_base;
+
+        // void*
+        internal IntPtr t_base;
     }
 
     // zenoh_commons.h
@@ -635,45 +490,29 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZCloseOptions
     {
+#if UNSTABLE_API
+        uint timeout_ms;
+
+        // zc_owned_concurrent_close_handle_t*
+        private IntPtr out_concurrent;
+#else
         internal byte dummy;
+#endif
     }
+
 
     // zenoh_opaque.h
     // z_owned_config_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedConfig
     {
-        private fixed byte data[1840];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_config_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedConfig
-    {
-        private fixed byte data[1840];
-    }
-
-    // zenoh_commons.h
-    // z_moved_config_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedConfig
-    {
-        internal ZOwnedConfig _ownedConfig;
+        private fixed byte data[1864];
     }
 
     // zenoh_opaque.h
     // z_owned_keyexpr_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedKeyexpr
-    {
-        private fixed byte data[32];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_keyexpr_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedKeyexpr
     {
         private fixed byte data[32];
     }
@@ -686,61 +525,49 @@ namespace Zenoh
         private fixed byte data[32];
     }
 
-    // zenoh_commons.h
-    // z_moved_keyexpr_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedKeyexpr
-    {
-        internal ZOwnedKeyexpr ownedKeyexpr;
-    }
-
     // zenoh_opaque.h
     // z_owned_encoding_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedEncoding
     {
+#if UNSTABLE_API
+        private fixed byte data[48];
+#else
         private fixed byte data[40];
+#endif
     }
 
+#if UNSTABLE_API
     // zenoh_opaque.h
-    // z_loaned_encoding_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedEncoding
+    // z_entity_global_id_t
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
+    internal unsafe struct ZEntityGlobalId
     {
-        private fixed byte data[40];
+        private fixed byte data[20];
     }
-
-    // zenoh_commons.h
-    // z_moved_encoding_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedEncoding
-    {
-        internal ZOwnedEncoding ownedEncoding;
-    }
+#endif
 
     // zenoh_opaque.h
     // z_owned_publisher_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedPublisher
     {
+#if UNSTABLE_API
+        private fixed byte data[112];
+#else
         private fixed byte data[96];
+#endif
     }
 
+#if UNSTABLE_API
     // zenoh_opaque.h
-    // z_loaned_publisher_t
+    // z_owned_querier_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedPublisher
+    internal unsafe struct ZOwnedQuerier
     {
-        private fixed byte data[96];
+        private fixed byte data[80];
     }
-
-    // zenoh_commons.h
-    // z_moved_publisher_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedPublisher
-    {
-        internal ZOwnedPublisher ownedPublisher;
-    }
+#endif
 
     // zenoh_opaque.h
     // z_owned_queryable_t
@@ -748,22 +575,6 @@ namespace Zenoh
     internal unsafe struct ZOwnedQueryable
     {
         private fixed byte data[16];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_queryable_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedQueryable
-    {
-        private fixed byte data[16];
-    }
-
-    // zenoh_commons.h
-    // z_moved_queryable_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedQueryable
-    {
-        internal ZOwnedQueryable ownedQueryable;
     }
 
     // zenoh_opaque.h
@@ -775,43 +586,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_subscriber_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedSubscriber
-    {
-        private fixed byte data[48];
-    }
-
-    // zenoh_commons.h
-    // z_moved_subscriber_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedSubscriber
-    {
-        internal ZOwnedSubscriber ownedSubscriber;
-    }
-
-    // zenoh_opaque.h
     // z_owned_fifo_handler_query_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedFifoHandlerQuery
     {
         private fixed byte data[8];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_fifo_handler_query_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedFifoHandlerQuery
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_fifo_handler_query_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedFifoHandlerQuery
-    {
-        internal ZOwnedFifoHandlerQuery _ownedFifoHandlerQuery;
     }
 
     // zenoh_opaque.h
@@ -823,43 +602,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_fifo_handler_reply_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedFifoHandlerReply
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_fifo_handler_reply_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedFifoHandlerReply
-    {
-        internal ZOwnedFifoHandlerReply _ownedFifoHandlerReply;
-    }
-
-    // zenoh_opaque.h
     // z_owned_fifo_handler_sample_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedFifoHandlerSample
     {
         private fixed byte data[8];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_fifo_handler_sample_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedFifoHandlerSample
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_fifo_handler_sample_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedFifoHandlerSample
-    {
-        internal ZOwnedFifoHandlerSample _ownedFifoHandlerSample;
     }
 
     // zenoh_opaque.h
@@ -871,43 +618,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_string_array_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedStringArray
-    {
-        private fixed byte data[24];
-    }
-
-    // zenoh_commons.h
-    // z_moved_string_array_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedStringArray
-    {
-        internal ZOwnedStringArray ownedStringArray;
-    }
-
-    // zenoh_opaque.h
     // z_owned_liveliness_token_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedLivelinessToken
     {
         private fixed byte data[16];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_liveliness_token_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedLivelinessToken
-    {
-        private fixed byte data[16];
-    }
-
-    // zenoh_commons.h
-    // z_moved_liveliness_token_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedLivelinessToken
-    {
-        internal ZOwnedLivelinessToken ownedLivelinessToken;
     }
 
     // zenoh_commons.h
@@ -942,36 +657,12 @@ namespace Zenoh
         private fixed byte data[32];
     }
 
-    // zenoh_commons.h
-    // z_moved_mutex_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedMutex
-    {
-        internal ZOwnedMutex ownedMutex;
-    }
-
     // zenoh_opaque.h
     // z_owned_ring_handler_query_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedRingHandlerQuery
     {
         private fixed byte data[8];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_ring_handler_query_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedRingHandlerQuery
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_ring_handler_query_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedRingHandlerQuery
-    {
-        internal ZOwnedRingHandlerQuery ownedRingHandlerQuery;
     }
 
     // zenoh_opaque.h
@@ -983,43 +674,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_loaned_ring_handler_reply_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedRingHandlerReply
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_ring_handler_reply_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedRingHandlerReply
-    {
-        internal ZOwnedRingHandlerReply ownedRingHandlerReply;
-    }
-
-    // zenoh_opaque.h
     // z_owned_ring_handler_sample_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedRingHandlerSample
     {
         private fixed byte data[8];
-    }
-
-    // zenoh_opaque.h
-    // z_loaned_ring_handler_sample_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZLoanedRingHandlerSample
-    {
-        private fixed byte data[8];
-    }
-
-    // zenoh_commons.h
-    // z_moved_ring_handler_sample_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedRingHandlerSample
-    {
-        internal ZOwnedRingHandlerSample ownedRingHandlerSample;
     }
 
     // zenoh_opaque.h
@@ -1030,28 +689,12 @@ namespace Zenoh
         private fixed byte data[8];
     }
 
-    // zenoh_commons.h
-    // z_moved_session_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedSession
-    {
-        internal ZOwnedSession ownedSession;
-    }
-
     // zenoh_opaque.h
     // z_owned_task_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedTask
     {
         private fixed byte data[24];
-    }
-
-    // zenoh_commons.h
-    // z_moved_task_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZMovedTask
-    {
-        internal ZOwnedTask ownedTask;
     }
 
     // zenoh_commons.h
@@ -1089,14 +732,10 @@ namespace Zenoh
         internal CongestionControl congestion_control;
         internal Priority priority;
         [MarshalAs(UnmanagedType.U1)] internal bool is_express;
-    }
-
-    // zenoh_commons.h
-    // z_publisher_delete_options_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal unsafe struct ZPublisherDeleteOptions
-    {
-        internal ZTimestamp* timestamp;
+#if UNSTABLE_API
+        internal Reliability reliability;
+        internal Locality allowed_destination;
+#endif
     }
 
     // zenoh_commons.h
@@ -1110,8 +749,22 @@ namespace Zenoh
         // z_timestamp_t*
         internal IntPtr timestamp;
 
+#if UNSTABLE_API
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+#endif
+
         // z_moved_bytes_t*
         internal IntPtr attachment;
+    }
+
+    // zenoh_commons.h
+    // z_publisher_delete_options_t
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ZPublisherDeleteOptions
+    {
+        // z_timestamp_t*
+        internal IntPtr timestamp;
     }
 
     // zenoh_commons.h
@@ -1120,6 +773,10 @@ namespace Zenoh
     internal struct ZQueryableOptions
     {
         [MarshalAs(UnmanagedType.U1)] internal bool complete;
+
+#if UNSTABLE_API
+        internal Locality allowed_origin;
+#endif
     }
 
     // zenoh_commons.h
@@ -1127,7 +784,11 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZSubscriberOptions
     {
-        internal byte option;
+#if UNSTABLE_API
+        internal Locality allowed_origin;
+#else
+        internal byte dummy;
+#endif
     }
 
     // zenoh_commons.h
@@ -1143,6 +804,11 @@ namespace Zenoh
 
         // z_timestamp_t*
         internal IntPtr timestamp;
+
+#if UNSTABLE_API
+        internal Reliability reliability;
+        internal Locality allowed_destination;
+#endif
     }
 
     // zenoh_commons.h
@@ -1152,6 +818,43 @@ namespace Zenoh
     {
         internal ConsolidationMode mode;
     }
+
+#if UNSTABLE_API
+    // zenoh_commons.h
+    // z_querier_options_t
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ZQuerierOptions
+    {
+        internal QueryTarget target;
+        internal ZQueryConsolidation consolidation;
+        internal CongestionControl congestion_control;
+        internal bool is_express;
+        internal Locality allowed_destination;
+        internal ReplyKeyexpr accept_replies;
+        internal Priority priority;
+        internal ulong timeout_ms;
+    }
+#endif
+
+#if UNSTABLE_API
+    // zenoh_commons.h
+    // z_querier_get_options_t
+    [StructLayout(LayoutKind.Sequential)]
+    internal struct ZQuerierGetOptions
+    {
+        // z_moved_bytes_t*
+        internal IntPtr payload;
+
+        // z_moved_encoding_t* 
+        internal IntPtr encoding;
+
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+
+        // z_moved_bytes_t*
+        internal IntPtr attachment;
+    }
+#endif
 
     // zenoh_commons.h
     // z_get_options_t 
@@ -1172,7 +875,17 @@ namespace Zenoh
 
         [MarshalAs(UnmanagedType.U1)] internal bool is_express;
 
+#if UNSTABLE_API
+        internal Locality allowed_destination;
+        internal ReplyKeyexpr accept_replies;
+#endif
+
         internal Priority priority;
+
+#if UNSTABLE_API
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+#endif
 
         // z_moved_bytes_t*
         internal IntPtr attachment;
@@ -1197,6 +910,15 @@ namespace Zenoh
         // z_timestamp_t*
         internal IntPtr timestamp;
 
+#if UNSTABLE_API
+        internal Reliability reliability;
+
+        internal Locality allowed_destination;
+
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+#endif
+
         // z_moved_bytes_t*
         internal IntPtr attachment;
     }
@@ -1218,6 +940,11 @@ namespace Zenoh
         // z_timestamp_t*
         internal IntPtr timestamp;
 
+#if UNSTABLE_API
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+#endif
+
         // z_moved_bytes_t*
         internal IntPtr attachment;
     }
@@ -1235,6 +962,11 @@ namespace Zenoh
 
         // timestamp*
         internal IntPtr timestamp;
+
+#if UNSTABLE_API
+        // z_moved_source_info_t*
+        internal IntPtr source_info;
+#endif
 
         // z_moved_bytes_t*
         internal IntPtr attachment;
@@ -1257,22 +989,6 @@ namespace Zenoh
         internal IntPtr context;
         internal IntPtr call;
         internal IntPtr drop;
-    }
-
-    // zenoh_commons.h
-    // zc_moved_closure_log_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZcMovedClosureLog
-    {
-        internal ZcOwnedClosureLog owned_closure_log;
-    }
-
-    // zenoh_opaque.h
-    // zc_loaned_closure_log_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZcLoanedClosureLog
-    {
-        private fixed ulong data[3];
     }
 
     // zenoh_commons.h
@@ -1302,26 +1018,14 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZeOwnedSerializer
     {
+#if UNSTABLE_API
+        private fixed byte data[64];
+#else
         private fixed byte data[56];
+#endif
     }
 
-    // zenoh_opaque.h
-    // ze_loaned_serializer_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
-    internal unsafe struct ZeLoanedSerializer
-    {
-        private fixed byte data[56];
-    }
-
-    // zenoh_commons.h
-    // ze_moved_serializer_t
-    [StructLayout(LayoutKind.Sequential)]
-    internal struct ZeMovedSerializer
-    {
-        internal ZeOwnedSerializer ownedSerializer;
-    }
-
-    internal static unsafe class ZenohC
+    internal static class ZenohC
     {
         internal delegate void Cb2(IntPtr data, IntPtr context);
 
@@ -1342,6 +1046,16 @@ namespace Zenoh
         internal static string ConfigScoutingTimeoutKey = "scouting/timeout";
         internal static string ConfigScoutingDelayKey = "scouting/delay";
         internal static string ConfigAddTimestampKey = "timestamping/enabled";
+
+#if UNSTABLE_API
+        /// enum z_reliability_t
+        /// z_reliability_default(
+        ///     void
+        /// )
+        [DllImport(DllName, EntryPoint = "z_reliability_default", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Reliability z_reliability_default();
+#endif
 
         /// void
         /// z_bytes_clone(
@@ -1419,33 +1133,43 @@ namespace Zenoh
         internal static extern Result z_bytes_from_buf(IntPtr dst, IntPtr src, UIntPtr len, IntPtr deleter,
             IntPtr context);
 
+        /// void
+        /// z_bytes_from_slice(
+        ///     struct z_owned_bytes_t *this_,
+        ///     struct z_moved_slice_t *slice
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_from_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_bytes_from_slice(ZOwnedBytes* dst, ZMovedSlice* src);
+        internal static extern void z_bytes_from_slice(IntPtr dst, IntPtr src);
 
         [DllImport(DllName, EntryPoint = "z_bytes_from_static_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_from_static_buf(ZOwnedBytes* dst, byte* src, UIntPtr len);
+        internal static extern Result z_bytes_from_static_buf(IntPtr dst, IntPtr src, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_bytes_from_static_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_from_static_str(ZOwnedBytes* dst, byte* src);
+        internal static extern Result z_bytes_from_static_str(IntPtr dst, IntPtr src);
 
         [DllImport(DllName, EntryPoint = "z_bytes_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_from_str(ZOwnedBytes* dst, byte* src, void* deleter, void* context);
+        internal static extern Result z_bytes_from_str(IntPtr dst, IntPtr src, IntPtr deleter, IntPtr context);
 
+        /// void
+        /// z_bytes_from_string(
+        ///     struct z_owned_bytes_t *this_,
+        ///     struct z_moved_string_t *s
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_from_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_bytes_from_string(ZOwnedBytes* dst, ZMovedString* src);
+        internal static extern void z_bytes_from_string(IntPtr dst, IntPtr src);
 
         [DllImport(DllName, EntryPoint = "z_bytes_get_reader", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZBytesReader z_bytes_get_reader(ZLoanedBytes* data);
+        internal static extern ZBytesReader z_bytes_get_reader(IntPtr data);
 
         [DllImport(DllName, EntryPoint = "z_bytes_get_slice_iterator", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZBytesSliceIterator z_bytes_get_slice_iterator(ZLoanedBytes* data);
+        internal static extern ZBytesSliceIterator z_bytes_get_slice_iterator(IntPtr data);
 
         /// bool
         /// z_bytes_is_empty(
@@ -1482,28 +1206,28 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_bytes_reader_read", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern UIntPtr z_bytes_reader_read(ZBytesReader* reader, byte* dst, UIntPtr len);
+        internal static extern UIntPtr z_bytes_reader_read(IntPtr reader, IntPtr dst, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_bytes_reader_remaining", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern UIntPtr z_bytes_reader_remaining(ZBytesReader* reader);
+        internal static extern UIntPtr z_bytes_reader_remaining(IntPtr reader);
 
         [DllImport(DllName, EntryPoint = "z_bytes_reader_seek", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_reader_seek(ZBytesReader* reader, long offset, int origin);
+        internal static extern Result z_bytes_reader_seek(IntPtr reader, long offset, int origin);
 
         [DllImport(DllName, EntryPoint = "z_bytes_reader_tell", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern long z_bytes_reader_tell(ZBytesReader* reader);
+        internal static extern long z_bytes_reader_tell(IntPtr reader);
 
         [DllImport(DllName, EntryPoint = "z_bytes_slice_iterator_next", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_bytes_slice_iterator_next(ZBytesSliceIterator* iter, ZViewSlice* slice);
+        internal static extern bool z_bytes_slice_iterator_next(IntPtr iter, IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "z_bytes_to_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_to_slice(ZLoanedBytes* bytes, ZOwnedSlice* dst);
+        internal static extern Result z_bytes_to_slice(IntPtr bytes, IntPtr dst);
 
         /// z_result_t
         /// z_bytes_to_string(
@@ -1514,56 +1238,70 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern Result z_bytes_to_string(IntPtr bytes, IntPtr dst);
 
+        /// z_result_t
+        /// z_bytes_writer_append(
+        ///     struct z_loaned_bytes_writer_t *this_,
+        ///     struct z_moved_bytes_t *bytes
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_append", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_writer_append(ZLoanedBytesWriter* writer, ZMovedBytes* bytes);
+        internal static extern Result z_bytes_writer_append(IntPtr writer, IntPtr bytes);
 
+        /// void
+        /// z_bytes_writer_drop(
+        ///     struct z_moved_bytes_writer_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_bytes_writer_drop(ZMovedBytesWriter* writer);
+        internal static extern void z_bytes_writer_drop(IntPtr writer);
 
         [DllImport(DllName, EntryPoint = "z_bytes_writer_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_writer_empty(ZOwnedBytesWriter* writer);
+        internal static extern Result z_bytes_writer_empty(IntPtr writer);
 
+        /// void
+        /// z_bytes_writer_finish(
+        ///     struct z_moved_bytes_writer_t *this_,
+        ///     struct z_owned_bytes_t *bytes
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_finish", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_bytes_writer_finish(ZMovedBytesWriter* writer, ZOwnedBytes* bytes);
+        internal static extern void z_bytes_writer_finish(IntPtr writer, IntPtr bytes);
 
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedBytesWriter* z_bytes_writer_loan(ZOwnedBytesWriter* writer);
+        internal static extern IntPtr z_bytes_writer_loan(IntPtr writer);
 
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedBytesWriter* z_bytes_writer_loan_mut(ZOwnedBytesWriter* writer);
+        internal static extern IntPtr z_bytes_writer_loan_mut(IntPtr writer);
 
         [DllImport(DllName, EntryPoint = "z_bytes_writer_write_all", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_bytes_writer_write_all(ZLoanedBytesWriter* writer, byte* src, UIntPtr len);
+        internal static extern Result z_bytes_writer_write_all(IntPtr writer, IntPtr src, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_clock_elapsed_s", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ulong z_clock_elapsed_s(ZClock* time);
+        internal static extern ulong z_clock_elapsed_s(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_clock_elapsed_ms", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ulong z_clock_elapsed_ms(ZClock* time);
+        internal static extern ulong z_clock_elapsed_ms(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_clock_elapsed_us", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ulong z_clock_elapsed_us(ZClock* time);
+        internal static extern ulong z_clock_elapsed_us(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_clock_now", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern ZClock z_clock_now();
 
         [DllImport(DllName, EntryPoint = "z_close", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-        internal static extern Result z_close(ZLoanedSession* session, ZCloseOptions* options);
+        internal static extern Result z_close(IntPtr session, IntPtr options);
 
         [DllImport(DllName, EntryPoint = "z_close_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_close_options_default(ZCloseOptions* options);
+        internal static extern void z_close_options_default(IntPtr options);
 
         /// void
         /// z_closure_hello(
@@ -1578,19 +1316,72 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_closure_hello_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_closure_hello_call(ZLoanedClosureHello* closure, ZLoanedHello* hello);
+        internal static extern void z_closure_hello_call(IntPtr closure, IntPtr hello);
 
+        /// void
+        /// z_closure_hello_drop(
+        ///     struct z_moved_closure_hello_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_closure_hello_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_closure_hello_drop(ZMovedClosureHello* closure);
+        internal static extern void z_closure_hello_drop(IntPtr closure);
 
         [DllImport(DllName, EntryPoint = "z_closure_hello_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedClosureHello* z_closure_hello_loan(ZOwnedClosureHello* closure);
+        internal static extern IntPtr z_closure_hello_loan(IntPtr closure);
 
         [DllImport(DllName, EntryPoint = "z_closure_hello_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedClosureHello* z_closure_hello_loan_mut(ZOwnedClosureHello* closure);
+        internal static extern IntPtr z_closure_hello_loan_mut(IntPtr closure);
+
+#if UNSTABLE_API
+        /// void
+        /// z_closure_matching_status(
+        ///     struct z_owned_closure_matching_status_t *this_,
+        ///     void (*call)(
+        ///         const struct z_matching_status_t *matching_status,
+        ///         void *context
+        ///     ),
+        ///     void (*drop)(
+        ///         void *context
+        ///     ),
+        ///     void *context
+        /// )
+        [DllImport(DllName, EntryPoint = "z_closure_matching_status", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_closure_matching_status(IntPtr closure, Cb2 call, Cb1 drop, IntPtr context);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_closure_matching_status_call(
+        ///     const struct z_loaned_closure_matching_status_t *closure,
+        ///     const struct z_matching_status_t *mathing_status
+        /// )
+        [DllImport(DllName, EntryPoint = "z_closure_matching_status_call", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_closure_matching_status_call(IntPtr closure, IntPtr mathing_status);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_closure_matching_status_drop(
+        ///     struct z_moved_closure_matching_status_t *closure_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_closure_matching_status_drop", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_closure_matching_status_drop(IntPtr closure, IntPtr mathing_status);
+#endif
+
+#if UNSTABLE_API
+        /// const struct z_loaned_closure_matching_status_t*
+        /// z_closure_matching_status_loan(
+        ///     const struct z_owned_closure_matching_status_t *closure
+        /// )
+        [DllImport(DllName, EntryPoint = "z_closure_matching_status_loan", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_closure_matching_status_loan(IntPtr closure);
+#endif
 
         /// void
         /// z_closure_query(
@@ -1768,29 +1559,33 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_closure_zid_loan_mut(IntPtr closure);
 
+        /// void
+        /// z_condvar_drop(
+        ///     struct z_moved_condvar_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_condvar_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_condvar_drop(ZMovedCondvar* condvar);
+        internal static extern void z_condvar_drop(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_condvar_init", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_condvar_init(ZOwnedCondvar* condvar);
+        internal static extern void z_condvar_init(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_condvar_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedCondvar* z_condvar_loan(ZOwnedCondvar* condvar);
+        internal static extern IntPtr z_condvar_loan(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_condvar_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedCondvar* z_condvar_loan_mut(ZOwnedCondvar* condvar);
+        internal static extern IntPtr z_condvar_loan_mut(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_condvar_signal", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_condvar_signal(ZLoanedCondvar* condvar);
+        internal static extern Result z_condvar_signal(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_condvar_wait", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_condvar_wait(ZLoanedCondvar* condvar, ZLoanedMutex* mutex);
+        internal static extern Result z_condvar_wait(IntPtr condvar, IntPtr mutex);
 
         /// void
         /// z_config_clone(
@@ -1834,30 +1629,12 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_config_loan_mut(IntPtr config);
 
-        [DllImport(DllName, EntryPoint = "z_declare_background_queryable", CallingConvention = CallingConvention.Cdecl,
-            ExactSpelling = true)]
-        internal static extern Result z_declare_background_queryable(
-            ZLoanedSession* session,
-            ZLoanedKeyexpr* keyexpr,
-            ZMovedClosureQuery* callback,
-            ZQueryableOptions* options
-        );
-
-        [DllImport(DllName, EntryPoint = "z_declare_background_subscriber", CallingConvention = CallingConvention.Cdecl,
-            ExactSpelling = true)]
-        internal static extern Result z_declare_background_subscriber(
-            ZLoanedSession* session,
-            ZLoanedKeyexpr* keyexpr,
-            ZMovedClosureSample* callback,
-            ZSubscriberOptions* options
-        );
-
         [DllImport(DllName, EntryPoint = "z_declare_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_declare_keyexpr(
-            ZLoanedSession* session,
-            ZOwnedKeyexpr* declaredKeyexpr,
-            ZLoanedKeyexpr* keyexpr
+            IntPtr session,
+            IntPtr declaredKeyexpr,
+            IntPtr keyexpr
         );
 
         /// z_result_t
@@ -1899,6 +1676,19 @@ namespace Zenoh
         internal static extern Result z_declare_subscriber(IntPtr session, IntPtr subscriber, IntPtr keyexpr,
             IntPtr callback,
             IntPtr options);
+
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_declare_querier(
+        ///     const struct z_loaned_session_t *session,
+        ///     struct z_owned_querier_t *querier,
+        ///     const struct z_loaned_keyexpr_t *key_expr,
+        ///     struct z_querier_options_t *options
+        /// )
+        [DllImport(DllName, EntryPoint = "z_declare_querier", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_declare_querier(IntPtr session, IntPtr querier, IntPtr keyexpr, IntPtr options);
+#endif
 
         /// z_result_t
         /// z_delete(
@@ -2378,11 +2168,11 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_encoding_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_encoding_from_str(ZOwnedEncoding* encoding, byte* s);
+        internal static extern Result z_encoding_from_str(IntPtr encoding, IntPtr s);
 
         [DllImport(DllName, EntryPoint = "z_encoding_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_encoding_from_substr(ZOwnedEncoding* encoding, byte* s, UIntPtr len);
+        internal static extern Result z_encoding_from_substr(IntPtr encoding, IntPtr s, UIntPtr len);
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_loan_default(
@@ -2436,6 +2226,27 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_encoding_to_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern void z_encoding_to_string(IntPtr encoding, IntPtr outStr);
+
+#if UNSTABLE_API
+        /// uint32_t 
+        /// z_entity_global_id_eid(
+        ///     const struct z_entity_global_id_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_entity_global_id_eid", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern uint z_entity_global_id_eid(IntPtr entity);
+#endif
+
+#if UNSTABLE_API
+        /// z_id_t 
+        /// z_entity_global_id_zid(
+        ///     const struct z_entity_global_id_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_entity_global_id_zid", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZId z_entity_global_id_zid(IntPtr entity);
+#endif
+
 
         /// void
         /// z_fifo_channel_query_new(
@@ -2596,27 +2407,31 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_hello_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_hello_clone(ZOwnedHello* dst, ZLoanedHello* src);
+        internal static extern void z_hello_clone(IntPtr dst, IntPtr src);
 
+        /// void
+        /// z_hello_drop(
+        ///     struct z_moved_hello_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_hello_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_hello_drop(ZMovedHello* hello);
+        internal static extern void z_hello_drop(IntPtr hello);
 
         [DllImport(DllName, EntryPoint = "z_hello_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedHello* z_hello_loan(ZOwnedHello* hello);
+        internal static extern IntPtr z_hello_loan(IntPtr hello);
 
         [DllImport(DllName, EntryPoint = "z_hello_locators", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_hello_locators(ZLoanedHello* hello, ZOwnedStringArray* locatorsOut);
+        internal static extern void z_hello_locators(IntPtr hello, IntPtr locatorsOut);
 
         [DllImport(DllName, EntryPoint = "z_hello_whatami", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Whatami z_hello_whatami(ZLoanedHello* hello);
+        internal static extern Whatami z_hello_whatami(IntPtr hello);
 
         [DllImport(DllName, EntryPoint = "z_hello_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZId z_hello_zid(ZLoanedHello* hello);
+        internal static extern ZId z_hello_zid(IntPtr hello);
 
         /// void
         /// z_id_to_string(
@@ -2656,74 +2471,97 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_internal_bytes_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_bytes_check(ZOwnedBytes* b);
+        internal static extern bool z_internal_bytes_check(IntPtr b);
 
         [DllImport(DllName, EntryPoint = "z_internal_bytes_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_bytes_null(ZOwnedBytes* b);
+        internal static extern void z_internal_bytes_null(IntPtr b);
 
         [DllImport(DllName, EntryPoint = "z_internal_bytes_writer_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_bytes_writer_check(ZOwnedBytesWriter* writer);
+        internal static extern bool z_internal_bytes_writer_check(IntPtr writer);
 
         [DllImport(DllName, EntryPoint = "z_internal_bytes_writer_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_bytes_writer_null(ZOwnedBytesWriter* writer);
+        internal static extern void z_internal_bytes_writer_null(IntPtr writer);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_hello_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_closure_hello_check(ZOwnedClosureHello* hello);
+        internal static extern bool z_internal_closure_hello_check(IntPtr hello);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_hello_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_closure_hello_null(ZOwnedClosureHello* hello);
+        internal static extern void z_internal_closure_hello_null(IntPtr hello);
+
+#if UNSTABLE_API
+        /// bool
+        /// z_internal_closure_matching_status_check(
+        ///     const struct z_owned_closure_matching_status_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_closure_matching_status_check",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool z_internal_closure_matching_status_check(IntPtr matching_status);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_internal_closure_matching_status_null(
+        ///     struct z_owned_closure_matching_status_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_closure_matching_status_null",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_internal_closure_matching_status_null(IntPtr matching_status);
+#endif
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_query_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_closure_query_check(ZOwnedClosureQuery* query);
+        internal static extern bool z_internal_closure_query_check(IntPtr query);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_query_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_closure_query_null(ZOwnedClosureQuery* query);
+        internal static extern void z_internal_closure_query_null(IntPtr query);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_reply_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_closure_reply_check(ZOwnedClosureReply* reply);
+        internal static extern bool z_internal_closure_reply_check(IntPtr reply);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_reply_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_closure_reply_null(ZOwnedClosureReply* reply);
+        internal static extern void z_internal_closure_reply_null(IntPtr reply);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_sample_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_closure_sample_check(ZOwnedClosureSample* sample);
+        internal static extern bool z_internal_closure_sample_check(IntPtr sample);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_sample_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_closure_sample_null(ZOwnedClosureSample* sample);
+        internal static extern void z_internal_closure_sample_null(IntPtr sample);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_zid_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_closure_zid_check(ZOwnedClosureZid* zid);
+        internal static extern bool z_internal_closure_zid_check(IntPtr zid);
 
         [DllImport(DllName, EntryPoint = "z_internal_closure_zid_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_closure_zid_null(ZOwnedClosureZid* zid);
+        internal static extern void z_internal_closure_zid_null(IntPtr zid);
 
         [DllImport(DllName, EntryPoint = "z_internal_condvar_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_condvar_check(ZOwnedCondvar* condvar);
+        internal static extern bool z_internal_condvar_check(IntPtr condvar);
 
         [DllImport(DllName, EntryPoint = "z_internal_condvar_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_condvar_null(ZOwnedCondvar* condvar);
+        internal static extern void z_internal_condvar_null(IntPtr condvar);
 
         /// bool
         /// z_internal_config_check(
@@ -2819,11 +2657,11 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_internal_hello_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_hello_check(ZOwnedHello* hello);
+        internal static extern bool z_internal_hello_check(IntPtr hello);
 
         [DllImport(DllName, EntryPoint = "z_internal_hello_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_hello_null(ZOwnedHello* hello);
+        internal static extern void z_internal_hello_null(IntPtr hello);
 
         /// bool
         /// z_internal_keyexpr_check(
@@ -2842,25 +2680,77 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_internal_keyexpr_null(IntPtr keyexpr);
 
+        /// bool
+        /// z_internal_liveliness_token_check(
+        ///     const struct z_owned_liveliness_token_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_internal_liveliness_token_check",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_liveliness_token_check(ZOwnedLivelinessToken* token);
+        internal static extern bool z_internal_liveliness_token_check(IntPtr token);
 
+        /// void
+        /// z_internal_liveliness_token_null(
+        ///     struct z_owned_liveliness_token_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_internal_liveliness_token_null",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_liveliness_token_null(ZOwnedLivelinessToken* token);
+        internal static extern void z_internal_liveliness_token_null(IntPtr token);
+
+#if UNSTABLE_API
+        /// bool 
+        /// z_internal_matching_listener_check(
+        ///     const struct z_owned_matching_listener_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_matching_listener_check",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool z_internal_matching_listener_check(IntPtr matching_listener);
+#endif
+
+#if UNSTABLE_API
+        /// void  
+        /// z_internal_matching_listener_null(
+        ///     struct z_owned_matching_listener_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_matching_listener_null",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_internal_matching_listener_null(IntPtr matching_listener);
+#endif
 
         [DllImport(DllName, EntryPoint = "z_internal_mutex_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_mutex_check(ZOwnedMutex* mutex);
+        internal static extern bool z_internal_mutex_check(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_internal_mutex_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_mutex_null(ZOwnedMutex* mutex);
+        internal static extern void z_internal_mutex_null(IntPtr mutex);
+
+#if UNSTABLE_API
+        /// bool
+        /// z_internal_querier_check(
+        ///     const struct z_owned_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_querier_check", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool z_internal_querier_check(IntPtr querier);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_internal_querier_null(
+        ///     struct z_owned_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_querier_null", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_internal_querier_null(IntPtr querier);
+#endif
 
         /// bool
         /// z_internal_publisher_check(
@@ -3041,29 +2931,51 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_internal_slice_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_slice_check(ZOwnedSlice* slice);
+        internal static extern bool z_internal_slice_check(IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "z_internal_slice_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_slice_null(ZOwnedSlice* slice);
+        internal static extern void z_internal_slice_null(IntPtr slice);
+
+#if UNSTABLE_API
+        /// bool
+        /// z_internal_source_info_check(
+        ///     const struct z_owned_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_source_info_check", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool z_internal_source_info_check(IntPtr info);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_internal_source_info_null(
+        ///     struct z_owned_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_internal_source_info_null", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_internal_source_info_null(IntPtr info);
+#endif
+
 
         [DllImport(DllName, EntryPoint = "z_internal_string_array_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_string_array_check(ZOwnedStringArray* strings);
+        internal static extern bool z_internal_string_array_check(IntPtr strings);
 
         [DllImport(DllName, EntryPoint = "z_internal_string_array_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_string_array_null(ZOwnedStringArray* strings);
+        internal static extern void z_internal_string_array_null(IntPtr strings);
 
         [DllImport(DllName, EntryPoint = "z_internal_string_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_string_check(ZOwnedString* str);
+        internal static extern bool z_internal_string_check(IntPtr str);
 
         [DllImport(DllName, EntryPoint = "z_internal_string_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_string_null(ZOwnedString* str);
+        internal static extern void z_internal_string_null(IntPtr str);
 
         /// bool
         /// z_internal_subscriber_check(
@@ -3085,11 +2997,11 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_internal_task_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_internal_task_check(ZOwnedTask* task);
+        internal static extern bool z_internal_task_check(IntPtr task);
 
         [DllImport(DllName, EntryPoint = "z_internal_task_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_internal_task_null(ZOwnedTask* task);
+        internal static extern void z_internal_task_null(IntPtr task);
 
         /// void
         /// z_keyexpr_as_view_string(
@@ -3244,84 +3156,141 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_keyexpr_loan(IntPtr keyexpr);
 
+#if UNSTABLE_API
+        /// enum z_keyexpr_intersection_level_t
+        /// z_keyexpr_relation_to(
+        ///     const struct z_loaned_keyexpr_t *left,
+        ///     const struct z_loaned_keyexpr_t *right
+        /// )
+        [DllImport(DllName, EntryPoint = "z_keyexpr_relation_to", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern KeyexprIntersectionLevel z_keyexpr_relation_to(IntPtr left, IntPtr right);
+#endif
+
+        /// z_result_t
+        /// z_liveliness_declare_subscriber(
+        ///     const struct z_loaned_session_t *session,
+        ///     struct z_owned_subscriber_t *subscriber,
+        ///     const struct z_loaned_keyexpr_t *key_expr,
+        ///     struct z_moved_closure_sample_t *callback,
+        ///     struct z_liveliness_subscriber_options_t *options
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_declare_subscriber", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_liveliness_declare_subscriber(
-            ZLoanedSession* session,
-            ZOwnedSubscriber* subscriber,
-            ZLoanedKeyexpr* keyexpr,
-            ZMovedClosureSample* callback,
-            ZLivelinessSubscriberOptions* options
-        );
+        internal static extern Result z_liveliness_declare_subscriber(IntPtr session, IntPtr subscriber, IntPtr keyexpr,
+            IntPtr callback, IntPtr options);
 
+        /// z_result_t
+        /// z_liveliness_declare_token(
+        ///     const struct z_loaned_session_t *session,
+        ///     struct z_owned_liveliness_token_t *token,
+        ///     const struct z_loaned_keyexpr_t *key_expr,
+        ///     const struct z_liveliness_token_options_t *_options
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_declare_token", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_liveliness_declare_token(
-            ZLoanedSession* session,
-            ZOwnedLivelinessToken* token,
-            ZLoanedKeyexpr* keyexpr,
-            ZLivelinessTokenOptions* options
-        );
+        internal static extern Result z_liveliness_declare_token(IntPtr session, IntPtr token, IntPtr keyexpr,
+            IntPtr options);
 
+        /// z_result_t
+        /// z_liveliness_get(
+        ///     const struct z_loaned_session_t *session,
+        ///     const struct z_loaned_keyexpr_t *key_expr,
+        ///     struct z_moved_closure_reply_t *callback,
+        ///     struct z_liveliness_get_options_t *options
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_get", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_liveliness_get(
-            ZLoanedSession* session,
-            ZLoanedKeyexpr* keyexpr,
-            ZMovedClosureReply* callback,
-            ZLivelinessGetOptions* options
-        );
+        internal static extern Result z_liveliness_get(IntPtr session, IntPtr keyexpr, IntPtr callback, IntPtr options);
 
+        /// void
+        /// z_liveliness_get_options_default(
+        ///     struct z_liveliness_get_options_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_get_options_default",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_liveliness_get_options_default(ZLivelinessGetOptions* options);
+        internal static extern void z_liveliness_get_options_default(IntPtr options);
 
+        /// void
+        /// z_liveliness_subscriber_options_default(
+        ///     struct z_liveliness_subscriber_options_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_subscriber_options_default",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_liveliness_subscriber_options_default(ZLivelinessSubscriberOptions* options);
+        internal static extern void z_liveliness_subscriber_options_default(IntPtr options);
 
+        /// void
+        /// z_liveliness_token_drop(
+        ///     struct z_moved_liveliness_token_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_liveliness_token_drop(ZMovedLivelinessToken* token);
+        internal static extern void z_liveliness_token_drop(IntPtr token);
 
+        /// const struct z_loaned_liveliness_token_t*
+        /// z_liveliness_token_loan(
+        ///     const struct z_owned_liveliness_token_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedLivelinessToken* z_liveliness_token_loan(ZOwnedLivelinessToken* token);
+        internal static extern IntPtr z_liveliness_token_loan(IntPtr token);
 
+        /// void
+        /// z_liveliness_token_options_default(
+        ///     struct z_liveliness_token_options_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_options_default",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_liveliness_token_options_default(ZLivelinessTokenOptions* options);
+        internal static extern void z_liveliness_token_options_default(IntPtr options);
 
+        /// z_result_t
+        /// z_liveliness_undeclare_token(
+        ///     struct z_moved_liveliness_token_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_undeclare_token", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_liveliness_undeclare_token(ZMovedLivelinessToken* token);
+        internal static extern Result z_liveliness_undeclare_token(IntPtr token);
 
+#if UNSTABLE_API
+        /// void 
+        /// z_matching_listener_drop(
+        ///     struct z_moved_matching_listener_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_matching_listener_drop", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_matching_listener_drop(IntPtr listener);
+#endif
+
+        /// void
+        /// z_mutex_drop(
+        ///     struct z_moved_mutex_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_mutex_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_mutex_drop(ZMovedMutex* mutex);
+        internal static extern void z_mutex_drop(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_mutex_init", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_mutex_init(ZOwnedMutex* mutex);
+        internal static extern Result z_mutex_init(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_mutex_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedMutex* z_mutex_loan_mut(ZOwnedMutex* mutex);
+        internal static extern IntPtr z_mutex_loan_mut(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_mutex_lock", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_mutex_lock(ZLoanedMutex* mutex);
+        internal static extern Result z_mutex_lock(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_mutex_try_lock", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_mutex_try_lock(ZLoanedMutex* mutex);
+        internal static extern Result z_mutex_try_lock(IntPtr mutex);
 
         [DllImport(DllName, EntryPoint = "z_mutex_unlock", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_mutex_unlock(ZLoanedMutex* mutex);
+        internal static extern Result z_mutex_unlock(IntPtr mutex);
 
         /// z_result_t
         /// z_open(
@@ -3346,6 +3315,20 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern Priority z_priority_default();
 
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_publisher_declare_matching_listener(
+        ///     const struct z_loaned_publisher_t *publisher,
+        ///     struct z_owned_matching_listener_t *matching_listener,
+        ///     struct z_moved_closure_matching_status_t *callback
+        /// )
+        [DllImport(DllName, EntryPoint = "z_publisher_declare_matching_listener",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_publisher_declare_matching_listener(IntPtr publisher, IntPtr listener,
+            IntPtr callback);
+#endif
+
         /// z_result_t
         /// z_publisher_delete(
         ///     const struct z_loaned_publisher_t *publisher,
@@ -3353,7 +3336,7 @@ namespace Zenoh
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_delete", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_publisher_delete(ZLoanedPublisher* publisher, ZPublisherDeleteOptions* options);
+        internal static extern Result z_publisher_delete(IntPtr publisher, IntPtr options);
 
         /// void
         /// z_publisher_delete_options_default(
@@ -3362,7 +3345,7 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_publisher_delete_options_default",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_publisher_delete_options_default(ZPublisherDeleteOptions* options);
+        internal static extern void z_publisher_delete_options_default(IntPtr options);
 
         /// void
         /// z_publisher_drop(
@@ -3371,6 +3354,28 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_publisher_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern void z_publisher_drop(IntPtr publisher);
+
+
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_publisher_get_matching_status(
+        ///     const struct z_loaned_publisher_t *this_,
+        ///     struct z_matching_status_t *matching_status
+        /// )
+        [DllImport(DllName, EntryPoint = "z_publisher_get_matching_status", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_publisher_get_matching_status(IntPtr publisher, IntPtr status);
+#endif
+
+#if UNSTABLE_API
+        /// struct z_entity_global_id_t
+        /// z_publisher_id(
+        ///     const struct z_loaned_publisher_t *publisher
+        /// )
+        [DllImport(DllName, EntryPoint = "z_publisher_id", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZEntityGlobalId z_publisher_id(IntPtr publisher);
+#endif
 
         /// const struct z_loaned_keyexpr_t*
         /// z_publisher_keyexpr(
@@ -3441,6 +3446,79 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_put_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern void z_put_options_default(IntPtr options);
+
+#if UNSTABLE_API
+        /// void
+        /// z_querier_drop(
+        ///     struct z_moved_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_drop", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_querier_drop(IntPtr querier);
+#endif
+
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_querier_get(
+        ///     const struct z_loaned_querier_t *querier,
+        ///     const char *parameters,
+        ///     struct z_moved_closure_reply_t *callback,
+        ///     struct z_querier_get_options_t *options
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_get", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_querier_get(IntPtr querier, IntPtr parameters, IntPtr callback, IntPtr options);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_querier_get_options_default(
+        ///     struct z_querier_get_options_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_get_options_default", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_querier_get_options_default(IntPtr options);
+#endif
+
+#if UNSTABLE_API
+        /// const struct z_loaned_keyexpr_t*
+        /// z_querier_keyexpr(
+        ///     const struct z_loaned_querier_t *querier
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_keyexpr", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_querier_keyexpr(IntPtr querier);
+#endif
+
+#if UNSTABLE_API
+        /// const struct z_loaned_querier_t*
+        /// z_querier_loan(
+        ///     const struct z_owned_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_loan", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_querier_loan(IntPtr querier);
+#endif
+
+#if UNSTABLE_API
+        /// struct z_loaned_querier_t*
+        /// z_querier_loan_mut(
+        ///     struct z_owned_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_loan_mut", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_querier_loan_mut(IntPtr querier);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_querier_options_default(
+        ///     struct z_querier_options_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_querier_options_default", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_querier_options_default(IntPtr querier);
+#endif
 
         /// const struct z_loaned_bytes_t*
         /// z_query_attachment(
@@ -3645,6 +3723,16 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_queryable_drop(IntPtr queryable);
 
+#if UNSTABLE_API
+        /// struct z_entity_global_id_t
+        /// z_queryable_id(
+        ///     const struct z_loaned_queryable_t *queryable
+        /// )
+        [DllImport(DllName, EntryPoint = "z_queryable_id", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZEntityGlobalId z_queryable_id(IntPtr queryable);
+#endif
+
         /// const struct z_loaned_queryable_t*
         /// z_queryable_loan(
         ///     const struct z_owned_queryable_t *this_
@@ -3663,7 +3751,7 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_random_fill", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_random_fill(byte* buf, UIntPtr len);
+        internal static extern void z_random_fill(IntPtr buf, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_random_u8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3701,6 +3789,27 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_reply_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern void z_reply_drop(IntPtr reply);
+
+#if UNSTABLE_API
+        /// bool
+        /// z_reply_replier_id(
+        ///     const struct z_loaned_reply_t *this_,
+        ///     struct z_id_t *out_id
+        /// )
+        [DllImport(DllName, EntryPoint = "z_reply_replier_id", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool z_reply_replier_id(IntPtr reply, IntPtr id);
+#endif
+
+        /// void
+        /// z_reply_take_from_loaned(
+        ///     struct z_owned_reply_t *dst,
+        ///     struct z_loaned_reply_t *src
+        /// )
+        [DllImport(DllName, EntryPoint = "z_reply_take_from_loaned", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_reply_take_from_loaned(IntPtr dst, IntPtr src);
 
         /// bool
         /// z_reply_is_ok(
@@ -4014,6 +4123,15 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_sample_loan_mut(IntPtr sample);
 
+        /// void
+        /// z_sample_take_from_loaned(
+        ///     struct z_owned_sample_t *dst,
+        ///     struct z_loaned_sample_t *src
+        /// )
+        [DllImport(DllName, EntryPoint = "z_sample_take_from_loaned", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_sample_take_from_loaned(IntPtr dst, IntPtr src);
+
         /// const struct z_loaned_bytes_t*
         /// z_sample_payload(
         ///     const struct z_loaned_sample_t *this_
@@ -4030,6 +4148,26 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern Priority z_sample_priority(IntPtr sample);
 
+#if UNSTABLE_API
+        /// enum z_reliability_t
+        /// z_sample_reliability(
+        ///     const struct z_loaned_sample_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_sample_reliability", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Reliability z_sample_reliability(IntPtr sample);
+#endif
+
+#if UNSTABLE_API
+        /// const struct z_loaned_source_info_t*
+        /// z_sample_source_info(
+        ///     const struct z_loaned_sample_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_sample_source_info", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_sample_source_info(IntPtr sample);
+#endif
+
         /// const struct z_timestamp_t*
         /// z_sample_timestamp(
         ///     const struct z_loaned_sample_t *this_
@@ -4038,14 +4176,23 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_sample_timestamp(IntPtr sample);
 
+        /// z_result_t
+        /// z_scout(
+        ///     struct z_moved_config_t *config,
+        ///     struct z_moved_closure_hello_t *callback,
+        ///     const struct z_scout_options_t *options
+        /// )
         [DllImport(DllName, EntryPoint = "z_scout", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_scout(ZMovedConfig* config, ZMovedClosureHello* callback,
-            ZScoutOptions* options);
+        internal static extern Result z_scout(IntPtr config, IntPtr callback, IntPtr options);
 
+        /// void
+        /// z_scout_options_default(
+        ///     struct z_scout_options_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_scout_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_scout_options_default(ZScoutOptions* options);
+        internal static extern void z_scout_options_default(IntPtr options);
 
         /// void
         /// z_session_drop(
@@ -4103,11 +4250,11 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_slice_copy_from_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_slice_copy_from_buf(ZOwnedSlice* slice, byte* start, UIntPtr len);
+        internal static extern Result z_slice_copy_from_buf(IntPtr slice, IntPtr start, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_slice_data", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern byte* z_slice_data(ZLoanedSlice* slice);
+        internal static extern IntPtr z_slice_data(IntPtr slice);
 
         /// void
         /// z_slice_drop(
@@ -4163,52 +4310,109 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_slice_loan(IntPtr slice);
 
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_source_info_new(
+        ///     struct z_owned_source_info_t *this_,
+        ///     const struct z_entity_global_id_t *source_id,
+        ///     uint32_t source_sn
+        /// )
+        [DllImport(DllName, EntryPoint = "z_source_info_new", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_source_info_new(IntPtr info, IntPtr id, uint sn);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// z_source_info_drop(
+        ///     struct z_moved_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_source_info_drop", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void z_source_info_drop(IntPtr info);
+#endif
+
+#if UNSTABLE_API
+        /// const struct z_loaned_source_info_t*
+        /// z_source_info_loan(
+        ///     const struct z_owned_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_source_info_loan", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern IntPtr z_source_info_loan(IntPtr info);
+#endif
+
+#if UNSTABLE_API
+        /// struct z_entity_global_id_t
+        /// z_source_info_id(
+        ///     const struct z_loaned_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_source_info_id", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZEntityGlobalId z_source_info_id(IntPtr info);
+#endif
+
+
+#if UNSTABLE_API
+        /// uint32_t
+        /// z_source_info_sn(
+        ///     const struct z_loaned_source_info_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_source_info_sn", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern uint z_source_info_sn(IntPtr info);
+#endif
+
         [DllImport(DllName, EntryPoint = "z_string_array_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_string_array_clone(ZOwnedStringArray* dst, ZLoanedStringArray* src);
+        internal static extern void z_string_array_clone(IntPtr dst, IntPtr src);
 
+        /// void
+        /// z_string_array_drop(
+        ///     struct z_moved_string_array_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_string_array_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_string_array_drop(ZMovedStringArray* stringArray);
+        internal static extern void z_string_array_drop(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_array_get", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedString* z_string_array_get(ZLoanedStringArray* stringArray, UIntPtr index);
+        internal static extern IntPtr z_string_array_get(IntPtr stringArray, UIntPtr index);
 
         [DllImport(DllName, EntryPoint = "z_string_array_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_string_array_is_empty(ZLoanedStringArray* stringArray);
+        internal static extern bool z_string_array_is_empty(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_array_len", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern UIntPtr z_string_array_len(ZLoanedStringArray* stringArray);
+        internal static extern UIntPtr z_string_array_len(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_array_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedStringArray* z_string_array_loan(ZOwnedStringArray* stringArray);
+        internal static extern IntPtr z_string_array_loan(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_array_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedStringArray* z_string_array_loan_mut(ZOwnedStringArray* stringArray);
+        internal static extern IntPtr z_string_array_loan_mut(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_array_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_string_array_new(ZOwnedStringArray* stringArray);
+        internal static extern void z_string_array_new(IntPtr stringArray);
 
         [DllImport(DllName, EntryPoint = "z_string_push_by_alias", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern UIntPtr
-            z_string_array_push_by_alias(ZLoanedStringArray* stringArray, ZLoanedString* value);
+            z_string_array_push_by_alias(IntPtr stringArray, IntPtr value);
 
         [DllImport(DllName, EntryPoint = "z_string_push_by_copy", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern UIntPtr z_string_array_push_by_copy(ZLoanedStringArray* stringArray,
-            ZLoanedString* value);
+        internal static extern UIntPtr z_string_array_push_by_copy(IntPtr stringArray,
+            IntPtr value);
 
         [DllImport(DllName, EntryPoint = "z_string_as_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedSlice* z_string_as_slice(ZLoanedString* str);
+        internal static extern IntPtr z_string_as_slice(IntPtr str);
 
         /// void
         /// z_string_clone(
@@ -4306,6 +4510,16 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_subscriber_drop(IntPtr subscriber);
 
+#if UNSTABLE_API
+        /// struct z_entity_global_id_t
+        /// z_subscriber_id(
+        ///     const struct z_loaned_subscriber_t *subscriber
+        /// )
+        [DllImport(DllName, EntryPoint = "z_subscriber_id", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZEntityGlobalId z_subscriber_id(IntPtr subscriber);
+#endif
+
         /// const struct z_loaned_keyexpr_t*
         /// z_subscriber_keyexpr(
         ///     const struct z_loaned_subscriber_t *subscriber
@@ -4330,13 +4544,21 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_subscriber_options_default(IntPtr options);
 
+        /// void
+        /// z_task_detach(
+        ///     struct z_moved_task_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_task_detach", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_task_detach(ZMovedTask* task);
+        internal static extern void z_task_detach(IntPtr task);
 
+        /// void
+        /// z_task_drop(
+        ///     struct z_moved_task_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_task_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_task_drop(ZMovedTask* task);
+        internal static extern void z_task_drop(IntPtr task);
 
         /// z_result_t
         /// z_task_init(
@@ -4349,24 +4571,28 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern Result z_task_init(IntPtr task, IntPtr attr, Cb1 fun, IntPtr arg);
 
+        /// z_result_t
+        /// z_task_join(
+        ///     struct z_moved_task_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_task_join", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_task_join(ZMovedTask* task);
+        internal static extern Result z_task_join(IntPtr task);
 
         [DllImport(DllName, EntryPoint = "z_time_elapsed_s", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U8)]
-        internal static extern ulong z_time_elapsed_s(ZTime* time);
+        internal static extern ulong z_time_elapsed_s(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_time_elapsed_ms", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U8)]
-        internal static extern ulong z_time_elapsed_ms(ZTime* time);
+        internal static extern ulong z_time_elapsed_ms(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_time_elapsed_us", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U8)]
-        internal static extern ulong z_time_elapsed_us(ZTime* time);
+        internal static extern ulong z_time_elapsed_us(IntPtr time);
 
         [DllImport(DllName, EntryPoint = "z_time_now", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4374,7 +4600,7 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_time_now_as_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern byte* z_time_now_as_str(byte* buf, UIntPtr len);
+        internal static extern IntPtr z_time_now_as_str(IntPtr buf, UIntPtr len);
 
         /// struct z_id_t
         /// z_timestamp_id(
@@ -4402,9 +4628,24 @@ namespace Zenoh
         [return: MarshalAs(UnmanagedType.U8)]
         internal static extern ulong z_timestamp_ntp64_time(IntPtr timestamp);
 
+        /// z_result_t
+        /// z_undeclare_keyexpr(
+        ///     const struct z_loaned_session_t *session,
+        ///     struct z_moved_keyexpr_t *key_expr
+        /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_undeclare_keyexpr(ZLoanedSession* session, ZMovedKeyexpr* keyexpr);
+        internal static extern Result z_undeclare_keyexpr(IntPtr session, IntPtr keyexpr);
+
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_undeclare_matching_listener(
+        ///     struct z_moved_matching_listener_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_undeclare_matching_listener", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_undeclare_matching_listener(IntPtr listener);
+#endif
 
         /// z_result_t
         /// z_undeclare_publisher(
@@ -4413,6 +4654,16 @@ namespace Zenoh
         [DllImport(DllName, EntryPoint = "z_undeclare_publisher", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_undeclare_publisher(IntPtr publisher);
+
+#if UNSTABLE_API
+        /// z_result_t
+        /// z_undeclare_querier(
+        ///     struct z_moved_querier_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_undeclare_querier", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Result z_undeclare_querier(IntPtr querier);
+#endif
 
         /// z_result_t
         /// z_undeclare_queryable(
@@ -4432,63 +4683,63 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_view_keyexpr_empty(ZViewKeyexpr* viewKeyexpr);
+        internal static extern void z_view_keyexpr_empty(IntPtr viewKeyexpr);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_keyexpr_from_str(ZViewKeyexpr* viewKeyexpr, byte* str);
+        internal static extern Result z_view_keyexpr_from_str(IntPtr viewKeyexpr, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_str_autocanonize",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_keyexpr_from_str_autocanonize(ZViewKeyexpr* viewKeyexpr, byte* str);
+        internal static extern Result z_view_keyexpr_from_str_autocanonize(IntPtr viewKeyexpr, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_str_unchecked",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_view_keyexpr_from_str_unchecked(ZViewKeyexpr* viewKeyexpr, byte* str);
+        internal static extern void z_view_keyexpr_from_str_unchecked(IntPtr viewKeyexpr, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_keyexpr_from_substr(ZViewKeyexpr* viewKeyexpr, byte* str, UIntPtr len);
+        internal static extern Result z_view_keyexpr_from_substr(IntPtr viewKeyexpr, IntPtr str, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_substr_autocanonize",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_keyexpr_from_substr_autocanonize(ZViewKeyexpr* viewKeyexpr, byte* start,
+        internal static extern Result z_view_keyexpr_from_substr_autocanonize(IntPtr viewKeyexpr, IntPtr start,
             UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_from_substr_unchecked",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_view_keyexpr_from_substr_unchecked(ZViewKeyexpr* viewKeyexpr, byte* start,
+        internal static extern void z_view_keyexpr_from_substr_unchecked(IntPtr viewKeyexpr, IntPtr start,
             UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_view_keyexpr_is_empty(ZViewKeyexpr* viewKeyexpr);
+        internal static extern bool z_view_keyexpr_is_empty(IntPtr viewKeyexpr);
 
         [DllImport(DllName, EntryPoint = "z_view_keyexpr_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedKeyexpr* z_view_keyexpr_loan(ZViewKeyexpr* viewKeyexpr);
+        internal static extern IntPtr z_view_keyexpr_loan(IntPtr viewKeyexpr);
 
         [DllImport(DllName, EntryPoint = "z_view_slice_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void z_view_slice_empty(ZViewSlice* viewSlice);
+        internal static extern void z_view_slice_empty(IntPtr viewSlice);
 
         [DllImport(DllName, EntryPoint = "z_view_slice_from_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_slice_from_buf(ZViewSlice* viewSlice, byte* start, UIntPtr len);
+        internal static extern Result z_view_slice_from_buf(IntPtr viewSlice, IntPtr start, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "z_view_slice_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool z_view_slice_is_empty(ZViewSlice* viewSlice);
+        internal static extern bool z_view_slice_is_empty(IntPtr viewSlice);
 
         [DllImport(DllName, EntryPoint = "z_view_slice_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZLoanedSlice* z_view_slice_loan(ZViewSlice* viewSlice);
+        internal static extern IntPtr z_view_slice_loan(IntPtr viewSlice);
 
         /// void
         /// z_view_string_empty(
@@ -4503,7 +4754,7 @@ namespace Zenoh
         // const char *str);
         [DllImport(DllName, EntryPoint = "z_view_string_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_view_string_from_str(ZViewString* viewString, byte* str);
+        internal static extern Result z_view_string_from_str(IntPtr viewString, IntPtr str);
 
         /// z_result_t
         /// z_view_string_from_substr(
@@ -4534,7 +4785,7 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "z_whatami_to_view_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result z_whatami_to_view_string(Whatami whatami, ZViewString* strOut);
+        internal static extern Result z_whatami_to_view_string(Whatami whatami, IntPtr strOut);
 
         /// void
         /// (*call)(
@@ -4563,16 +4814,40 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "zc_closure_log_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void zc_closure_log_call(ZcLoanedClosureLog* closure, LogSeverity serverity,
-            ZLoanedString* msg);
+        internal static extern void zc_closure_log_call(IntPtr closure, LogSeverity serverity,
+            IntPtr msg);
 
+        /// void
+        /// zc_closure_log_drop(
+        ///     struct zc_moved_closure_log_t *closure_
+        /// )
         [DllImport(DllName, EntryPoint = "zc_closure_log_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void zc_closure_log_call_drop(ZcMovedClosureLog* closure);
+        internal static extern void zc_closure_log_call_drop(IntPtr closure);
 
         [DllImport(DllName, EntryPoint = "zc_closure_log_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZcLoanedClosureLog* zc_closure_log_call_loan(ZcOwnedClosureLog* closure);
+        internal static extern IntPtr zc_closure_log_call_loan(IntPtr closure);
+
+#if UNSTABLE_API
+        /// void
+        /// zc_concurrent_close_handle_drop(
+        ///     struct zc_moved_concurrent_close_handle_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_concurrent_close_handle_drop", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void zc_concurrent_close_handle_drop(IntPtr handle);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// zc_concurrent_close_handle_drop(
+        ///     struct zc_moved_concurrent_close_handle_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_concurrent_close_handle_wait", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void zc_concurrent_close_handle_wait(IntPtr handle);
+#endif
 
         /// z_result_t
         /// zc_config_from_env(
@@ -4602,24 +4877,24 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "zc_config_get_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result zc_config_get_from_str(ZLoanedConfig* config, byte* key,
-            ZOwnedString* outValueString);
+        internal static extern Result zc_config_get_from_str(IntPtr config, IntPtr key,
+            IntPtr outValueString);
 
         [DllImport(DllName, EntryPoint = "zc_config_get_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result zc_config_get_from_substr(ZLoanedConfig* config, byte* key, UIntPtr keyLen,
-            ZOwnedString* outValueString);
+        internal static extern Result zc_config_get_from_substr(IntPtr config, IntPtr key, UIntPtr keyLen,
+            IntPtr outValueString);
 
         [DllImport(DllName, EntryPoint = "zc_config_insert_json5", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result zc_config_insert_json5(ZLoanedConfig* config, byte* key, byte* value);
+        internal static extern Result zc_config_insert_json5(IntPtr config, IntPtr key, IntPtr value);
 
         [DllImport(DllName, EntryPoint = "zc_config_insert_json5_from_substr",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result zc_config_insert_json5_from_substr(ZLoanedConfig* config, byte* key,
+        internal static extern Result zc_config_insert_json5_from_substr(IntPtr config, IntPtr key,
             UIntPtr keyLen,
-            byte* value, UIntPtr valueLen);
+            IntPtr value, UIntPtr valueLen);
 
         /// z_result_t
         /// zc_config_to_string(
@@ -4636,20 +4911,68 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "zc_init_log_from_env_or", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result zc_init_log_from_env_or(byte* fallbackFilter);
+        internal static extern Result zc_init_log_from_env_or(IntPtr fallbackFilter);
 
+        /// void
+        /// zc_init_log_with_callback(
+        ///     enum zc_log_severity_t min_severity,
+        ///     struct zc_moved_closure_log_t *callback
+        /// )
         [DllImport(DllName, EntryPoint = "zc_init_log_with_callback", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void zc_init_log_with_callback(LogSeverity minSeverity, ZcMovedClosureLog* callback);
+        internal static extern void zc_init_log_with_callback(LogSeverity minSeverity, IntPtr callback);
 
         [DllImport(DllName, EntryPoint = "zc_internal_closure_log_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool zc_internal_closure_log_check(ZcOwnedClosureLog* closure);
+        internal static extern bool zc_internal_closure_log_check(IntPtr closure);
 
         [DllImport(DllName, EntryPoint = "zc_internal_closure_log_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void zc_internal_closure_log_null(ZcOwnedClosureLog* closure);
+        internal static extern void zc_internal_closure_log_null(IntPtr closure);
+
+#if UNSTABLE_API
+        /// bool
+        /// zc_internal_concurrent_close_handle_check(
+        ///     const struct zc_owned_concurrent_close_handle_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_internal_concurrent_close_handle_check",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        [return: MarshalAs(UnmanagedType.U1)]
+        internal static extern bool zc_internal_concurrent_close_handle_check(IntPtr handle);
+#endif
+
+#if UNSTABLE_API
+        /// void
+        /// zc_internal_concurrent_close_handle_null(
+        ///     struct zc_owned_concurrent_close_handle_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_internal_concurrent_close_handle_null",
+            CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern void zc_internal_concurrent_close_handle_null(IntPtr handle);
+#endif
+
+#if UNSTABLE_API
+        /// enum zc_locality_t
+        /// zc_locality_default(
+        ///     void
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_locality_default", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern Locality zc_locality_default();
+#endif
+
+#if UNSTABLE_API
+        /// enum zc_reply_keyexpr_t
+        /// zc_reply_keyexpr_default(
+        ///     void
+        /// )
+        [DllImport(DllName, EntryPoint = "zc_reply_keyexpr_default", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ReplyKeyexpr zc_reply_keyexpr_default();
+#endif
 
         /// void
         /// zc_internal_encoding_from_data(
@@ -4674,300 +4997,309 @@ namespace Zenoh
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_bool", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_bool(ZLoanedBytes* bytes, byte* dst);
+        internal static extern Result ze_deserialize_bool(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_double", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_double(ZLoanedBytes* bytes, double* dst);
+        internal static extern Result ze_deserialize_double(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_float", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_float(ZLoanedBytes* bytes, float* dst);
+        internal static extern Result ze_deserialize_float(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_int8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_int8(ZLoanedBytes* bytes, sbyte* dst);
+        internal static extern Result ze_deserialize_int8(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_int16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_int16(ZLoanedBytes* bytes, short* dst);
+        internal static extern Result ze_deserialize_int16(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_int32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_int32(ZLoanedBytes* bytes, int* dst);
+        internal static extern Result ze_deserialize_int32(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_int64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_int64(ZLoanedBytes* bytes, long* dst);
+        internal static extern Result ze_deserialize_int64(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_uint8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_uint8(ZLoanedBytes* bytes, byte* dst);
+        internal static extern Result ze_deserialize_uint8(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_uint16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_uint16(ZLoanedBytes* bytes, ushort* dst);
+        internal static extern Result ze_deserialize_uint16(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_uint32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_uint32(ZLoanedBytes* bytes, uint* dst);
+        internal static extern Result ze_deserialize_uint32(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_uint64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_uint64(ZLoanedBytes* bytes, ulong* dst);
+        internal static extern Result ze_deserialize_uint64(IntPtr bytes, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_slice(ZLoanedBytes* bytes, ZOwnedSlice* slice);
+        internal static extern Result ze_deserialize_slice(IntPtr bytes, IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "ze_deserialize_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserialize_string(ZLoanedBytes* bytes, ZOwnedString* str);
+        internal static extern Result ze_deserialize_string(IntPtr bytes, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_bool",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_bool(ZeDeserializer* deserializer, byte* dst);
+        internal static extern Result ze_deserializer_deserialize_bool(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_double",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_double(ZeDeserializer* deserializer, double* dst);
+        internal static extern Result ze_deserializer_deserialize_double(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_float",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_float(ZeDeserializer* deserializer, float* dst);
+        internal static extern Result ze_deserializer_deserialize_float(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_int8",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_int8(ZeDeserializer* deserializer, sbyte* dst);
+        internal static extern Result ze_deserializer_deserialize_int8(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_int16",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_int16(ZeDeserializer* deserializer, short* dst);
+        internal static extern Result ze_deserializer_deserialize_int16(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_int32",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_int32(ZeDeserializer* deserializer, int* dst);
+        internal static extern Result ze_deserializer_deserialize_int32(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_int64",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_int64(ZeDeserializer* deserializer, long* dst);
+        internal static extern Result ze_deserializer_deserialize_int64(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_uint8",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_uint8(ZeDeserializer* deserializer, byte* dst);
+        internal static extern Result ze_deserializer_deserialize_uint8(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_uint16",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_uint16(ZeDeserializer* deserializer, ushort* dst);
+        internal static extern Result ze_deserializer_deserialize_uint16(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_uint32",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_uint32(ZeDeserializer* deserializer, uint* dst);
+        internal static extern Result ze_deserializer_deserialize_uint32(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_uint64",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_uint64(ZeDeserializer* deserializer, ulong* dst);
+        internal static extern Result ze_deserializer_deserialize_uint64(IntPtr deserializer, IntPtr dst);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_sequence_length",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result
-            ze_deserializer_deserialize_sequence_length(ZeDeserializer* deserializer, UIntPtr* len);
+            ze_deserializer_deserialize_sequence_length(IntPtr deserializer, IntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_slice",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_slice(ZeDeserializer* deserializer,
-            ZOwnedSlice* slice);
+        internal static extern Result ze_deserializer_deserialize_slice(IntPtr deserializer,
+            IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_deserialize_string",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_deserializer_deserialize_string(ZeDeserializer* deserializer,
-            ZOwnedString* str);
+        internal static extern Result ze_deserializer_deserialize_string(IntPtr deserializer,
+            IntPtr str);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_from_bytes", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZeDeserializer ze_deserializer_from_bytes(ZLoanedBytes* bytes);
+        internal static extern ZeDeserializer ze_deserializer_from_bytes(IntPtr bytes);
 
         [DllImport(DllName, EntryPoint = "ze_deserializer_is_done", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool ze_deserializer_is_done(ZeDeserializer* deserializer);
+        internal static extern bool ze_deserializer_is_done(IntPtr deserializer);
 
         [DllImport(DllName, EntryPoint = "ze_internal_serializer_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
-        internal static extern bool ze_internal_serializer_check(ZeOwnedSerializer* serializer);
+        internal static extern bool ze_internal_serializer_check(IntPtr serializer);
 
         [DllImport(DllName, EntryPoint = "ze_internal_serializer_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void ze_internal_serializer_null(ZeOwnedSerializer* serializer);
+        internal static extern void ze_internal_serializer_null(IntPtr serializer);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_buf(ZOwnedBytes* bytes, byte* data, UIntPtr len);
+        internal static extern Result ze_serialize_buf(IntPtr bytes, IntPtr data, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_bool", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_bool(ZOwnedBytes* bytes, byte val);
+        internal static extern Result ze_serialize_bool(IntPtr bytes, byte val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_double", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_double(ZOwnedBytes* bytes, double val);
+        internal static extern Result ze_serialize_double(IntPtr bytes, double val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_float", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_float(ZOwnedBytes* bytes, float val);
+        internal static extern Result ze_serialize_float(IntPtr bytes, float val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_int8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_int8(ZOwnedBytes* bytes, sbyte val);
+        internal static extern Result ze_serialize_int8(IntPtr bytes, sbyte val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_int16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_int16(ZOwnedBytes* bytes, short val);
+        internal static extern Result ze_serialize_int16(IntPtr bytes, short val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_int32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_int32(ZOwnedBytes* bytes, int val);
+        internal static extern Result ze_serialize_int32(IntPtr bytes, int val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_int64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_int64(ZOwnedBytes* bytes, long val);
+        internal static extern Result ze_serialize_int64(IntPtr bytes, long val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_uint8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_uint8(ZOwnedBytes* bytes, byte val);
+        internal static extern Result ze_serialize_uint8(IntPtr bytes, byte val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_uint16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_uint16(ZOwnedBytes* bytes, ushort val);
+        internal static extern Result ze_serialize_uint16(IntPtr bytes, ushort val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_uint32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_uint32(ZOwnedBytes* bytes, uint val);
+        internal static extern Result ze_serialize_uint32(IntPtr bytes, uint val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_uint64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_uint64(ZOwnedBytes* bytes, ulong val);
+        internal static extern Result ze_serialize_uint64(IntPtr bytes, ulong val);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_slice(ZOwnedBytes* bytes, ZLoanedSlice* slice);
+        internal static extern Result ze_serialize_slice(IntPtr bytes, IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_str(ZOwnedBytes* bytes, byte* str);
+        internal static extern Result ze_serialize_str(IntPtr bytes, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_substr(ZOwnedBytes* bytes, byte* start, UIntPtr len);
+        internal static extern Result ze_serialize_substr(IntPtr bytes, IntPtr start, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_serialize_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serialize_string(ZOwnedBytes* bytes, ZLoanedString* str);
+        internal static extern Result ze_serialize_string(IntPtr bytes, IntPtr str);
 
+        /// void
+        /// ze_serializer_drop(
+        ///     struct ze_moved_serializer_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "ze_serializer_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void ze_serializer_drop(ZeMovedSerializer* serializer);
+        internal static extern void ze_serializer_drop(IntPtr serializer);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_empty(ZeOwnedSerializer* serializer);
+        internal static extern Result ze_serializer_empty(IntPtr serializer);
 
+        /// void
+        /// ze_serializer_finish(
+        ///     struct ze_moved_serializer_t *this_,
+        ///     struct z_owned_bytes_t *bytes
+        /// )
         [DllImport(DllName, EntryPoint = "ze_serializer_finish", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern void ze_serializer_finish(ZeMovedSerializer* serializer, ZOwnedBytes* bytes);
+        internal static extern void ze_serializer_finish(IntPtr serializer, IntPtr bytes);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern ZeLoanedSerializer* ze_serializer_loan(ZeOwnedSerializer* serializer);
+        internal static extern IntPtr ze_serializer_loan(IntPtr serializer);
 
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_bool", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_bool(ZeLoanedSerializer* serializer, byte val);
+        internal static extern Result ze_serializer_serialize_bool(IntPtr serializer, byte val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_double", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_double(ZeLoanedSerializer* serializer, double val);
+        internal static extern Result ze_serializer_serialize_double(IntPtr serializer, double val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_float", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_float(ZeLoanedSerializer* serializer, float val);
+        internal static extern Result ze_serializer_serialize_float(IntPtr serializer, float val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_int8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_int8(ZeLoanedSerializer* serializer, sbyte val);
+        internal static extern Result ze_serializer_serialize_int8(IntPtr serializer, sbyte val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_int16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_int16(ZeLoanedSerializer* serializer, short val);
+        internal static extern Result ze_serializer_serialize_int16(IntPtr serializer, short val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_int32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_int32(ZeLoanedSerializer* serializer, int val);
+        internal static extern Result ze_serializer_serialize_int32(IntPtr serializer, int val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_int64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_int64(ZeLoanedSerializer* serializer, long val);
+        internal static extern Result ze_serializer_serialize_int64(IntPtr serializer, long val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_uint8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_uint8(ZeLoanedSerializer* serializer, byte val);
+        internal static extern Result ze_serializer_serialize_uint8(IntPtr serializer, byte val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_uint16", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_uint16(ZeLoanedSerializer* serializer, ushort val);
+        internal static extern Result ze_serializer_serialize_uint16(IntPtr serializer, ushort val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_uint32", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_uint32(ZeLoanedSerializer* serializer, uint val);
+        internal static extern Result ze_serializer_serialize_uint32(IntPtr serializer, uint val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_uint64", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_uint64(ZeLoanedSerializer* serializer, ulong val);
+        internal static extern Result ze_serializer_serialize_uint64(IntPtr serializer, ulong val);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result
-            ze_serializer_serialize_buf(ZeLoanedSerializer* serializer, byte* data, UIntPtr len);
+            ze_serializer_serialize_buf(IntPtr serializer, IntPtr data, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_sequence_length",
             CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result
-            ze_serializer_serialize_sequence_length(ZeLoanedSerializer* serializer, UIntPtr len);
+            ze_serializer_serialize_sequence_length(IntPtr serializer, UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result
-            ze_serializer_serialize_slice(ZeLoanedSerializer* serializer, ZLoanedSlice* slice);
+            ze_serializer_serialize_slice(IntPtr serializer, IntPtr slice);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_str(ZeLoanedSerializer* serializer, byte* str);
+        internal static extern Result ze_serializer_serialize_str(IntPtr serializer, IntPtr str);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
-        internal static extern Result ze_serializer_serialize_substr(ZeLoanedSerializer* serializer, byte* start,
+        internal static extern Result ze_serializer_serialize_substr(IntPtr serializer, IntPtr start,
             UIntPtr len);
 
         [DllImport(DllName, EntryPoint = "ze_serializer_serialize_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result
-            ze_serializer_serialize_string(ZeLoanedSerializer* serializer, ZLoanedString* str);
+            ze_serializer_serialize_string(IntPtr serializer, IntPtr str);
     }
 }

@@ -30,7 +30,7 @@ namespace ZPull
             var keyexpr = Keyexpr.FromString(keyexprStr);
             if (keyexpr is null) goto Exit;
 
-            r = session.DeclareSubscriber(keyexpr, ChannelType.Ring, 100, out var handle);
+            r = session.DeclareSubscriber(keyexpr, new SubscriberOptions(), ChannelType.Ring, 100, out var handle);
             if (handle is null)
             {
                 Console.WriteLine($"Declare subscriber unsuccessful! result: {r}");

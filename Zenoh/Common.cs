@@ -541,7 +541,6 @@ namespace Zenoh
             return ZenohC.z_timestamp_ntp64_time(Handle);
         }
 
-
         internal IntPtr AllocUnmanagedMem()
         {
             var zTimestamp = Marshal.PtrToStructure<ZTimestamp>(Handle);
@@ -615,9 +614,12 @@ namespace Zenoh
     // z_owned_keyexpr_t
     public sealed class Keyexpr : Loanable
     {
-        private Keyexpr()
+        internal Keyexpr()
         {
-            throw new InvalidOperationException();
+            var pOwnedKeyexpr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedKeyexpr>());
+            ZenohC.z_internal_keyexpr_null(pOwnedKeyexpr);
+            Handle = pOwnedKeyexpr;
+            Owned = true;
         }
 
         private Keyexpr(IntPtr handle, bool owned)
@@ -760,7 +762,7 @@ namespace Zenoh
             return ZenohC.z_keyexpr_intersects(pThis, pOther);
         }
 
-        public override string? ToString()
+        public override string ToString()
         {
             var viewString = new ViewString();
             var pLoanedKeyexpr = LoanedPointer();
@@ -971,4 +973,219 @@ namespace Zenoh
             return pTimestamp == IntPtr.Zero ? null : Timestamp.CloneFromPointer(pTimestamp);
         }
     }
+
+#if UNSTABLE_API
+    public sealed class EntityGlobalId : IDisposable
+    {
+        // z_entity_global_id_t*
+        internal IntPtr Handle { get; private set; }
+
+        private EntityGlobalId()
+        {
+            throw new InvalidOperationException();
+        }
+
+        internal EntityGlobalId(ZEntityGlobalId id)
+        {
+            var pEntityGlobalId = Marshal.AllocHGlobal(Marshal.SizeOf<ZEntityGlobalId>());
+            Marshal.StructureToPtr(id, pEntityGlobalId, false);
+            Handle = pEntityGlobalId;
+        }
+
+        /// <summary>
+        /// Returns the entity id of the entity global id.
+        /// </summary>
+        /// <returns></returns>
+        public uint GetEntityId()
+        {
+            CheckDisposed();
+
+            return ZenohC.z_entity_global_id_eid(Handle);
+        }
+
+        /// <summary>
+        /// Returns the zenoh id of entity global id.
+        /// </summary>
+        /// <returns></returns>
+        public Id GetZenohId()
+        {
+            CheckDisposed();
+
+            var zid = ZenohC.z_entity_global_id_zid(Handle);
+            return new Id(zid);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~EntityGlobalId() => Dispose(false);
+
+        private void Dispose(bool disposing)
+        {
+            if (Handle == IntPtr.Zero) return;
+
+            Marshal.FreeHGlobal(Handle);
+            Handle = IntPtr.Zero;
+        }
+
+        public void CheckDisposed()
+        {
+            if (Handle == IntPtr.Zero)
+            {
+                throw new InvalidOperationException("Object has been destroyed");
+            }
+        }
+    }
+#endif
+
+#if UNSTABLE_API
+    // z_owned_source_info_t
+    public sealed class SourceInfo : Loanable
+    {
+        private SourceInfo()
+        {
+            throw new InvalidOperationException();
+        }
+
+        public SourceInfo(SourceInfo other)
+        {
+            other.CheckDisposed();
+
+            var pOther = other.LoanedPointer();
+            var sn = ZenohC.z_source_info_sn(pOther);
+            var eid = ZenohC.z_source_info_id(pOther);
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            unsafe
+            {
+                var pEid = (IntPtr)(&eid);
+                var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
+            }
+            Handle = pOwnedSourceInfo;
+            Owned = true;
+        }
+
+        internal SourceInfo(IntPtr handle, bool owned)
+        {
+            Handle = handle;
+            Owned = owned;
+        }
+
+        /// <summary>
+        /// Creates source info. 
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="sn"></param>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static Result Create(EntityGlobalId id, uint sn, out SourceInfo? info)
+        {
+            id.CheckDisposed();
+
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            var r = ZenohC.z_source_info_new(pOwnedSourceInfo, id.Handle, sn);
+
+            if (r == Result.Ok)
+            {
+                info = new SourceInfo(pOwnedSourceInfo, true);
+            }
+            else
+            {
+                info = null;
+                Marshal.FreeHGlobal(pOwnedSourceInfo);
+            }
+            
+            return r;
+        }
+
+        public override void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~SourceInfo() => Dispose(false);
+
+        private void Dispose(bool disposing)
+        {
+            if (Handle == IntPtr.Zero) return;
+
+            if (Owned)
+            {
+                ZenohC.z_source_info_drop(Handle);   
+                Marshal.FreeHGlobal(Handle);
+            }
+            
+            Handle = IntPtr.Zero;
+        }
+
+        public override void ToOwned()
+        {
+            if(Owned) return;
+            
+            var sn = ZenohC.z_source_info_sn(Handle);
+            var eid = ZenohC.z_source_info_id(Handle);
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            unsafe
+            {
+                var pEid = (IntPtr)(&eid);
+                var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
+            }
+            Handle = pOwnedSourceInfo;
+            Owned = true;
+        }
+
+        internal override IntPtr LoanedPointer()
+        {
+            return Owned ? ZenohC.z_source_info_loan(Handle) : Handle;
+        }
+
+        /// <summary>
+        /// Returns the source_sn of the source info. 
+        /// </summary>
+        /// <returns></returns>
+        public uint GetSn()
+        {
+            CheckDisposed();
+            
+            var pLoanedSourceInfo = LoanedPointer();
+            return ZenohC.z_source_info_sn(pLoanedSourceInfo);
+        }
+
+        /// <summary>
+        /// Returns the entity_global_id of the source info.
+        /// </summary>
+        /// <returns></returns>
+        public EntityGlobalId GetEntityGlobalId()
+        {
+            CheckDisposed();
+
+            var pLoanedSourceInfo = LoanedPointer();
+            var entityGlobalId = ZenohC.z_source_info_id(pLoanedSourceInfo);
+            return new EntityGlobalId(entityGlobalId);
+        }
+
+        internal IntPtr AllocUnmanagedMemory()
+        {
+            var pLoanedSourceInfo = LoanedPointer();
+            var eid = ZenohC.z_source_info_id(pLoanedSourceInfo);
+            var sn = ZenohC.z_source_info_sn(pLoanedSourceInfo);
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            unsafe
+            {
+                var pEid = (IntPtr)(&eid);
+                var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
+            }
+            return pOwnedSourceInfo;
+        }
+
+        internal static void FreeUnmanagedMemory(IntPtr handle)
+        {
+            ZenohC.z_source_info_drop(handle);   
+            Marshal.FreeHGlobal(handle);
+        }
+    }
+#endif
 }

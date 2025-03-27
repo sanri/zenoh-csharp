@@ -31,7 +31,7 @@ C# API是用于纯客户端的, 可以很容易地针对运行在Docker容器中
 |  Zenoh-C  | Zenoh-CS |
 |:---------:|:--------:|
 | v0.7.2-rc |  v0.1.*  |
-|  v1.2.*   |  v0.2.*  |
+|  v1.3.*   |  v0.2.*  |
 
 ### 开发和测试环境组合
 
@@ -48,12 +48,10 @@ C# API是用于纯客户端的, 可以很容易地针对运行在Docker容器中
 ## 如何安装使用
 
 需求:
-- [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被安装在你的主机上.
-  - 需要选择与 zenoh-cs 版本对应的 zenoh-c 版本 (例如 zenoh-c V1.2.1).
-  - 编译 zenoh-c 时使用默认构建选项.
-
-> :warning: **警告** :warning: : 目前不支持Zenoh官方编译的 [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c/releases) 库文件, 
-> 目前不支持 zenoh-c 的 **UNSTABLE_API**, **SHARED_MEMORY** 编译选项
+- [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被 [安装](https://zenoh.io/docs/getting-started/installation/) 在你的主机上.
+  - 需要选择与 zenoh-cs 版本对应的 zenoh-c 版本 (例如 zenoh-c V1.3.0).
+  - 兼容 zenoh 官方提供的编译好的 [库文件](https://github.com/eclipse-zenoh/zenoh-c/releases).
+  - 若自行编译 zenoh-c, 则需使用 **UNSTABLE_API**, **SHARED_MEMORY** 编译选项.
 
 ### 在项目里使用源码
 (待补充)

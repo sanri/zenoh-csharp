@@ -6,14 +6,55 @@ namespace Zenoh
     // z_get_options_t
     public sealed class GetOptions : IDisposable
     {
-        private QueryTarget _target;
-        private ZQueryConsolidation _consolidation;
-        private CongestionControl _congestionControl;
-        private Priority _priority;
-        private ulong _timeoutMs;
+        public QueryTarget Target { get; set; }
+
+        public ConsolidationMode Consolidation { get; set; }
+
+        public CongestionControl CongestionControl { get; set; }
+
+        public Priority Priority { get; set; }
+
+        ///  The timeout for the query in milliseconds. 0 means default query timeout from zenoh configuration.
+        public ulong Timeout { get; set; }
+
+        public Encoding? Encoding
+        {
+            get => _encoding is null ? null : new Encoding(_encoding);
+            set => _encoding = value is null ? null : new Encoding(value);
+        }
+
         private Encoding? _encoding;
+
+        public ZBytes? Payload
+        {
+            get => _payload is null ? null : new ZBytes(_payload);
+            set => _payload = value is null ? null : new ZBytes(value);
+        }
+
         private ZBytes? _payload;
+
+
+        public ZBytes? Attachment
+        {
+            get => _attachment is null ? null : new ZBytes(_attachment);
+            set => _attachment = value is null ? null : new ZBytes(value);
+        }
+
         private ZBytes? _attachment;
+
+#if UNSTABLE_API
+        public Locality AllowedDestination { get; set; }
+
+        public ReplyKeyexpr AcceptReplies { get; set; }
+
+        public SourceInfo? SourceInfo
+        {
+            get => _sourceInfo is null ? null : new SourceInfo(_sourceInfo);
+            set => _sourceInfo = value is null ? null : new SourceInfo(value);
+        }
+
+        private SourceInfo? _sourceInfo;
+#endif
 
         public GetOptions()
         {
@@ -22,26 +63,36 @@ namespace Zenoh
             var options = Marshal.PtrToStructure<ZGetOptions>(pGetOptions);
             Marshal.FreeHGlobal(pGetOptions);
 
-            _target = options.target;
-            _consolidation = options.consolidation;
-            _congestionControl = options.congestion_control;
-            _priority = options.priority;
-            _timeoutMs = options.timeout_ms;
+            Target = options.target;
+            Consolidation = options.consolidation.mode;
+            CongestionControl = options.congestion_control;
+            Priority = options.priority;
+            Timeout = options.timeout_ms;
             _encoding = null;
             _payload = null;
             _attachment = null;
+#if UNSTABLE_API
+            AllowedDestination = options.allowed_destination;
+            AcceptReplies = options.accept_replies;
+            _sourceInfo = null;
+#endif
         }
 
         public GetOptions(GetOptions other)
         {
-            _target = other._target;
-            _consolidation = other._consolidation;
-            _congestionControl = other._congestionControl;
-            _priority = other._priority;
-            _timeoutMs = other._timeoutMs;
-            _encoding = other._encoding is null ? null : new Encoding(other._encoding);
-            _payload = other._payload is null ? null : new ZBytes(other._payload);
-            _attachment = other._attachment is null ? null : new ZBytes(other._attachment);
+            Target = other.Target;
+            Consolidation = other.Consolidation;
+            CongestionControl = other.CongestionControl;
+            Priority = other.Priority;
+            Timeout = other.Timeout;
+            _encoding = other.Encoding;
+            _payload = other.Payload;
+            _attachment = other.Attachment;
+#if UNSTABLE_API
+            AllowedDestination = other.AllowedDestination;
+            AcceptReplies = other.AcceptReplies;
+            _sourceInfo = other.SourceInfo;
+#endif
         }
 
         public void Dispose()
@@ -83,114 +134,17 @@ namespace Zenoh
 
                 _attachment = null;
             }
-        }
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                if (disposing)
+                {
+                    _sourceInfo.Dispose();
+                }
 
-        public void SetQueryTarget(QueryTarget target)
-        {
-            _target = target;
-        }
-
-        public QueryTarget GetQueryTarget()
-        {
-            return _target;
-        }
-
-        public void SetQueryConsolidation(ConsolidationMode mode)
-        {
-            _consolidation.mode = mode;
-        }
-
-        public ConsolidationMode GetQueryConsolidation()
-        {
-            return _consolidation.mode;
-        }
-
-        public void SetCongestionControl(CongestionControl congestionControl)
-        {
-            _congestionControl = congestionControl;
-        }
-
-        public CongestionControl GetCongestionControl()
-        {
-            return _congestionControl;
-        }
-
-        public void SetPriority(Priority priority)
-        {
-            _priority = priority;
-        }
-
-        public Priority GetPriority()
-        {
-            return _priority;
-        }
-
-        /// <summary>
-        /// The timeout for the query in milliseconds.
-        /// 0 means default query timeout from zenoh configuration.
-        /// </summary>
-        /// <param name="time"></param>
-        public void SetTimeout(ulong time)
-        {
-            _timeoutMs = time;
-        }
-
-        /// <summary>
-        /// The timeout for the query in milliseconds.
-        /// 0 means default query timeout from zenoh configuration.
-        /// </summary>
-        /// <returns></returns>
-        public ulong GetTimeout()
-        {
-            return _timeoutMs;
-        }
-
-        public void SetEncoding(Encoding? encoding)
-        {
-            _encoding = encoding is null ? null : new Encoding(encoding);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return Encoding is loaned.
-        /// </returns>
-        public Encoding? GetEncoding()
-        {
-            return _encoding is null ? null : Encoding.CreateLoaned(_encoding.LoanedPointer());
-        }
-
-        public void SetPayload(ZBytes? payload)
-        {
-            _payload = payload is null ? null : new ZBytes(payload);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return ZBytes is loaned.
-        /// </returns>
-        public ZBytes? GetPayload()
-        {
-            return _payload is null ? null : ZBytes.CreateLoaned(_payload.LoanedPointer());
-        }
-
-        public void SetAttachment(ZBytes? attachment)
-        {
-            _attachment = attachment is null ? null : new ZBytes(attachment);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return ZBytes is loaned.
-        /// </returns>
-        public ZBytes? GetAttachment()
-        {
-            return _attachment is null ? null : ZBytes.CreateLoaned(_attachment.LoanedPointer());
+                _sourceInfo = null;
+            }
+#endif
         }
 
         internal IntPtr AllocUnmanagedMemory()
@@ -200,11 +154,16 @@ namespace Zenoh
                 encoding = IntPtr.Zero,
                 payload = IntPtr.Zero,
                 attachment = IntPtr.Zero,
-                target = _target,
-                consolidation = _consolidation,
-                congestion_control = _congestionControl,
-                priority = _priority,
-                timeout_ms = _timeoutMs,
+                target = Target,
+                consolidation = new ZQueryConsolidation { mode = Consolidation },
+                congestion_control = CongestionControl,
+                priority = Priority,
+                timeout_ms = Timeout,
+#if UNSTABLE_API
+                source_info = IntPtr.Zero,
+                allowed_destination = AllowedDestination,
+                accept_replies = AcceptReplies,
+#endif
             };
 
             if (_encoding is null == false)
@@ -221,6 +180,13 @@ namespace Zenoh
             {
                 options.attachment = _attachment.AllocUnmanagedMemory();
             }
+
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                options.source_info = _sourceInfo.AllocUnmanagedMemory();
+            }
+#endif
 
             var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf(typeof(ZGetOptions)));
             Marshal.StructureToPtr(options, pOptions, false);
@@ -246,6 +212,13 @@ namespace Zenoh
             {
                 ZBytes.FreeUnmanagedMem(options.attachment);
             }
+
+#if UNSTABLE_API
+            if (options.source_info != IntPtr.Zero)
+            {
+                SourceInfo.FreeUnmanagedMemory(options.source_info);
+            }
+#endif
 
             Marshal.FreeHGlobal(handle);
         }
@@ -567,4 +540,330 @@ namespace Zenoh
             return pLoanedSample == IntPtr.Zero ? null : Sample.CreateLoaned(pLoanedSample);
         }
     }
+
+
+#if UNSTABLE_API
+    public sealed class QuerierOptions
+    {
+        /// The Queryables that should be target of the querier queries.
+        public QueryTarget Target { get; set; }
+
+        /// The replies consolidation strategy to apply on replies to the querier queries.
+        public ConsolidationMode Consolidation { get; set; }
+
+        // The congestion control to apply when routing the querier queries.
+        public CongestionControl CongestionControl { get; set; }
+
+        public bool IsExpress { get; set; }
+
+        public Locality AllowedDestination { get; set; }
+
+        public ReplyKeyexpr AcceptReplies { get; set; }
+
+        public Priority Priority { get; set; }
+
+        /// The timeout for the querier queries in milliseconds.
+        /// 0 means default query timeout from zenoh configuration.
+        public ulong Timeout { get; set; }
+
+        internal IntPtr AllocUnmanagedMemory()
+        {
+            var options = new ZQuerierOptions
+            {
+                target = Target,
+                consolidation = new ZQueryConsolidation { mode = Consolidation },
+                congestion_control = CongestionControl,
+                is_express = IsExpress,
+                allowed_destination = AllowedDestination,
+                accept_replies = AcceptReplies,
+                priority = Priority,
+                timeout_ms = Timeout,
+            };
+
+            var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQuerierOptions>());
+            Marshal.StructureToPtr(options, pOptions, false);
+
+            return pOptions;
+        }
+
+        internal static void FreeUnmanagedMemory(IntPtr handle)
+        {
+            Marshal.FreeHGlobal(handle);
+        }
+    }
+#endif
+
+#if UNSTABLE_API
+    public sealed class QuerierGetOptions : IDisposable
+    {
+        public ZBytes? Payload
+        {
+            get => _payload is null ? null : new ZBytes(_payload);
+            set => _payload = value is null ? null : new ZBytes(value);
+        }
+
+        private ZBytes? _payload;
+
+        public Encoding? Encoding
+        {
+            get => _encoding is null ? null : new Encoding(_encoding);
+            set => _encoding = value is null ? null : new Encoding(value);
+        }
+
+        private Encoding? _encoding;
+
+        public SourceInfo? SourceInfo
+        {
+            get => _sourceInfo is null ? null : new SourceInfo(_sourceInfo);
+            set => _sourceInfo = value is null ? null : new SourceInfo(value);
+        }
+
+        private SourceInfo? _sourceInfo;
+
+        public ZBytes? Attachment
+        {
+            get => _attachment is null ? null : new ZBytes(_attachment);
+            set => _attachment = value is null ? null : new ZBytes(value);
+        }
+
+        private ZBytes? _attachment;
+
+        public QuerierGetOptions()
+        {
+            _payload = null;
+            _encoding = null;
+            _sourceInfo = null;
+            _attachment = null;
+        }
+
+        public QuerierGetOptions(QuerierGetOptions other)
+        {
+            Payload = other.Payload;
+            Encoding = other.Encoding;
+            SourceInfo = other.SourceInfo;
+            Attachment = other.Attachment;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~QuerierGetOptions() => Dispose(false);
+
+        private void Dispose(bool disposing)
+        {
+            if (_payload is null == false)
+            {
+                if (disposing)
+                {
+                    _payload.Dispose();
+                }
+
+                _payload = null;
+            }
+
+            if (_encoding is null == false)
+            {
+                if (disposing)
+                {
+                    _encoding.Dispose();
+                }
+
+                _encoding = null;
+            }
+
+            if (_attachment is null == false)
+            {
+                if (disposing)
+                {
+                    _attachment.Dispose();
+                }
+
+                _attachment = null;
+            }
+
+            if (_sourceInfo is null == false)
+            {
+                if (disposing)
+                {
+                    _sourceInfo.Dispose();
+                }
+
+                _sourceInfo = null;
+            }
+        }
+
+        internal IntPtr AllocUnmanagedMemory()
+        {
+            var options = new ZQuerierGetOptions
+            {
+                payload = IntPtr.Zero,
+                encoding = IntPtr.Zero,
+                source_info = IntPtr.Zero,
+                attachment = IntPtr.Zero
+            };
+
+            if (_payload is null == false)
+            {
+                options.payload = _payload.AllocUnmanagedMemory();
+            }
+
+            if (_encoding is null == false)
+            {
+                options.encoding = _encoding.AllocUnmanagedMemory();
+            }
+
+            if (_sourceInfo is null == false)
+            {
+                options.source_info = _sourceInfo.AllocUnmanagedMemory();
+            }
+
+            if (_attachment is null == false)
+            {
+                options.attachment = _attachment.AllocUnmanagedMemory();
+            }
+
+            var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQuerierGetOptions>());
+            Marshal.StructureToPtr(options, pOptions, false);
+
+            return pOptions;
+        }
+
+        internal static void FreeUnmanagedMemory(IntPtr handle)
+        {
+            var options = Marshal.PtrToStructure<ZQuerierGetOptions>(handle);
+
+            if (options.payload != IntPtr.Zero)
+            {
+                ZBytes.FreeUnmanagedMem(options.payload);
+            }
+
+            if (options.encoding != IntPtr.Zero)
+            {
+                Encoding.FreeUnmanagedMem(options.encoding);
+            }
+
+            if (options.source_info != IntPtr.Zero)
+            {
+                SourceInfo.FreeUnmanagedMemory(options.source_info);
+            }
+
+            if (options.attachment != IntPtr.Zero)
+            {
+                ZBytes.FreeUnmanagedMem(options.attachment);
+            }
+
+            Marshal.FreeHGlobal(handle);
+        }
+    }
+#endif
+
+#if UNSTABLE_API
+    public sealed class Querier : IDisposable
+    {
+        // z_owned_querier_t*
+        internal IntPtr Handle { get; private set; }
+
+        internal Querier()
+        {
+            var pOwnedQuerier = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedQuerier>());
+            ZenohC.z_internal_querier_null(pOwnedQuerier);
+            Handle = pOwnedQuerier;
+        }
+
+        private Querier(Querier other)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        ~Querier() => Dispose(false);
+
+        private void Dispose(bool disposing)
+        {
+            if (Handle == IntPtr.Zero) return;
+
+            ZenohC.z_querier_drop(Handle);
+            Marshal.FreeHGlobal(Handle);
+            Handle = IntPtr.Zero;
+        }
+
+        internal void CheckDisposed()
+        {
+            if (Handle == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException("Object has been destroyed");
+            }
+        }
+
+        /// <summary>
+        /// Undeclare the querier and free memory. This is equivalent to calling the "Dispose()"
+        /// </summary>
+        public void Undeclare()
+        {
+            Dispose();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="options"></param>
+        /// <param name="parameters"></param>
+        /// <param name="channelType"></param>
+        /// <param name="channelSize"></param>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public Result Get(QuerierGetOptions options, string? parameters, ChannelType channelType, uint channelSize,
+            out ChannelReply? channel
+        )
+        {
+            CheckDisposed();
+
+            var pOwnedClosureReply = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureReply>());
+            switch (channelType)
+            {
+                case ChannelType.Ring:
+                    channel = new ChannelReplyRing();
+                    ZenohC.z_ring_channel_reply_new(pOwnedClosureReply, channel.Handle, (UIntPtr)channelSize);
+                    break;
+                case ChannelType.Fifo:
+                    channel = new ChannelReplyFifo();
+                    ZenohC.z_fifo_channel_reply_new(pOwnedClosureReply, channel.Handle, (UIntPtr)channelSize);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(channelType), channelType, null);
+            }
+
+            var pLoanedQuerier = ZenohC.z_querier_loan(Handle);
+            var pOptions = options.AllocUnmanagedMemory();
+            var pParameters = IntPtr.Zero;
+            if (!string.IsNullOrEmpty(parameters))
+            {
+                var utf8BytesParameters = System.Text.Encoding.UTF8.GetBytes(parameters + "\0");
+                pParameters = Marshal.AllocHGlobal(utf8BytesParameters.Length);
+                Marshal.Copy(utf8BytesParameters, 0, pParameters, utf8BytesParameters.Length);
+            }
+
+            var r = ZenohC.z_querier_get(pLoanedQuerier, pParameters, pOwnedClosureReply, pOptions);
+
+            ZenohC.z_closure_reply_drop(pOwnedClosureReply);
+            Marshal.FreeHGlobal(pOwnedClosureReply);
+            Marshal.FreeHGlobal(pParameters);
+            QuerierGetOptions.FreeUnmanagedMemory(pOptions);
+
+            if (r == Result.Ok) return Result.Ok;
+
+            channel.Dispose();
+            channel = null;
+            return r;
+        }
+    }
+#endif
 }
