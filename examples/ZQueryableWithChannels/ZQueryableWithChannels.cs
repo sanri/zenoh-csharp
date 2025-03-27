@@ -61,8 +61,8 @@ namespace ZQueryableWithChannels
                 var payload = ZBytes.FromString(payloadStr);
                 var options = new QueryReplyOptions();
                 var encoding = new Encoding(EncodingId.TextPlain);
-                options.SetEncoding(encoding);
-                var encodingStr = encoding.ToZString()?.ToString() ?? "";
+                options.Encoding = encoding;
+                var encodingStr = encoding.ToZString().ToString();
 
                 r = query.Reply(keyexpr, payload, options);
                 Console.WriteLine(r == Result.Ok
@@ -82,7 +82,7 @@ namespace ZQueryableWithChannels
         static void PrintQuery(Query query)
         {
             var qKeyexpr = query.GetKeyexpr();
-            var qKeyexprStr = qKeyexpr.ToString() ?? "";
+            var qKeyexprStr = qKeyexpr.ToString();
             var qPayload = query.GetPayload();
             var qPayloadStr = qPayload?.ToZString()?.ToString() ?? "";
             var qEncoding = query.GetEncoding();

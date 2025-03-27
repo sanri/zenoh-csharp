@@ -336,7 +336,7 @@ namespace Zenoh
             return zString;
         }
 
-        public override string? ToString()
+        public override string ToString()
         {
             CheckDisposed();
 

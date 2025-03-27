@@ -3,6 +3,55 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh
 {
+    public sealed class SubscriberOptions
+    {
+#if UNSTABLE_API
+        /// Restricts the matching publications that will be received by this Subscriber to
+        /// the ones that have the compatible AllowedDestination
+        public Locality AllowedOrigin { get; set; }
+#else
+        /// Dummy field to avoid having fieldless struct.
+        public byte Dummy{ get; set; }
+#endif
+
+        public SubscriberOptions()
+        {
+            var pSubscriberOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZSubscriberOptions>());
+            ZenohC.z_subscriber_options_default(pSubscriberOptions);
+            var options = Marshal.PtrToStructure<ZSubscriberOptions>(pSubscriberOptions);
+            Marshal.FreeHGlobal(pSubscriberOptions);
+
+#if UNSTABLE_API
+            AllowedOrigin = options.allowed_origin;
+#else
+            Dummy = options.dummy;
+#endif
+        }
+
+
+        internal IntPtr AllocUnmanagedMemory()
+        {
+            var options = new ZSubscriberOptions
+            {
+#if UNSTABLE_API
+                allowed_origin = AllowedOrigin,
+#else
+                dummy = Dummy,
+#endif
+            };
+
+            var pSubscriberOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZSubscriberOptions>());
+            Marshal.StructureToPtr(options, pSubscriberOptions, false);
+
+            return pSubscriberOptions;
+        }
+
+        internal static void FreeUnmanagedMemory(IntPtr handle)
+        {
+            Marshal.FreeHGlobal(handle);
+        }
+    }
+
     public sealed class Subscriber : IDisposable
     {
         // z_owned_subscriber_t*
@@ -69,6 +118,21 @@ namespace Zenoh
             var pLoanedKeyexpr = ZenohC.z_subscriber_keyexpr(pLoanedSubscriber);
             return Keyexpr.CreateLoaned(pLoanedKeyexpr);
         }
+
+#if UNSTABLE_API
+        /// <summary>
+        /// Returns the ID of the subscriber.
+        /// </summary>
+        /// <returns></returns>
+        public EntityGlobalId GetId()
+        {
+            CheckDisposed();
+
+            var pLoanedSubscriber = ZenohC.z_subscriber_loan(Handle);
+            var zEntityGlobalId = ZenohC.z_subscriber_id(pLoanedSubscriber);
+            return new EntityGlobalId(zEntityGlobalId);
+        }
+#endif
 
         internal static void CallbackClosureSampleCall(IntPtr sample, IntPtr context)
         {

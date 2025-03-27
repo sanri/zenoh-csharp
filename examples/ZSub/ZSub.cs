@@ -30,7 +30,7 @@ namespace ZSub
             var keyexpr = Keyexpr.FromString(keyexprStr);
             if (keyexpr is null) goto Exit;
 
-            r = session.DeclareSubscriber(keyexpr, Callback, out Subscriber? subscriber);
+            r = session.DeclareSubscriber(keyexpr, new SubscriberOptions(), Callback, out Subscriber? subscriber);
             if (subscriber is null)
             {
                 Console.WriteLine($"Declare subscriber unsuccessful! result: {r}");

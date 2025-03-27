@@ -39,7 +39,7 @@ namespace ZPut
             if (keyexpr is null) goto Exit;
             payload = ZBytes.FromString(dataStr);
             options = new PutOptions(EncodingId.TextPlain);
-            options.SetAttachment(ZBytes.FromString("abcd"));
+            options.Attachment = ZBytes.FromString("abcd");
 
             r = session.Put(keyexpr, payload, options);
 
@@ -55,7 +55,7 @@ namespace ZPut
             if (keyexpr is null) goto Exit;
             payload = ZBytes.FromString(dataJson);
             options = new PutOptions(EncodingId.TextJson);
-            options.SetAttachment(ZBytes.FromString("1234"));
+            options.Attachment = ZBytes.FromString("1234");
 
             r = session.Put(keyexpr, payload, options);
 
@@ -71,7 +71,7 @@ namespace ZPut
             if (keyexpr is null) goto Exit;
             payload = ZBytes.FromBytes(dataBin);
             options = new PutOptions(EncodingId.ZenohBytes);
-            options.SetAttachment(ZBytes.FromString("bin"));
+            options.Attachment = ZBytes.FromString("bin");
 
             r = session.Put(keyexpr, payload, options);
 

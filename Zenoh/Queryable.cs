@@ -6,12 +6,42 @@ namespace Zenoh
     // z_query_reply_options_t
     public sealed class QueryReplyOptions : IDisposable
     {
-        private CongestionControl _congestionControl;
-        private Priority _priority;
-        private bool _isExpress;
+        public CongestionControl CongestionControl;
+        public Priority Priority;
+        public bool IsExpress;
+
+        public Encoding? Encoding
+        {
+            get => _encoding is null ? null : new Encoding(_encoding);
+            set => _encoding = value is null ? null : new Encoding(value);
+        }
+
         private Encoding? _encoding;
+
+        public Timestamp? Timestamp
+        {
+            get => _timestamp is null ? null : new Timestamp(_timestamp);
+            set => _timestamp = value is null ? null : new Timestamp(value);
+        }
+
         private Timestamp? _timestamp;
+
+        public ZBytes? Attachment
+        {
+            get => _attachment is null ? null : new ZBytes(_attachment);
+            set => _attachment = value is null ? null : new ZBytes(value);
+        }
+
         private ZBytes? _attachment;
+#if UNSTABLE_API
+        public SourceInfo? SourceInfo
+        {
+            get => _sourceInfo is null ? null : new SourceInfo(_sourceInfo);
+            set => _sourceInfo = value is null ? null : new SourceInfo(value);
+        }
+
+        private SourceInfo? _sourceInfo;
+#endif
 
         public QueryReplyOptions()
         {
@@ -20,22 +50,28 @@ namespace Zenoh
             var options = Marshal.PtrToStructure<ZQueryReplyOptions>(pQueryReplyOptions);
             Marshal.FreeHGlobal(pQueryReplyOptions);
 
-            _congestionControl = options.congestion_control;
-            _priority = options.priority;
-            _isExpress = options.is_express;
+            CongestionControl = options.congestion_control;
+            Priority = options.priority;
+            IsExpress = options.is_express;
             _encoding = null;
             _timestamp = null;
             _attachment = null;
+#if UNSTABLE_API
+            _sourceInfo = null;
+#endif
         }
 
         public QueryReplyOptions(QueryReplyOptions other)
         {
-            _congestionControl = other._congestionControl;
-            _priority = other._priority;
-            _isExpress = other._isExpress;
-            _encoding = other._encoding is null ? null : new Encoding(other._encoding);
-            _timestamp = other._timestamp is null ? null : new Timestamp(other._timestamp);
-            _attachment = other._attachment is null ? null : new ZBytes(other._attachment);
+            CongestionControl = other.CongestionControl;
+            Priority = other.Priority;
+            IsExpress = other.IsExpress;
+            _encoding = other.Encoding;
+            _timestamp = other.Timestamp;
+            _attachment = other.Attachment;
+#if UNSTABLE_API
+            _sourceInfo = other.SourceInfo;
+#endif
         }
 
         public void Dispose()
@@ -77,78 +113,18 @@ namespace Zenoh
 
                 _attachment = null;
             }
-        }
 
-        public void SetCongestionControl(CongestionControl congestionControl)
-        {
-            _congestionControl = congestionControl;
-        }
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                if (disposing)
+                {
+                    _sourceInfo.Dispose();
+                }
 
-        public CongestionControl GetCongestionControl()
-        {
-            return _congestionControl;
-        }
-
-        public void SetPriority(Priority priority)
-        {
-            _priority = priority;
-        }
-
-        public Priority GetPriority()
-        {
-            return _priority;
-        }
-
-        public void SetIsExpress(bool isExpress)
-        {
-            _isExpress = isExpress;
-        }
-
-        public bool GetIsExpress()
-        {
-            return _isExpress;
-        }
-
-        public void SetEncoding(Encoding? encoding)
-        {
-            _encoding = encoding is null ? null : new Encoding(encoding);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return Encoding is loaned.
-        /// </returns>
-        public Encoding? GetEncoding()
-        {
-            return _encoding is null ? null : Encoding.CreateLoaned(_encoding.LoanedPointer());
-        }
-
-        public void SetTimestamp(Timestamp? timestamp)
-        {
-            _timestamp = timestamp is null ? null : new Timestamp(timestamp);
-        }
-
-        public Timestamp? GetTimestamp()
-        {
-            return _timestamp is null ? null : new Timestamp(_timestamp);
-        }
-
-        public void SetAttachment(ZBytes? attachment)
-        {
-            _attachment = attachment is null ? null : new ZBytes(attachment);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return ZBytes is loaned.
-        /// </returns>
-        public ZBytes? GetAttachment()
-        {
-            return _attachment is null ? null : ZBytes.CreateLoaned(_attachment.LoanedPointer());
+                _sourceInfo = null;
+            }
+#endif
         }
 
         internal IntPtr AllocUnmanagedMemory()
@@ -158,9 +134,12 @@ namespace Zenoh
                 encoding = IntPtr.Zero,
                 timestamp = IntPtr.Zero,
                 attachment = IntPtr.Zero,
-                congestion_control = _congestionControl,
-                priority = _priority,
-                is_express = _isExpress,
+                congestion_control = CongestionControl,
+                priority = Priority,
+                is_express = IsExpress,
+#if UNSTABLE_API
+                source_info = IntPtr.Zero,
+#endif
             };
 
             if (_encoding is null == false)
@@ -177,6 +156,13 @@ namespace Zenoh
             {
                 options.attachment = _attachment.AllocUnmanagedMemory();
             }
+
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                options.source_info = _sourceInfo.AllocUnmanagedMemory();
+            }
+#endif
 
             var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyOptions>());
             Marshal.StructureToPtr(options, pOptions, false);
@@ -203,6 +189,13 @@ namespace Zenoh
                 ZBytes.FreeUnmanagedMem(options.attachment);
             }
 
+#if UNSTABLE_API
+            if (options.source_info != IntPtr.Zero)
+            {
+                SourceInfo.FreeUnmanagedMemory(options.source_info);
+            }
+#endif
+
             Marshal.FreeHGlobal(handle);
         }
     }
@@ -210,6 +203,12 @@ namespace Zenoh
     // z_query_reply_err_options_t
     public sealed class QueryReplyErrOptions : IDisposable
     {
+        public Encoding? Encoding
+        {
+            get => _encoding is null ? null : new Encoding(_encoding);
+            set => _encoding = value is null ? null : new Encoding(value);
+        }
+
         private Encoding? _encoding;
 
         public QueryReplyErrOptions()
@@ -219,7 +218,7 @@ namespace Zenoh
 
         public QueryReplyErrOptions(QueryReplyErrOptions other)
         {
-            _encoding = other._encoding is null ? null : new Encoding(other._encoding);
+            _encoding = other.Encoding;
         }
 
         public void Dispose()
@@ -241,22 +240,6 @@ namespace Zenoh
 
                 _encoding = null;
             }
-        }
-
-        public void SetEncoding(Encoding? encoding)
-        {
-            _encoding = encoding is null ? null : new Encoding(encoding);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return Encoding is loaned.
-        /// </returns>
-        public Encoding? GetEncoding()
-        {
-            return _encoding is null ? null : Encoding.CreateLoaned(_encoding.LoanedPointer());
         }
 
         internal IntPtr AllocUnmanagedMemory()
@@ -293,11 +276,36 @@ namespace Zenoh
     // z_query_reply_del_options_t
     public sealed class QueryReplyDelOptions : IDisposable
     {
-        private CongestionControl _congestionControl;
-        private Priority _priority;
-        private bool _isExpress;
+        public CongestionControl CongestionControl;
+        public Priority Priority;
+        public bool IsExpress;
+
+        public Timestamp? Timestamp
+        {
+            get => _timestamp is null ? null : new Timestamp(_timestamp);
+            set => _timestamp = value is null ? null : new Timestamp(value);
+        }
+
         private Timestamp? _timestamp;
+
+        public ZBytes? Attachment
+        {
+            get => _attachment is null ? null : new ZBytes(_attachment);
+            set => _attachment = value is null ? null : new ZBytes(value);
+        }
+
         private ZBytes? _attachment;
+
+#if UNSTABLE_API
+
+        public SourceInfo? SourceInfo
+        {
+            get => _sourceInfo is null ? null : new SourceInfo(_sourceInfo);
+            set => _sourceInfo = value is null ? null : new SourceInfo(value);
+        }
+
+        private SourceInfo? _sourceInfo;
+#endif
 
         public QueryReplyDelOptions()
         {
@@ -306,20 +314,26 @@ namespace Zenoh
             var options = Marshal.PtrToStructure<ZQueryReplyDelOptions>(pOptions);
             Marshal.FreeHGlobal(pOptions);
 
-            _congestionControl = options.congestion_control;
-            _priority = options.priority;
-            _isExpress = options.is_express;
+            CongestionControl = options.congestion_control;
+            Priority = options.priority;
+            IsExpress = options.is_express;
             _timestamp = null;
             _attachment = null;
+#if UNSTABLE_API
+            _sourceInfo = null;
+#endif
         }
 
         public QueryReplyDelOptions(QueryReplyDelOptions other)
         {
-            _congestionControl = other._congestionControl;
-            _priority = other._priority;
-            _isExpress = other._isExpress;
-            _timestamp = other._timestamp is null ? null : new Timestamp(other._timestamp);
-            _attachment = other._attachment is null ? null : new ZBytes(other._attachment);
+            CongestionControl = other.CongestionControl;
+            Priority = other.Priority;
+            IsExpress = other.IsExpress;
+            _timestamp = other.Timestamp;
+            _attachment = other.Attachment;
+#if UNSTABLE_API
+            _sourceInfo = other.SourceInfo;
+#endif
         }
 
         public void Dispose()
@@ -351,73 +365,32 @@ namespace Zenoh
 
                 _attachment = null;
             }
-        }
 
-        public void SetCongestionControl(CongestionControl congestionControl)
-        {
-            _congestionControl = congestionControl;
-        }
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                if (disposing)
+                {
+                    _sourceInfo.Dispose();
+                }
 
-        public CongestionControl GetCongestionControl()
-        {
-            return _congestionControl;
-        }
-
-        public void SetPriority(Priority priority)
-        {
-            _priority = priority;
-        }
-
-        public Priority GetPriority()
-        {
-            return _priority;
-        }
-
-        public void SetIsExpress(bool isExpress)
-        {
-            _isExpress = isExpress;
-        }
-
-        public bool GetIsExpress()
-        {
-            return _isExpress;
-        }
-
-        public void SetTimestamp(Timestamp? timestamp)
-        {
-            _timestamp = timestamp is null ? null : new Timestamp(timestamp);
-        }
-
-        public Timestamp? GetTimestamp()
-        {
-            return _timestamp is null ? null : new Timestamp(_timestamp);
-        }
-
-        public void SetAttachment(ZBytes? attachment)
-        {
-            _attachment = attachment is null ? null : new ZBytes(attachment);
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <returns>
-        /// Return ZBytes is loaned.
-        /// </returns>
-        public ZBytes? GetAttachment()
-        {
-            return _attachment is null ? null : ZBytes.CreateLoaned(_attachment.LoanedPointer());
+                _sourceInfo = null;
+            }
+#endif
         }
 
         internal IntPtr AllocUnmanagedMemory()
         {
             var options = new ZQueryReplyDelOptions
             {
-                congestion_control = _congestionControl,
-                priority = _priority,
-                is_express = _isExpress,
+                congestion_control = CongestionControl,
+                priority = Priority,
+                is_express = IsExpress,
                 timestamp = IntPtr.Zero,
-                attachment = IntPtr.Zero
+                attachment = IntPtr.Zero,
+#if UNSTABLE_API
+                source_info = IntPtr.Zero,
+#endif
             };
 
             if (_timestamp is null == false)
@@ -429,6 +402,13 @@ namespace Zenoh
             {
                 options.attachment = _attachment.AllocUnmanagedMemory();
             }
+
+#if UNSTABLE_API
+            if (_sourceInfo is null == false)
+            {
+                options.source_info = _sourceInfo.AllocUnmanagedMemory();
+            }
+#endif
 
             var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryReplyDelOptions>());
             Marshal.StructureToPtr(options, pOptions, false);
@@ -449,6 +429,13 @@ namespace Zenoh
             {
                 ZBytes.FreeUnmanagedMem(options.attachment);
             }
+
+#if UNSTABLE_API
+            if (options.source_info != IntPtr.Zero)
+            {
+                SourceInfo.FreeUnmanagedMemory(options.source_info);
+            }
+#endif
 
             Marshal.FreeHGlobal(handle);
         }
@@ -708,6 +695,9 @@ namespace Zenoh
     public sealed class QueryableOptions
     {
         public bool Complete;
+#if UNSTABLE_API
+        public Locality AllowedOrigin;
+#endif
 
         public QueryableOptions()
         {
@@ -716,18 +706,27 @@ namespace Zenoh
             var options = Marshal.PtrToStructure<ZQueryableOptions>(pOptions);
             Marshal.FreeHGlobal(pOptions);
             Complete = options.complete;
+#if UNSTABLE_API
+            AllowedOrigin = options.allowed_origin;
+#endif
         }
 
         public QueryableOptions(QueryableOptions other)
         {
             Complete = other.Complete;
+#if UNSTABLE_API
+            AllowedOrigin = other.AllowedOrigin;
+#endif
         }
 
         internal IntPtr AllocUnmanagedMem()
         {
             var options = new ZQueryableOptions
             {
-                complete = Complete
+                complete = Complete,
+#if UNSTABLE_API
+                allowed_origin = AllowedOrigin,
+#endif
             };
             var pOptions = Marshal.AllocHGlobal(Marshal.SizeOf<ZQueryableOptions>());
             Marshal.StructureToPtr(options, pOptions, false);
@@ -791,6 +790,21 @@ namespace Zenoh
         {
             Dispose();
         }
+
+#if UNSTABLE_API
+        /// <summary>
+        /// Returns the ID of the queryable.
+        /// </summary>
+        /// <returns></returns>
+        public EntityGlobalId GetId()
+        {
+            CheckDisposed();
+
+            var pLoanedQueryable = ZenohC.z_queryable_loan(Handle);
+            var zEntityGlobalId = ZenohC.z_queryable_id(pLoanedQueryable);
+            return new EntityGlobalId(zEntityGlobalId);
+        }
+#endif
 
         // void (*call)(struct z_loaned_query_t *query, void *context)
         internal static void CallbackClosureQueryCall(IntPtr query, IntPtr context)
