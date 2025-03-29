@@ -860,7 +860,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             var pLoanedBytes = ZenohC.z_sample_attachment(pLoanedSample);
             return pLoanedBytes == IntPtr.Zero ? null : ZBytes.CreateLoaned(pLoanedBytes);
         }
@@ -873,7 +873,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             return ZenohC.z_sample_congestion_control(pLoanedSample);
         }
 
@@ -885,7 +885,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             var pLoanedEncoding = ZenohC.z_sample_encoding(pLoanedSample);
             return Encoding.CreateLoaned(pLoanedEncoding);
         }
@@ -900,7 +900,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             return ZenohC.z_sample_express(pLoanedSample);
         }
 
@@ -927,7 +927,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             return ZenohC.z_sample_kind(pLoanedSample);
         }
 
@@ -954,7 +954,7 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             return ZenohC.z_sample_priority(pLoanedSample);
         }
 
@@ -968,10 +968,39 @@ namespace Zenoh
         {
             CheckDisposed();
 
-            var pLoanedSample = Owned ? ZenohC.z_sample_loan(Handle) : Handle;
+            var pLoanedSample = LoanedPointer();
             var pTimestamp = ZenohC.z_sample_timestamp(pLoanedSample);
             return pTimestamp == IntPtr.Zero ? null : Timestamp.CloneFromPointer(pTimestamp);
         }
+
+#if UNSTABLE_API
+        /// <summary>
+        /// Returns the reliability setting the sample was delivered with.
+        /// </summary>
+        /// <returns></returns>
+        public Reliability GetReliability()
+        {
+            CheckDisposed();
+
+            var pLoanedSample = LoanedPointer();
+            return ZenohC.z_sample_reliability(pLoanedSample);
+        }
+#endif
+
+#if UNSTABLE_API
+        /// <summary>
+        /// Returns the sample source_info.
+        /// </summary>
+        /// <returns></returns>
+        public SourceInfo GetSourceInfo()
+        {
+            CheckDisposed();
+
+            var pLoanedSample = LoanedPointer();
+            var pLoanedSourceInfo = ZenohC.z_sample_source_info(pLoanedSample);
+            return new SourceInfo(pLoanedSourceInfo, false);
+        }
+#endif
     }
 
 #if UNSTABLE_API
@@ -1063,6 +1092,7 @@ namespace Zenoh
                 var pEid = (IntPtr)(&eid);
                 var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
             }
+
             Handle = pOwnedSourceInfo;
             Owned = true;
         }
@@ -1096,7 +1126,7 @@ namespace Zenoh
                 info = null;
                 Marshal.FreeHGlobal(pOwnedSourceInfo);
             }
-            
+
             return r;
         }
 
@@ -1114,17 +1144,17 @@ namespace Zenoh
 
             if (Owned)
             {
-                ZenohC.z_source_info_drop(Handle);   
+                ZenohC.z_source_info_drop(Handle);
                 Marshal.FreeHGlobal(Handle);
             }
-            
+
             Handle = IntPtr.Zero;
         }
 
         public override void ToOwned()
         {
-            if(Owned) return;
-            
+            if (Owned) return;
+
             var sn = ZenohC.z_source_info_sn(Handle);
             var eid = ZenohC.z_source_info_id(Handle);
             var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
@@ -1133,6 +1163,7 @@ namespace Zenoh
                 var pEid = (IntPtr)(&eid);
                 var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
             }
+
             Handle = pOwnedSourceInfo;
             Owned = true;
         }
@@ -1149,7 +1180,7 @@ namespace Zenoh
         public uint GetSn()
         {
             CheckDisposed();
-            
+
             var pLoanedSourceInfo = LoanedPointer();
             return ZenohC.z_source_info_sn(pLoanedSourceInfo);
         }
@@ -1178,12 +1209,13 @@ namespace Zenoh
                 var pEid = (IntPtr)(&eid);
                 var r = ZenohC.z_source_info_new(pOwnedSourceInfo, pEid, sn);
             }
+
             return pOwnedSourceInfo;
         }
 
         internal static void FreeUnmanagedMemory(IntPtr handle)
         {
-            ZenohC.z_source_info_drop(handle);   
+            ZenohC.z_source_info_drop(handle);
             Marshal.FreeHGlobal(handle);
         }
     }

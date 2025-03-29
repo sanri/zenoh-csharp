@@ -177,6 +177,80 @@ namespace Zenoh
         }
 
         /// <summary>
+        /// Liveliness token subscribers on an intersecting key expression
+        /// will receive a PUT sample when connectivity is achieved, and a DELETE sample if it's lost.
+        /// </summary>
+        /// <param name="keyexpr">A keyexpr to declare a liveliess token for.</param>
+        /// <param name="livelinessToken"></param>
+        /// <returns></returns>
+        public Result DeclareLivelinessToken(Keyexpr keyexpr, out LivelinessToken? livelinessToken)
+        {
+            CheckDisposed();
+            keyexpr.CheckDisposed();
+
+            var pLoanedSession = ZenohC.z_session_loan(Handle);
+            var pLoanedKeyexpr = keyexpr.LoanedPointer();
+            livelinessToken = new LivelinessToken();
+
+            var r = ZenohC.z_liveliness_declare_token(
+                pLoanedSession, livelinessToken.Handle, pLoanedKeyexpr, IntPtr.Zero);
+
+            if (r == Result.Ok) return Result.Ok;
+
+            livelinessToken.Dispose();
+            livelinessToken = null;
+            return r;
+        }
+
+        /// <summary>
+        /// Declares a subscriber on liveliness tokens that intersect "keyexpr".
+        /// </summary>
+        /// <param name="keyexpr"></param>
+        /// <param name="options"></param>
+        /// <param name="callback"></param>
+        /// <param name="livelinessSubscriber"></param>
+        /// <returns></returns>
+        public Result DeclareLivelinessSubscriber(Keyexpr keyexpr, LivelinessSubscriberOptions options,
+            LivelinessSubscriber.Cb callback, out LivelinessSubscriber? livelinessSubscriber)
+        {
+            CheckDisposed();
+            keyexpr.CheckDisposed();
+
+            var gcHandle = GCHandle.Alloc(callback);
+
+            var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
+            ZenohC.z_closure_sample(
+                pOwnedClosureSample,
+                LivelinessSubscriber.CallbackClosureSampleCall,
+                LivelinessSubscriber.CallbackClosureSampleDrop,
+                GCHandle.ToIntPtr(gcHandle)
+            );
+
+            var pLoanedSession = ZenohC.z_session_loan(Handle);
+            var pLoanedKeyexpr = keyexpr.LoanedPointer();
+            var pOptions = options.AllocUnmanagedMemory();
+            livelinessSubscriber = new LivelinessSubscriber();
+
+            var r = ZenohC.z_liveliness_declare_subscriber(
+                pLoanedSession,
+                livelinessSubscriber.Handle,
+                pLoanedKeyexpr,
+                pOwnedClosureSample,
+                pOptions
+            );
+
+            LivelinessSubscriberOptions.FreeUnmanagedMemory(pOptions);
+            Marshal.FreeHGlobal(pOwnedClosureSample);
+
+            if (r == Result.Ok) return Result.Ok;
+
+            livelinessSubscriber.Dispose();
+            gcHandle.Free();
+            livelinessSubscriber = null;
+            return r;
+        }
+
+        /// <summary>
         /// Constructs and declares a callback type subscriber for a given key expression. 
         /// </summary>
         /// <param name="keyexpr">
@@ -208,7 +282,7 @@ namespace Zenoh
 
             var pLoanedSession = ZenohC.z_session_loan(Handle);
             var pLoanedKeyexpr = keyexpr.LoanedPointer();
-            var pSubscriberOptions = options.AllocUnmanagedMemory();
+            var pOptions = options.AllocUnmanagedMemory();
             subscriber = new Subscriber();
 
             var r = ZenohC.z_declare_subscriber(
@@ -216,10 +290,10 @@ namespace Zenoh
                 subscriber.Handle,
                 pLoanedKeyexpr,
                 pOwnedClosureSample,
-                pSubscriberOptions
+                pOptions
             );
 
-            SubscriberOptions.FreeUnmanagedMemory(pSubscriberOptions);
+            SubscriberOptions.FreeUnmanagedMemory(pOptions);
             Marshal.FreeHGlobal(pOwnedClosureSample);
 
             if (r == Result.Ok) return Result.Ok;
@@ -459,8 +533,7 @@ namespace Zenoh
         /// <param name="channel"></param>
         /// <returns></returns>
         public Result Get(Keyexpr keyexpr, GetOptions options, string? parameters, ChannelType channelType,
-            uint channelSize,
-            out ChannelReply? channel)
+            uint channelSize, out ChannelReply? channel)
         {
             CheckDisposed();
             keyexpr.CheckDisposed();
@@ -500,6 +573,53 @@ namespace Zenoh
             GetOptions.FreeUnmanagedMemory(pGetOptions);
 
             if (r == Result.Ok) return r;
+
+            channel.Dispose();
+            channel = null;
+            return r;
+        }
+
+        /// <summary>
+        /// Queries liveliness tokens currently on the network with a key expression intersecting with "keyexpr".
+        /// </summary>
+        /// <param name="keyexpr">The key expression to query liveliness tokens for.</param>
+        /// <param name="options">Additional options for the liveliness get operation.</param>
+        /// <param name="channelType"></param>
+        /// <param name="channelSize"></param>
+        /// <param name="channel"></param>
+        /// <returns></returns>
+        public Result LivelinessGet(Keyexpr keyexpr, LivelinessGetOptions options, ChannelType channelType,
+            uint channelSize, out ChannelReply? channel)
+        {
+            CheckDisposed();
+            keyexpr.CheckDisposed();
+
+            var pOwnedClosureReply = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureReply>());
+            switch (channelType)
+            {
+                case ChannelType.Ring:
+                    channel = new ChannelReplyRing();
+                    ZenohC.z_ring_channel_reply_new(pOwnedClosureReply, channel.Handle, (UIntPtr)channelSize);
+                    break;
+                case ChannelType.Fifo:
+                    channel = new ChannelReplyFifo();
+                    ZenohC.z_fifo_channel_reply_new(pOwnedClosureReply, channel.Handle, (UIntPtr)channelSize);
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(channelType), channelType, null);
+            }
+
+            var pLoanedSession = ZenohC.z_session_loan(Handle);
+            var pLoanedKeyexpr = keyexpr.LoanedPointer();
+            var pOptions = options.AllocUnmanagedMemory();
+
+            var r = ZenohC.z_liveliness_get(pLoanedSession, pLoanedKeyexpr, pOwnedClosureReply, pOptions);
+
+            ZenohC.z_closure_reply_drop(pOwnedClosureReply);
+            Marshal.FreeHGlobal(pOwnedClosureReply);
+            LivelinessGetOptions.FreeUnmanagedMemory(pOptions);
+
+            if (r == Result.Ok) return Result.Ok;
 
             channel.Dispose();
             channel = null;

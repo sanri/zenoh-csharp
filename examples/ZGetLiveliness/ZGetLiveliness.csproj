@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>ZGetLiveliness</AssemblyName>
+        <PackageId>ZGetLiveliness</PackageId>
+        <OutputType>Exe</OutputType>
+        <EnableDefaultItems>false</EnableDefaultItems>
+        <LangVersion>8</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64;ARM64</Platforms>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Zenoh\Zenoh.csproj"/>
+        <Compile Include="ZGetLiveliness.cs"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="CommandLineParser" Version="2.9.1" />
+    </ItemGroup>
+
+</Project>

@@ -321,7 +321,6 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedQuery
     {
-        
 #if UNSTABLE_API
         private fixed byte data[144];
 #else
@@ -630,7 +629,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZLivelinessSubscriberOptions
     {
-        internal byte history;
+        [MarshalAs(UnmanagedType.U1)] internal bool history;
     }
 
     // zenoh_commons.h
@@ -646,7 +645,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZLivelinessGetOptions
     {
-        internal uint timeout_ms;
+        internal ulong timeout_ms;
     }
 
     // zenoh_opaque.h

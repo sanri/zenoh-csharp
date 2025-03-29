@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using CommandLine;
 using Zenoh;
 
-namespace ZGet
+namespace ZGetLiveliness
 {
     public class Program
     {
@@ -26,14 +26,14 @@ namespace ZGet
 
             Console.WriteLine("Opening session successful!\n");
 
-            string keyStr = "demo/example/**";
+            string keyStr = "group1/**";
             var keyexpr = Keyexpr.FromString(keyStr);
             if (keyexpr is null) goto Exit;
 
-            var getOptions = new GetOptions();
+            var options = new LivelinessGetOptions();
 
-            Console.WriteLine($"Querying keyexpr: {keyStr}");
-            r = session.Get(keyexpr, getOptions, null, ChannelType.Fifo, 10, out ChannelReply? channel);
+            Console.WriteLine($"Sending liveliness query {keyStr}");
+            r = session.LivelinessGet(keyexpr, options, ChannelType.Fifo, 10, out ChannelReply? channel);
             if (channel is null)
             {
                 Console.WriteLine($"Query unsuccessful! result: {r}");
@@ -63,12 +63,9 @@ namespace ZGet
                     if (sample is null) continue;
 
                     var k = sample.GetKeyexpr();
-                    var e = sample.GetEncoding();
-                    var p = sample.GetPayload();
-                    var pStr = p.ToZString()?.ToString() ?? "";
+                    var kStr = k.ToString();
 
-                    var printStr = $">> Received ({k}, {e}, {pStr})";
-                    Console.WriteLine(printStr);
+                    Console.WriteLine($">> Alive token ({kStr})");
                 }
                 else
                 {
@@ -76,11 +73,11 @@ namespace ZGet
                     if (replyErr is null) continue;
 
                     var e = replyErr.GetEncoding();
+                    var eStr = e.ToString() ?? "";
                     var p = replyErr.GetPayload();
                     var pStr = p.ToZString()?.ToString() ?? "";
 
-                    var printStr = $">> Received err ({e}, {pStr})";
-                    Console.WriteLine(printStr);
+                    Console.WriteLine($">> Received err ({eStr}, {pStr})");
                 }
             }
 
