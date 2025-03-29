@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading;
+using System;
 using CommandLine;
 using Zenoh;
 
-namespace ZPub
+namespace ZSubLiveliness
 {
     public class Program
     {
@@ -27,42 +26,49 @@ namespace ZPub
 
             Console.WriteLine("Opening session successful!\n");
 
-            string keyStr = "demo/example/zenoh-cs-pub/string";
+            string keyStr = "group1/**";
             var keyexpr = Keyexpr.FromString(keyStr);
             if (keyexpr is null) goto Exit;
 
-            var publisherOptions = new PublisherOptions();
-            publisherOptions.Encoding = new Encoding(EncodingId.TextPlain);
+            var options = new LivelinessSubscriberOptions();
+            options.History = true;
 
-            r = session.DeclarePublisher(keyexpr, publisherOptions, out Publisher? publisher);
-            if (publisher is null)
+            r = session.DeclareLivelinessSubscriber(keyexpr, options, Callback,
+                out LivelinessSubscriber? livelinessSubscriber);
+            if (livelinessSubscriber is null)
             {
-                Console.WriteLine($"Declare publisher unsuccessful! result: {r}");
+                Console.WriteLine($"Declare liveliness subscriber unsuccessful! result: {r}");
                 goto Exit;
             }
 
-            Console.WriteLine($"Declared publisher on {keyexpr}");
+            Console.WriteLine($"Declared liveliness subscriber on {keyStr}");
 
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("Input 'q' to quit.");
+            while (true)
             {
-                Thread.Sleep(1000);
-                var payloadStr = $"[{i}] Pub from CS!";
-                var payload = ZBytes.FromString(payloadStr);
-                r = publisher.Put(payload, new PublisherPutOptions());
-                if (r != Result.Ok)
-                {
-                    Console.WriteLine($"Publisher put unsuccessful! result: {r}");
-                    goto Exit;
-                }
-
-                Console.WriteLine($"Publisher put data {payloadStr}");
+                var input = Console.ReadLine();
+                if (input == "q") break;
             }
-
-            publisher.Undeclare();
 
             Exit:
             session.Close();
             Console.WriteLine("exit");
+        }
+
+        static void Callback(Sample sample)
+        {
+            var keyexpr = sample.GetKeyexpr();
+            var keyexprStr = keyexpr.ToString();
+            var kind = sample.GetKind();
+
+            string print = kind switch
+            {
+                SampleKind.Put => $"[LivelinessSubscriber] New alive token ({keyexprStr})",
+                SampleKind.Delete => $"[LivelinessSubscriber] Dropped token ({keyexprStr})",
+                _ => ""
+            };
+
+            Console.WriteLine(print);
         }
     }
 

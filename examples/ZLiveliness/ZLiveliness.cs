@@ -1,9 +1,8 @@
-﻿using System;
-using System.Threading;
+using System;
 using CommandLine;
 using Zenoh;
 
-namespace ZPub
+namespace ZLiveliness
 {
     public class Program
     {
@@ -27,38 +26,28 @@ namespace ZPub
 
             Console.WriteLine("Opening session successful!\n");
 
-            string keyStr = "demo/example/zenoh-cs-pub/string";
+            string keyStr = "group1/zenoh-cs-liveliness";
             var keyexpr = Keyexpr.FromString(keyStr);
             if (keyexpr is null) goto Exit;
 
-            var publisherOptions = new PublisherOptions();
-            publisherOptions.Encoding = new Encoding(EncodingId.TextPlain);
-
-            r = session.DeclarePublisher(keyexpr, publisherOptions, out Publisher? publisher);
-            if (publisher is null)
+            r = session.DeclareLivelinessToken(keyexpr, out LivelinessToken? livelinessToken);
+            if (livelinessToken is null)
             {
-                Console.WriteLine($"Declare publisher unsuccessful! result: {r}");
+                Console.WriteLine($"Declare liveliness token unsuccessful! result: {r}");
                 goto Exit;
             }
 
-            Console.WriteLine($"Declared publisher on {keyexpr}");
+            Console.WriteLine($"Declared liveliness token on {keyStr}");
 
-            for (int i = 0; i < 100; i++)
+            Console.WriteLine("Input 'q' to undeclare liveliness token and quit.");
+            while (true)
             {
-                Thread.Sleep(1000);
-                var payloadStr = $"[{i}] Pub from CS!";
-                var payload = ZBytes.FromString(payloadStr);
-                r = publisher.Put(payload, new PublisherPutOptions());
-                if (r != Result.Ok)
-                {
-                    Console.WriteLine($"Publisher put unsuccessful! result: {r}");
-                    goto Exit;
-                }
-
-                Console.WriteLine($"Publisher put data {payloadStr}");
+                var input = Console.ReadLine();
+                if (input == "q") break;
             }
 
-            publisher.Undeclare();
+            livelinessToken.Undeclare();
+            livelinessToken.Dispose();
 
             Exit:
             session.Close();

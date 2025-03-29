@@ -37,7 +37,7 @@ namespace ZSub
                 goto Exit;
             }
 
-            Console.WriteLine($"Declaring subscriber on {keyexpr}");
+            Console.WriteLine($"Declared subscriber on {keyexpr}");
 
             Console.WriteLine("Input 'q' to quit.");
             while (true)
