@@ -509,6 +509,14 @@ namespace Zenoh
             return Owned ? ZenohC.z_query_loan(Handle) : Handle;
         }
 
+        internal override void CheckDisposed()
+        {
+            if (Handle == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException(nameof(Query));
+            }
+        }
+
         /// <summary>
         /// Gets query attachment.
         /// </summary>
@@ -779,7 +787,7 @@ namespace Zenoh
         {
             if (Handle == IntPtr.Zero)
             {
-                throw new InvalidOperationException("Object has been destroyed");
+                throw new ObjectDisposedException(nameof(Queryable));
             }
         }
 

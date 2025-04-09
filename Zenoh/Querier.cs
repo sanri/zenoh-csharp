@@ -33,7 +33,6 @@ namespace Zenoh
 
         private ZBytes? _payload;
 
-
         public ZBytes? Attachment
         {
             get => _attachment is null ? null : new ZBytes(_attachment);
@@ -410,6 +409,14 @@ namespace Zenoh
             return Owned ? ZenohC.z_reply_err_loan(Handle) : Handle;
         }
 
+        internal override void CheckDisposed()
+        {
+            if (Handle == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException(nameof(ReplyErr));
+            }
+        }
+
         public override void ToOwned()
         {
             var pOwnedReplyErr = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedReplyErr>());
@@ -491,7 +498,7 @@ namespace Zenoh
         {
             if (Handle == IntPtr.Zero)
             {
-                throw new InvalidOperationException("Object is disposed");
+                throw new ObjectDisposedException(nameof(Reply));
             }
         }
 

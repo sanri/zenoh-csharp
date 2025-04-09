@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <AssemblyName>ZBytes</AssemblyName>
+        <PackageId>ZBytes</PackageId>
+        <OutputType>Exe</OutputType>
+        <EnableDefaultItems>false</EnableDefaultItems>
+        <LangVersion>8</LangVersion>
+        <TargetFramework>net8.0</TargetFramework>
+        <Configurations>Release;Debug</Configurations>
+        <Platforms>x64;ARM64</Platforms>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\Zenoh\Zenoh.csproj"/>
+        <Compile Include="ZBytes.cs"/>
+    </ItemGroup>
+
+</Project>

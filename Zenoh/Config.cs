@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Zenoh
 {
+    /// <summary>
+    /// Zenoh session config.
+    /// </summary>
     public sealed class Config : IDisposable
     {
         // z_owned_config*
@@ -114,7 +117,7 @@ namespace Zenoh
         {
             if (Handle == IntPtr.Zero)
             {
-                throw new InvalidOperationException();
+                throw new ObjectDisposedException(nameof(Config));
             }
         }
 

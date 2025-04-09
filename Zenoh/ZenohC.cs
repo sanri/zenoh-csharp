@@ -26,26 +26,60 @@ namespace Zenoh
     // z_result_t
     public enum Result : sbyte
     {
+        /// Ok
         Ok = 0,
+
+        /// Channel disconnected
         ChannelDisconnected = 1,
+
+        /// Channel nodata
         ChannelNodata = 2,
+
+        /// Invalid argument
         ErrorInvalidArgument = -1,
+
+        /// Parse error.
         ErrorParse = -2,
+
+        /// IO error.
         ErrorIo = -3,
+
+        ///  Network error.
         ErrorNetwork = -4,
+
+        /// Null
         ErrorNull = -5,
+
+        /// Unavailable
         ErrorUnavailable = -6,
+
+        /// Deserialize error.
         ErrorDeserialize = -7,
+
+        /// Session closed.
         ErrorSessionClosed = -8,
+
+        /// 
         ErrorUtf8 = -9,
+
+        /// 
         ErrorResourceTemporarilyUnavailableMutex = -11,
+
+        /// 
         ErrorDeviceOrResourceBusyMutex = -16,
+
+        /// 
         ErrorInvalidArgumentMutex = -22,
+
+        /// 
         ErrorGeneric = -128,
     }
 
     // zenoh_commons.h
     // z_congestion_control_t
+    /// <summary>
+    /// Congestion control
+    /// </summary>
     public enum CongestionControl : uint
     {
         /// <summary>
@@ -61,38 +95,107 @@ namespace Zenoh
 
     // zenoh_commons.h
     // z_sample_kind_t
+    /// <summary>
+    /// Sample kind.
+    /// </summary>
     public enum SampleKind : uint
     {
+        /// <summary>
+        /// The Sample was issued by a "put" operation.
+        /// </summary>
         Put = 0,
+
+        /// <summary>
+        ///  The Sample was issued by a "delete" operation.
+        /// </summary>
         Delete = 1
     }
 
     // zenoh_commons.h
     // z_priority_t
+    /// <summary>
+    /// The priority of zenoh messages.
+    /// </summary>
     public enum Priority : uint
     {
+        /// <summary>
+        /// Priority for "RealTime" messages.
+        /// </summary>
         RealTime = 1,
+
+        /// <summary>
+        /// Highest priority for "Interactive" messages.
+        /// </summary>
         InteractiveHigh = 2,
+
+        /// <summary>
+        /// Lowest priority for "Interactive" messages.
+        /// </summary>
         InteractiveLow = 3,
+
+        /// <summary>
+        /// Highest priority for "Data" messages.
+        /// </summary>
         DataHigh = 4,
+
+        /// <summary>
+        /// Default priority for "Data" messages.
+        /// </summary>
         Data = 5,
+
+        /// <summary>
+        /// Lowest priority for "Data" messages.
+        /// </summary>
         DataLow = 6,
+
+        /// <summary>
+        /// Priority for "Background traffic" messages.
+        /// </summary>
         Background = 7
     }
 
     // zenoh_commons.h
     // z_consolidation_mode_t
+    /// <summary>
+    /// Consolidation mode values.
+    /// </summary>
     public enum ConsolidationMode
     {
+        /// <summary>
+        /// Let Zenoh decide the best consolidation mode depending on the query selector.
+        /// If the selector contains time range properties, consolidation mode "None" is used.
+        /// Otherwise the "Latest" consolidation mode is used.
+        /// </summary>
         Auto = -1,
+
+        /// <summary>
+        /// No consolidation is applied. Replies may come in any order and any number.
+        /// </summary>
         None = 0,
+
+        /// <summary>
+        /// <para>
+        /// It guarantees that any reply for a given key expression will be monotonic in time  w.r.t. the previous received replies for the same key expression. 
+        /// </para>
+        /// <para>
+        /// I.e., for the same key expression multiple replies may be received.
+        /// It is guaranteed that two replies received at t1 and t2 will have timestamp ts2 > ts1. It optimizes latency.
+        /// </para>
+        /// </summary>
         Monotonic = 1,
+
+        /// <summary>
+        /// It guarantees unicity of replies for the same key expression. It optimizes bandwidth.
+        /// </summary>
         Latest = 2
     }
 
 #if UNSTABLE_API
     // zenoh_commons.h
     // z_keyexpr_intersection_level_t
+    /// <summary>
+    /// Intersection level of 2 key expressions.
+    /// </summary>
     public enum KeyexprIntersectionLevel : uint
     {
         /// 2 key expressions do not intersect.
@@ -112,19 +215,47 @@ namespace Zenoh
 #if UNSTABLE_API
     // zenoh_commons.h
     // z_reliability_t
+    /// <summary>
+    /// <para>The publisher reliability.</para>
+    /// <para>
+    /// Currently, "reliability" does not trigger any data retransmission on the wire.
+    /// It is rather used as a marker on the wire and it may be used to select the best link available (e.g. TCP for reliable data and UDP for best effort data).
+    /// </para>
+    /// </summary>
     public enum Reliability : uint
     {
+        /// <summary>
+        /// Best effort.
+        /// </summary>
         BestEffort = 0,
+
+        /// <summary>
+        /// Reliable.
+        /// </summary>
         Reliable = 1
     }
 #endif
 
     // zenoh_commons.h
     // z_query_target_t 
+    /// <summary>
+    /// The Queryables that should be target of a "session.Get()".
+    /// </summary>
     public enum QueryTarget : uint
     {
+        /// <summary>
+        /// The nearest complete queryable if any else all matching queryables.
+        /// </summary>
         BestMatching = 0,
+
+        /// <summary>
+        /// All matching queryables.
+        /// </summary>
         All = 1,
+
+        /// <summary>
+        /// All complete queryables.
+        /// </summary>
         AllComplete = 2
     }
 
@@ -132,41 +263,123 @@ namespace Zenoh
     // z_what_t
     public enum What : uint
     {
+        /// <summary>
+        /// Router node.
+        /// </summary>
         Router = 1,
+
+        /// <summary>
+        /// Peer node.
+        /// </summary>
         Peer = 2,
+
+        /// <summary>
+        /// Client node.
+        /// </summary>
         Client = 4,
+
+        /// <summary>
+        /// Router and peer node.
+        /// </summary>
         RouterPeer = 1 | 2,
+
+        /// <summary>
+        /// Router and client node.
+        /// </summary>
         RouterClient = 1 | 4,
+
+        /// <summary>
+        /// Peer and client node.
+        /// </summary>
         PeerClient = 2 | 4,
+
+        /// <summary>
+        /// Router, peer and client node.
+        /// </summary>
         RouterPeerClient = 1 | 2 | 4,
     }
 
     // zenoh_commons.h
     // z_whatami_t
+    /// <summary>
+    /// What am I.
+    /// </summary>
     public enum Whatami : uint
     {
+        /// <summary>
+        /// Router
+        /// </summary>
         Router = 1,
+
+        /// <summary>
+        /// Peer
+        /// </summary>
         Peer = 2,
+
+        /// <summary>
+        /// Client
+        /// </summary>
         Client = 4
     }
 
     // zenoh_commons.h
     // zc_locality_t
+    /// <summary>
+    /// The locality of samples to be received by subscribers or targeted by publishers.
+    /// </summary>
     public enum Locality : uint
     {
+        /// <summary>
+        /// Any
+        /// </summary>
         Any = 0,
+
+        /// <summary>
+        /// Only from local sessions.
+        /// </summary>
         Local = 1,
+
+        /// <summary>
+        /// Only from remote sessions.
+        /// </summary>
         Remote = 2,
     }
 
     // zenoh_commons.h
     // zc_log_severity_t
+    /// <summary>
+    /// Severity level of Zenoh log message.
+    /// </summary>
     public enum LogSeverity : uint
     {
+        /// <summary>
+        /// The `trace` level.
+        /// Designates very low priority, often extremely verbose, information.
+        /// </summary>
         Trace = 0,
+
+        /// <summary>
+        /// The "debug" level.
+        /// Designates lower priority information.
+        /// </summary>
         Debug = 1,
+
+        /// <summary>
+        /// The "info" level.
+        /// Designates useful information.
+        /// </summary>
         Info = 2,
+
+        /// <summary>
+        /// The "warn" level.
+        /// Designates hazardous situations.
+        /// </summary>
         Warn = 3,
+
+        /// <summary>
+        /// The "error" level.
+        /// Designates very serious errors.
+        /// </summary>
         Error = 4,
     }
 
@@ -499,13 +712,12 @@ namespace Zenoh
 #endif
     }
 
-
     // zenoh_opaque.h
     // z_owned_config_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedConfig
     {
-        private fixed byte data[1864];
+        private fixed byte data[1912];
     }
 
     // zenoh_opaque.h
@@ -1162,14 +1374,6 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_bytes_from_string(IntPtr dst, IntPtr src);
 
-        [DllImport(DllName, EntryPoint = "z_bytes_get_reader", CallingConvention = CallingConvention.Cdecl,
-            ExactSpelling = true)]
-        internal static extern ZBytesReader z_bytes_get_reader(IntPtr data);
-
-        [DllImport(DllName, EntryPoint = "z_bytes_get_slice_iterator", CallingConvention = CallingConvention.Cdecl,
-            ExactSpelling = true)]
-        internal static extern ZBytesSliceIterator z_bytes_get_slice_iterator(IntPtr data);
-
         /// bool
         /// z_bytes_is_empty(
         ///     const struct z_loaned_bytes_t *this_
@@ -1203,27 +1407,73 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern IntPtr z_bytes_loan_mut(IntPtr data);
 
+        /// struct z_bytes_reader_t
+        /// z_bytes_get_reader(
+        ///     const struct z_loaned_bytes_t *data
+        /// )
+        [DllImport(DllName, EntryPoint = "z_bytes_get_reader", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZBytesReader z_bytes_get_reader(IntPtr data);
+
+        /// struct z_bytes_slice_iterator_t
+        /// z_bytes_get_slice_iterator(
+        ///     const struct z_loaned_bytes_t *this_
+        /// )
+        [DllImport(DllName, EntryPoint = "z_bytes_get_slice_iterator", CallingConvention = CallingConvention.Cdecl,
+            ExactSpelling = true)]
+        internal static extern ZBytesSliceIterator z_bytes_get_slice_iterator(IntPtr data);
+
+        /// size_t
+        /// z_bytes_reader_read(
+        ///     struct z_bytes_reader_t *this_,
+        ///     uint8_t *dst,
+        ///     size_t len
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_read", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern UIntPtr z_bytes_reader_read(IntPtr reader, IntPtr dst, UIntPtr len);
 
+        /// size_t
+        /// z_bytes_reader_remaining(
+        ///     const struct z_bytes_reader_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_remaining", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern UIntPtr z_bytes_reader_remaining(IntPtr reader);
 
+        /// z_result_t
+        /// z_bytes_reader_seek(
+        ///     struct z_bytes_reader_t *this_,
+        ///     int64_t offset,
+        ///     int origin
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_seek", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_bytes_reader_seek(IntPtr reader, long offset, int origin);
 
+        /// int64_t
+        /// z_bytes_reader_tell(
+        ///     struct z_bytes_reader_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_tell", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern long z_bytes_reader_tell(IntPtr reader);
 
+        /// bool
+        /// z_bytes_slice_iterator_next(
+        ///     struct z_bytes_slice_iterator_t *this_,
+        ///     struct z_view_slice_t *slice
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_slice_iterator_next", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         [return: MarshalAs(UnmanagedType.U1)]
         internal static extern bool z_bytes_slice_iterator_next(IntPtr iter, IntPtr slice);
 
+        /// z_result_t
+        /// z_bytes_to_slice(
+        ///     const struct z_loaned_bytes_t *this_,
+        ///     struct z_owned_slice_t *dst
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_to_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_bytes_to_slice(IntPtr bytes, IntPtr dst);
@@ -1254,6 +1504,10 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_bytes_writer_drop(IntPtr writer);
 
+        /// z_result_t
+        /// z_bytes_writer_empty(
+        ///     struct z_owned_bytes_writer_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_bytes_writer_empty(IntPtr writer);
@@ -1267,14 +1521,28 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern void z_bytes_writer_finish(IntPtr writer, IntPtr bytes);
 
+        /// const struct z_loaned_bytes_writer_t*
+        /// z_bytes_writer_loan(
+        ///     const struct z_owned_bytes_writer_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern IntPtr z_bytes_writer_loan(IntPtr writer);
 
+        /// struct z_loaned_bytes_writer_t*
+        /// z_bytes_writer_loan_mut(
+        ///     struct z_owned_bytes_writer_t *this_
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern IntPtr z_bytes_writer_loan_mut(IntPtr writer);
 
+        /// z_result_t
+        /// z_bytes_writer_write_all(
+        ///     struct z_loaned_bytes_writer_t *this_,
+        ///     const uint8_t *src,
+        ///     size_t len
+        /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_write_all", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
         internal static extern Result z_bytes_writer_write_all(IntPtr writer, IntPtr src, UIntPtr len);
