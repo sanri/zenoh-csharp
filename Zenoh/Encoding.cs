@@ -311,6 +311,14 @@ namespace Zenoh
             return Owned ? ZenohC.z_encoding_loan(Handle) : Handle;
         }
 
+        internal override void CheckDisposed()
+        {
+            if (Handle == IntPtr.Zero)
+            {
+                throw new ObjectDisposedException(nameof(Encoding));
+            }
+        }
+
         /// <summary>
         /// Checking encoding for equality.
         /// </summary>

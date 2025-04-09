@@ -36,7 +36,7 @@ namespace Zenoh
         {
             if (Handle == IntPtr.Zero)
             {
-                throw new InvalidOperationException("Channel is disposed");
+                throw new ObjectDisposedException(nameof(Channel));
             }
         }
     }

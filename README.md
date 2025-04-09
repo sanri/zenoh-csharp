@@ -34,7 +34,8 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 |  Zenoh-C  | Zenoh-CS |
 |:---------:|:--------:|
 | v0.7.2-rc |  v0.1.*  |
-|  v1.3.*   |  v0.2.*  |
+|  v1.3.0   |  v0.2.0  |
+|  v1.3.2   |  v0.2.1  |
 
 ### Development and test environment composition
 | OS                  | CPU | .NET implementation  | Notes |

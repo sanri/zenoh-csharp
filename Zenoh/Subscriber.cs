@@ -92,7 +92,7 @@ namespace Zenoh
         {
             if (Handle == IntPtr.Zero)
             {
-                throw new InvalidOperationException("Object has been destroyed");
+                throw new ObjectDisposedException(nameof(Subscriber));
             }
         }
 
