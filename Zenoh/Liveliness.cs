@@ -98,6 +98,8 @@ namespace Zenoh
     {
         // z_owned_subscriber_t*
         internal IntPtr Handle { get; private set; }
+        internal static ZenohC.Cb2 CbCall = _Call;
+        internal static ZenohC.Cb1 CbDrop = _Drop;
 
         public delegate void Cb(Sample sample);
 
@@ -176,7 +178,7 @@ namespace Zenoh
         }
 #endif
 
-        internal static void CallbackClosureSampleCall(IntPtr sample, IntPtr context)
+        private static void _Call(IntPtr sample, IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             if (!(gcHandle.Target is Cb callback)) return;
@@ -185,7 +187,7 @@ namespace Zenoh
             callback(loanedSample);
         }
 
-        internal static void CallbackClosureSampleDrop(IntPtr context)
+        private static void _Drop(IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             gcHandle.Free();

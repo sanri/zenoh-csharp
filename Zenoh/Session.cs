@@ -221,8 +221,8 @@ namespace Zenoh
             var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
             ZenohC.z_closure_sample(
                 pOwnedClosureSample,
-                LivelinessSubscriber.CallbackClosureSampleCall,
-                LivelinessSubscriber.CallbackClosureSampleDrop,
+                LivelinessSubscriber.CbCall,
+                LivelinessSubscriber.CbDrop,
                 GCHandle.ToIntPtr(gcHandle)
             );
 
@@ -275,10 +275,9 @@ namespace Zenoh
             var pOwnedClosureSample = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureSample>());
             ZenohC.z_closure_sample(
                 pOwnedClosureSample,
-                Subscriber.CallbackClosureSampleCall,
-                Subscriber.CallbackClosureSampleDrop,
-                GCHandle.ToIntPtr(gcHandle)
-            );
+                Subscriber.CbCall,
+                Subscriber.CbDrop,
+                GCHandle.ToIntPtr(gcHandle));
 
             var pLoanedSession = ZenohC.z_session_loan(Handle);
             var pLoanedKeyexpr = keyexpr.LoanedPointer();
@@ -384,8 +383,10 @@ namespace Zenoh
 
             var gcHandle = GCHandle.Alloc(callback);
             var pOwnedClosureQuery = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureQuery>());
-            ZenohC.z_closure_query(pOwnedClosureQuery, Queryable.CallbackClosureQueryCall,
-                Queryable.CallbackClosureQueryDrop,
+            ZenohC.z_closure_query(
+                pOwnedClosureQuery,
+                Queryable.CbCall,
+                Queryable.CbDrop,
                 GCHandle.ToIntPtr(gcHandle));
 
             var pLoanedSession = ZenohC.z_session_loan(Handle);
@@ -681,8 +682,7 @@ namespace Zenoh
 
             var gcHandle = GCHandle.Alloc(callback);
             var pOwnedClosureZid = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZid>());
-            ZenohC.z_closure_zid(pOwnedClosureZid, Id.CallbackClosureIdCall, Id.CallbackClosureIdDrop,
-                GCHandle.ToIntPtr(gcHandle));
+            ZenohC.z_closure_zid(pOwnedClosureZid, Id.CbCall, Id.CbDrop, GCHandle.ToIntPtr(gcHandle));
 
             var pLoanedSession = ZenohC.z_session_loan(Handle);
             var r = ZenohC.z_info_routers_zid(pLoanedSession, pOwnedClosureZid);
@@ -714,8 +714,7 @@ namespace Zenoh
 
             var gcHandle = GCHandle.Alloc(callback);
             var pOwnedClosureZid = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedClosureZid>());
-            ZenohC.z_closure_zid(pOwnedClosureZid, Id.CallbackClosureIdCall, Id.CallbackClosureIdDrop,
-                GCHandle.ToIntPtr(gcHandle));
+            ZenohC.z_closure_zid(pOwnedClosureZid, Id.CbCall, Id.CbDrop, GCHandle.ToIntPtr(gcHandle));
 
             var pLoanedSession = ZenohC.z_session_loan(Handle);
             var r = ZenohC.z_info_peers_zid(pLoanedSession, pOwnedClosureZid);

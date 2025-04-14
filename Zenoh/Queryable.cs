@@ -751,6 +751,8 @@ namespace Zenoh
     public sealed class Queryable : IDisposable
     {
         internal IntPtr Handle { get; private set; }
+        internal static ZenohC.Cb2 CbCall = _Call;
+        internal static ZenohC.Cb1 CbDrop = _Drop;
 
         public delegate void Cb(Query query);
 
@@ -815,7 +817,7 @@ namespace Zenoh
 #endif
 
         // void (*call)(struct z_loaned_query_t *query, void *context)
-        internal static void CallbackClosureQueryCall(IntPtr query, IntPtr context)
+        private static void _Call(IntPtr query, IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             if (!(gcHandle.Target is Cb callback)) return;
@@ -825,7 +827,7 @@ namespace Zenoh
         }
 
         // void (*drop)(void *context)
-        internal static void CallbackClosureQueryDrop(IntPtr context)
+        private static void _Drop(IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             gcHandle.Free();
