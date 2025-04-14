@@ -10,7 +10,7 @@
 
 [Zenoh](http://zenoh.io) is an extremely efficient and fault-tolerant [Named Data Networking](http://named-data.net) (NDN) protocol that is able to scale down to extremely constrainded devices and networks.
 
-The C# API is for pure clients, in other terms does not support peer-to-peer communication, 
+Zenoh-CS provides the common interface of Zenoh-C.
 can be easily tested against a zenoh router running in a Docker container (see [quick test](https://zenoh.io/docs/getting-started/quick-test/)).
 
 
@@ -23,7 +23,7 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 | .NET implementation | Version support         |
 |:--------------------|-------------------------|
 | .NET                | 5.0, 6.0, 7.0, 8.0, 9.0 |
-| .NET Framework      | 4.8, 4.8.1              |
+| .NET Framework      | 4.8.1                   |
 | Unity               | 2022.3                  |
 
 ### Supported CPU arch
@@ -31,20 +31,20 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 - arm64 (planned, untested)
 
 ### Mapping between Zenoh-CS and Zenoh-C versions
-|  Zenoh-C  | Zenoh-CS |
-|:---------:|:--------:|
-| v0.7.2-rc |  v0.1.*  |
-|  v1.3.0   |  v0.2.0  |
-|  v1.3.2   |  v0.2.1  |
+|     Zenoh-C     | Zenoh-CS |
+|:---------------:|:--------:|
+|    v0.7.2-rc    |  v0.1.*  |
+|     v1.3.0      |  v0.2.0  |
+| v1.3.2 ~ v1.3.3 |  v0.2.2  |
 
 ### Development and test environment composition
-| OS                  | CPU | .NET implementation  | Notes |
-|---------------------|-----|----------------------|-------|
-| macOS 15            | x64 | .NET 8.0             | main  |
-| macOS 15            | x64 | Unity 2022.3         |       |
-| Windows Server 2022 | x64 | .NET 8.0             |       |
-| Windows Server 2022 | x64 | .NET Framework 4.8.1 |       |
-| Ubuntu 24.04        | x64 | .NET 8.0             |       |
+| OS           | CPU | .NET implementation  | Notes |
+|--------------|-----|----------------------|-------|
+| macOS 15     | x64 | .NET 8.0             | main  |
+| macOS 15     | x64 | Unity 2022.3         |       |
+| Windows 11   | x64 | .NET 8.0             |       |
+| Windows 11   | x64 | .NET Framework 4.8.1 |       |
+| Ubuntu 24.04 | x64 | .NET 8.0             |       |
 
 
 -------------------------------
@@ -52,7 +52,7 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 
 Requirements:
 - The [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) library must be [installed](https://zenoh.io/docs/getting-started/installation/) on your host.
-  - You need to select the zenoh-c version that corresponds to the zenoh-cs version (for example, zenoh-c V1.2.1).
+  - You need to select the zenoh-c version that corresponds to the zenoh-cs version (for example, zenoh-c V1.3.3).
   - Compatible with zenoh compiled [library](https://github.com/eclipse-zenoh/zenoh-c/releases).
   - If you build zenoh-c yourself, you will need to use the **UNSTABLE_API**, **SHARED_MEMORY** compilation options.
   
@@ -70,7 +70,7 @@ dotnet build Zenoh.csproj -c Release
 ```
 
 ### Download the library using Nuget
-(todo)
+Links to https://www.nuget.org/packages/Zenoh-CS/
 
 
 -------------------------------

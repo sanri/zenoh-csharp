@@ -930,6 +930,8 @@ namespace Zenoh
     public sealed class Id
     {
         public delegate void Cb(Id id);
+        internal static ZenohC.Cb2 CbCall = _Call;
+        internal static ZenohC.Cb1 CbDrop = _Drop;
 
         private byte[] _data;
 
@@ -967,7 +969,7 @@ namespace Zenoh
             return b;
         }
 
-        internal static void CallbackClosureIdCall(IntPtr id, IntPtr context)
+        private static void _Call(IntPtr id, IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             if (!(gcHandle.Target is Cb callback)) return;
@@ -976,7 +978,7 @@ namespace Zenoh
             callback(new Id(zid));
         }
 
-        internal static void CallbackClosureIdDrop(IntPtr context)
+        private static void _Drop(IntPtr context)
         {
             var gcHandle = GCHandle.FromIntPtr(context);
             gcHandle.Free();

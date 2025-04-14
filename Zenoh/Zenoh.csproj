@@ -2,7 +2,7 @@
     <PropertyGroup>
         <AssemblyName>Zenoh</AssemblyName>
         <PackageId>Zenoh-CS</PackageId>
-        <Version>0.2.1</Version>
+        <Version>0.2.2</Version>
         <Authors>sanri</Authors>
         <PackageLicenseExpression>EPL-2.0 OR Apache-2.0</PackageLicenseExpression>
         <Description>Zenoh: Zero Overhead Pub/sub, Store/Query and Compute.</Description>
@@ -14,7 +14,7 @@
         <OutputType>Library</OutputType>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>8</LangVersion>
-        <PackageVersion>0.2.1</PackageVersion>
+        <PackageVersion>0.2.2</PackageVersion>
         <PackageTags>zenoh</PackageTags>
         <TargetFramework>netstandard2.0</TargetFramework>
         <Configurations>Release;Debug</Configurations>
