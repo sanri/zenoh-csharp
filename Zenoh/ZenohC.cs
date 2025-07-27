@@ -90,7 +90,14 @@ namespace Zenoh
         /// <summary>
         /// Messages are dropped in case of congestion.
         /// </summary>
-        Drop = 1
+        Drop = 1,
+        
+#if UNSTABLE_API
+        /// <summary>
+        /// Messages except the first one are dropped in case of congestion.
+        /// </summary>
+        BlockFirst = 2,
+#endif
     }
 
     // zenoh_commons.h
@@ -471,15 +478,13 @@ namespace Zenoh
 #endif
     }
 
-#if UNSTABLE_API
     // zenoh_opaque.h
     // zc_owned_concurrent_close_handle_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZcOwnedConcurrentCloseHandle
     {
-        private fixed byte data[8];
+        private fixed byte data[16];
     }
-#endif
 
     // zenoh_opaque.h
     // z_owned_hello_t
@@ -619,7 +624,6 @@ namespace Zenoh
         internal IntPtr drop;
     }
 
-#if UNSTABLE_API
     // zenoh_opaque.h
     // z_owned_source_info_t
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -627,7 +631,6 @@ namespace Zenoh
     {
         private fixed byte data[32];
     }
-#endif
 
     // zenoh_opaque.h
     // z_id_t
@@ -717,7 +720,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedConfig
     {
-        private fixed byte data[1912];
+        private fixed byte data[1960];
     }
 
     // zenoh_opaque.h
@@ -785,7 +788,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedQueryable
     {
-        private fixed byte data[16];
+        private fixed byte data[48];
     }
 
     // zenoh_opaque.h
@@ -905,7 +908,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedTask
     {
-        private fixed byte data[24];
+        private fixed byte data[32];
     }
 
     // zenoh_commons.h
