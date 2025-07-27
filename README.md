@@ -36,6 +36,7 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 |    v0.7.2-rc    |  v0.1.*  |
 |     v1.3.0      |  v0.2.0  |
 | v1.3.2 ~ v1.3.3 |  v0.2.2  |
+|     v1.5.0      |  v0.3.0  |
 
 ### Development and test environment composition
 | OS           | CPU | .NET implementation  | Notes |
@@ -52,7 +53,7 @@ Reference Links [netstandard2.0](https://learn.microsoft.com/en-us/dotnet/standa
 
 Requirements:
 - The [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) library must be [installed](https://zenoh.io/docs/getting-started/installation/) on your host.
-  - You need to select the zenoh-c version that corresponds to the zenoh-cs version (for example, zenoh-c V1.3.3).
+  - You need to select the zenoh-c version that corresponds to the zenoh-cs version (for example, zenoh-c V1.5.0).
   - Compatible with zenoh compiled [library](https://github.com/eclipse-zenoh/zenoh-c/releases).
   - If you build zenoh-c yourself, you will need to use the **UNSTABLE_API**, **SHARED_MEMORY** compilation options.
   

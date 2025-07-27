@@ -12,6 +12,7 @@
     timeout_ms: { router: -1, peer: -1, client: 0 },
     endpoints: [
        "tcp/127.0.0.1:7447"
+//      "tcp/172.30.10.2:7447"
     ],
     exit_on_failure: { router: false, peer: false, client: true },
   },
