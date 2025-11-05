@@ -1,0 +1,103 @@
+﻿# need to install nushell (https://www.nushell.sh/)
+set shell := ["nu", "-c"]
+
+# load .env file 
+set dotenv-load 
+
+default:
+    @just --list --unsorted
+
+
+# =================================================================================================
+
+run_z_bytes:
+    dotnet run --project ZBytes/ZBytes.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" 
+        
+run_z_delete:
+    dotnet run --project ZDelete/ZDelete.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_get:
+    dotnet run --project ZGet/ZGet.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_get_liveliness:
+    dotnet run --project ZGetLiveliness/ZGetLiveliness.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+
+run_z_info:
+    dotnet run --project ZInfo/ZInfo.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_pub:
+    dotnet run --project ZPub/ZPub.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_pull:
+    dotnet run --project ZPull/ZPull.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_put:
+    dotnet run --project ZPut/ZPut.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_querier:
+    dotnet run --project ZQuerier/ZQuerier.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+
+run_z_queryable:
+    dotnet run --project ZQueryable/ZQueryable.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_queryable_with_channels:
+    dotnet run --project ZQueryableWithChannels/ZQueryableWithChannels.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_sub:
+    dotnet run --project ZSub/ZSub.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
+run_z_sub_liveliness:
+    dotnet run --project ZSubLiveliness/ZSubLiveliness.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+
+# =================================================================================================
+zenohc_lib_dir := env_var('ZENOHC_LIB_DIR')

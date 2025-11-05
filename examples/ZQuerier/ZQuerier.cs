@@ -33,7 +33,7 @@ namespace ZQuerier
 
             var options = new QuerierOptions();
 
-            Console.WriteLine($"Querying Querier on {keyStr}");
+            Console.WriteLine($"Querying querier on {keyStr}");
             r = session.DeclareQuerier(keyexpr, options, out Querier? querier);
             if (querier is null)
             {
