@@ -521,7 +521,7 @@ namespace Zenoh
             Handle = p;
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
@@ -632,7 +632,7 @@ namespace Zenoh
             Handle = p;
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);

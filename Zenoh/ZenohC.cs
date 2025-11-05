@@ -44,7 +44,7 @@ namespace Zenoh
         /// IO error.
         ErrorIo = -3,
 
-        ///  Network error.
+        /// Network error.
         ErrorNetwork = -4,
 
         /// Null
@@ -72,29 +72,29 @@ namespace Zenoh
         ErrorInvalidArgumentMutex = -22,
 
         /// 
-        ErrorGeneric = -128,
+        ErrorGeneric = -128
     }
 
     // zenoh_commons.h
     // z_congestion_control_t
     /// <summary>
-    /// Congestion control
+    ///     Congestion control
     /// </summary>
     public enum CongestionControl : uint
     {
         /// <summary>
-        /// Messages are not dropped in case of congestion.
+        ///     Messages are not dropped in case of congestion.
         /// </summary>
         Block = 0,
 
         /// <summary>
-        /// Messages are dropped in case of congestion.
+        ///     Messages are dropped in case of congestion.
         /// </summary>
         Drop = 1,
-        
+
 #if UNSTABLE_API
         /// <summary>
-        /// Messages except the first one are dropped in case of congestion.
+        ///     Messages except the first one are dropped in case of congestion.
         /// </summary>
         BlockFirst = 2,
 #endif
@@ -103,17 +103,17 @@ namespace Zenoh
     // zenoh_commons.h
     // z_sample_kind_t
     /// <summary>
-    /// Sample kind.
+    ///     Sample kind.
     /// </summary>
     public enum SampleKind : uint
     {
         /// <summary>
-        /// The Sample was issued by a "put" operation.
+        ///     The Sample was issued by a "put" operation.
         /// </summary>
         Put = 0,
 
         /// <summary>
-        ///  The Sample was issued by a "delete" operation.
+        ///     The Sample was issued by a "delete" operation.
         /// </summary>
         Delete = 1
     }
@@ -121,42 +121,42 @@ namespace Zenoh
     // zenoh_commons.h
     // z_priority_t
     /// <summary>
-    /// The priority of zenoh messages.
+    ///     The priority of zenoh messages.
     /// </summary>
     public enum Priority : uint
     {
         /// <summary>
-        /// Priority for "RealTime" messages.
+        ///     Priority for "RealTime" messages.
         /// </summary>
         RealTime = 1,
 
         /// <summary>
-        /// Highest priority for "Interactive" messages.
+        ///     Highest priority for "Interactive" messages.
         /// </summary>
         InteractiveHigh = 2,
 
         /// <summary>
-        /// Lowest priority for "Interactive" messages.
+        ///     Lowest priority for "Interactive" messages.
         /// </summary>
         InteractiveLow = 3,
 
         /// <summary>
-        /// Highest priority for "Data" messages.
+        ///     Highest priority for "Data" messages.
         /// </summary>
         DataHigh = 4,
 
         /// <summary>
-        /// Default priority for "Data" messages.
+        ///     Default priority for "Data" messages.
         /// </summary>
         Data = 5,
 
         /// <summary>
-        /// Lowest priority for "Data" messages.
+        ///     Lowest priority for "Data" messages.
         /// </summary>
         DataLow = 6,
 
         /// <summary>
-        /// Priority for "Background traffic" messages.
+        ///     Priority for "Background traffic" messages.
         /// </summary>
         Background = 7
     }
@@ -164,35 +164,36 @@ namespace Zenoh
     // zenoh_commons.h
     // z_consolidation_mode_t
     /// <summary>
-    /// Consolidation mode values.
+    ///     Consolidation mode values.
     /// </summary>
     public enum ConsolidationMode
     {
         /// <summary>
-        /// Let Zenoh decide the best consolidation mode depending on the query selector.
-        /// If the selector contains time range properties, consolidation mode "None" is used.
-        /// Otherwise the "Latest" consolidation mode is used.
+        ///     Let Zenoh decide the best consolidation mode depending on the query selector.
+        ///     If the selector contains time range properties, consolidation mode "None" is used.
+        ///     Otherwise the "Latest" consolidation mode is used.
         /// </summary>
         Auto = -1,
 
         /// <summary>
-        /// No consolidation is applied. Replies may come in any order and any number.
+        ///     No consolidation is applied. Replies may come in any order and any number.
         /// </summary>
         None = 0,
 
         /// <summary>
-        /// <para>
-        /// It guarantees that any reply for a given key expression will be monotonic in time  w.r.t. the previous received replies for the same key expression. 
-        /// </para>
-        /// <para>
-        /// I.e., for the same key expression multiple replies may be received.
-        /// It is guaranteed that two replies received at t1 and t2 will have timestamp ts2 > ts1. It optimizes latency.
-        /// </para>
+        ///     <para>
+        ///         It guarantees that any reply for a given key expression will be monotonic in time  w.r.t. the previous received
+        ///         replies for the same key expression.
+        ///     </para>
+        ///     <para>
+        ///         I.e., for the same key expression multiple replies may be received.
+        ///         It is guaranteed that two replies received at t1 and t2 will have timestamp ts2 > ts1. It optimizes latency.
+        ///     </para>
         /// </summary>
         Monotonic = 1,
 
         /// <summary>
-        /// It guarantees unicity of replies for the same key expression. It optimizes bandwidth.
+        ///     It guarantees unicity of replies for the same key expression. It optimizes bandwidth.
         /// </summary>
         Latest = 2
     }
@@ -201,7 +202,7 @@ namespace Zenoh
     // zenoh_commons.h
     // z_keyexpr_intersection_level_t
     /// <summary>
-    /// Intersection level of 2 key expressions.
+    ///     Intersection level of 2 key expressions.
     /// </summary>
     public enum KeyexprIntersectionLevel : uint
     {
@@ -215,7 +216,7 @@ namespace Zenoh
         Includes = 2,
 
         /// 2 key expressions are equal.
-        Equals = 3,
+        Equals = 3
     }
 #endif
 
@@ -223,21 +224,22 @@ namespace Zenoh
     // zenoh_commons.h
     // z_reliability_t
     /// <summary>
-    /// <para>The publisher reliability.</para>
-    /// <para>
-    /// Currently, "reliability" does not trigger any data retransmission on the wire.
-    /// It is rather used as a marker on the wire and it may be used to select the best link available (e.g. TCP for reliable data and UDP for best effort data).
-    /// </para>
+    ///     <para>The publisher reliability.</para>
+    ///     <para>
+    ///         Currently, "reliability" does not trigger any data retransmission on the wire.
+    ///         It is rather used as a marker on the wire and it may be used to select the best link available (e.g. TCP for
+    ///         reliable data and UDP for best effort data).
+    ///     </para>
     /// </summary>
     public enum Reliability : uint
     {
         /// <summary>
-        /// Best effort.
+        ///     Best effort.
         /// </summary>
         BestEffort = 0,
 
         /// <summary>
-        /// Reliable.
+        ///     Reliable.
         /// </summary>
         Reliable = 1
     }
@@ -246,22 +248,22 @@ namespace Zenoh
     // zenoh_commons.h
     // z_query_target_t 
     /// <summary>
-    /// The Queryables that should be target of a "session.Get()".
+    ///     The Queryables that should be target of a "session.Get()".
     /// </summary>
     public enum QueryTarget : uint
     {
         /// <summary>
-        /// The nearest complete queryable if any else all matching queryables.
+        ///     The nearest complete queryable if any else all matching queryables.
         /// </summary>
         BestMatching = 0,
 
         /// <summary>
-        /// All matching queryables.
+        ///     All matching queryables.
         /// </summary>
         All = 1,
 
         /// <summary>
-        /// All complete queryables.
+        ///     All complete queryables.
         /// </summary>
         AllComplete = 2
     }
@@ -271,60 +273,60 @@ namespace Zenoh
     public enum What : uint
     {
         /// <summary>
-        /// Router node.
+        ///     Router node.
         /// </summary>
         Router = 1,
 
         /// <summary>
-        /// Peer node.
+        ///     Peer node.
         /// </summary>
         Peer = 2,
 
         /// <summary>
-        /// Client node.
+        ///     Client node.
         /// </summary>
         Client = 4,
 
         /// <summary>
-        /// Router and peer node.
+        ///     Router and peer node.
         /// </summary>
         RouterPeer = 1 | 2,
 
         /// <summary>
-        /// Router and client node.
+        ///     Router and client node.
         /// </summary>
         RouterClient = 1 | 4,
 
         /// <summary>
-        /// Peer and client node.
+        ///     Peer and client node.
         /// </summary>
         PeerClient = 2 | 4,
 
         /// <summary>
-        /// Router, peer and client node.
+        ///     Router, peer and client node.
         /// </summary>
-        RouterPeerClient = 1 | 2 | 4,
+        RouterPeerClient = 1 | 2 | 4
     }
 
     // zenoh_commons.h
     // z_whatami_t
     /// <summary>
-    /// What am I.
+    ///     What am I.
     /// </summary>
     public enum Whatami : uint
     {
         /// <summary>
-        /// Router
+        ///     Router
         /// </summary>
         Router = 1,
 
         /// <summary>
-        /// Peer
+        ///     Peer
         /// </summary>
         Peer = 2,
 
         /// <summary>
-        /// Client
+        ///     Client
         /// </summary>
         Client = 4
     }
@@ -332,69 +334,69 @@ namespace Zenoh
     // zenoh_commons.h
     // zc_locality_t
     /// <summary>
-    /// The locality of samples to be received by subscribers or targeted by publishers.
+    ///     The locality of samples to be received by subscribers or targeted by publishers.
     /// </summary>
     public enum Locality : uint
     {
         /// <summary>
-        /// Any
+        ///     Any
         /// </summary>
         Any = 0,
 
         /// <summary>
-        /// Only from local sessions.
+        ///     Only from local sessions.
         /// </summary>
         Local = 1,
 
         /// <summary>
-        /// Only from remote sessions.
+        ///     Only from remote sessions.
         /// </summary>
-        Remote = 2,
+        Remote = 2
     }
 
     // zenoh_commons.h
     // zc_log_severity_t
     /// <summary>
-    /// Severity level of Zenoh log message.
+    ///     Severity level of Zenoh log message.
     /// </summary>
     public enum LogSeverity : uint
     {
         /// <summary>
-        /// The `trace` level.
-        /// Designates very low priority, often extremely verbose, information.
+        ///     The `trace` level.
+        ///     Designates very low priority, often extremely verbose, information.
         /// </summary>
         Trace = 0,
 
         /// <summary>
-        /// The "debug" level.
-        /// Designates lower priority information.
+        ///     The "debug" level.
+        ///     Designates lower priority information.
         /// </summary>
         Debug = 1,
 
         /// <summary>
-        /// The "info" level.
-        /// Designates useful information.
+        ///     The "info" level.
+        ///     Designates useful information.
         /// </summary>
         Info = 2,
 
         /// <summary>
-        /// The "warn" level.
-        /// Designates hazardous situations.
+        ///     The "warn" level.
+        ///     Designates hazardous situations.
         /// </summary>
         Warn = 3,
 
         /// <summary>
-        /// The "error" level.
-        /// Designates very serious errors.
+        ///     The "error" level.
+        ///     Designates very serious errors.
         /// </summary>
-        Error = 4,
+        Error = 4
     }
 
 #if UNSTABLE_API
     // zenoh_commons.h
     // zc_reply_keyexpr_t
     /// <summary>
-    /// Key expressions types to which Queryable should reply to.
+    ///     Key expressions types to which Queryable should reply to.
     /// </summary>
     public enum ReplyKeyexpr : uint
     {
@@ -402,7 +404,7 @@ namespace Zenoh
         Any = 0,
 
         /// Replies only to queries with intersecting key expressions.
-        MatchingQuery = 1,
+        MatchingQuery = 1
     }
 #endif
 
@@ -642,10 +644,7 @@ namespace Zenoh
         internal byte[] GetId()
         {
             var o = new byte[16];
-            for (var i = 0; i < 16; i++)
-            {
-                o[i] = id[i];
-            }
+            for (var i = 0; i < 16; i++) o[i] = id[i];
 
             return o;
         }
@@ -667,10 +666,10 @@ namespace Zenoh
 
     // zenoh_opaque.h
     // z_owned_condvar_t
-    [StructLayout(LayoutKind.Sequential, Pack = 8)]
+    [StructLayout(LayoutKind.Sequential, Pack = 4)]
     internal unsafe struct ZOwnedCondvar
     {
-        private fixed byte data[24];
+        private fixed byte data[8];
     }
 
     // zenoh_opaque.h
@@ -706,7 +705,7 @@ namespace Zenoh
     internal struct ZCloseOptions
     {
 #if UNSTABLE_API
-        uint timeout_ms;
+        private uint timeout_ms;
 
         // zc_owned_concurrent_close_handle_t*
         private IntPtr out_concurrent;
@@ -720,7 +719,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedConfig
     {
-        private fixed byte data[1960];
+        private fixed byte data[1984];
     }
 
     // zenoh_opaque.h
@@ -773,7 +772,6 @@ namespace Zenoh
 #endif
     }
 
-#if UNSTABLE_API
     // zenoh_opaque.h
     // z_owned_querier_t
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
@@ -781,7 +779,6 @@ namespace Zenoh
     {
         private fixed byte data[80];
     }
-#endif
 
     // zenoh_opaque.h
     // z_owned_queryable_t
@@ -868,7 +865,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedMutex
     {
-        private fixed byte data[32];
+        private fixed byte data[24];
     }
 
     // zenoh_opaque.h
@@ -948,8 +945,8 @@ namespace Zenoh
         [MarshalAs(UnmanagedType.U1)] internal bool is_express;
 #if UNSTABLE_API
         internal Reliability reliability;
-        internal Locality allowed_destination;
 #endif
+        internal Locality allowed_destination;
     }
 
     // zenoh_commons.h
@@ -987,10 +984,7 @@ namespace Zenoh
     internal struct ZQueryableOptions
     {
         [MarshalAs(UnmanagedType.U1)] internal bool complete;
-
-#if UNSTABLE_API
         internal Locality allowed_origin;
-#endif
     }
 
     // zenoh_commons.h
@@ -998,11 +992,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     internal struct ZSubscriberOptions
     {
-#if UNSTABLE_API
         internal Locality allowed_origin;
-#else
-        internal byte dummy;
-#endif
     }
 
     // zenoh_commons.h
@@ -1021,8 +1011,8 @@ namespace Zenoh
 
 #if UNSTABLE_API
         internal Reliability reliability;
-        internal Locality allowed_destination;
 #endif
+        internal Locality allowed_destination;
     }
 
     // zenoh_commons.h
@@ -1033,7 +1023,6 @@ namespace Zenoh
         internal ConsolidationMode mode;
     }
 
-#if UNSTABLE_API
     // zenoh_commons.h
     // z_querier_options_t
     [StructLayout(LayoutKind.Sequential)]
@@ -1044,13 +1033,13 @@ namespace Zenoh
         internal CongestionControl congestion_control;
         internal bool is_express;
         internal Locality allowed_destination;
+#if UNSTABLE_API
         internal ReplyKeyexpr accept_replies;
+#endif
         internal Priority priority;
         internal ulong timeout_ms;
     }
-#endif
 
-#if UNSTABLE_API
     // zenoh_commons.h
     // z_querier_get_options_t
     [StructLayout(LayoutKind.Sequential)]
@@ -1062,13 +1051,14 @@ namespace Zenoh
         // z_moved_encoding_t* 
         internal IntPtr encoding;
 
+#if UNSTABLE_API
         // z_moved_source_info_t*
         internal IntPtr source_info;
+#endif
 
         // z_moved_bytes_t*
         internal IntPtr attachment;
     }
-#endif
 
     // zenoh_commons.h
     // z_get_options_t 
@@ -1089,8 +1079,9 @@ namespace Zenoh
 
         [MarshalAs(UnmanagedType.U1)] internal bool is_express;
 
-#if UNSTABLE_API
         internal Locality allowed_destination;
+
+#if UNSTABLE_API
         internal ReplyKeyexpr accept_replies;
 #endif
 
@@ -1126,9 +1117,11 @@ namespace Zenoh
 
 #if UNSTABLE_API
         internal Reliability reliability;
+#endif
 
         internal Locality allowed_destination;
 
+#if UNSTABLE_API
         // z_moved_source_info_t*
         internal IntPtr source_info;
 #endif
@@ -1241,10 +1234,6 @@ namespace Zenoh
 
     internal static class ZenohC
     {
-        internal delegate void Cb2(IntPtr data, IntPtr context);
-
-        internal delegate void Cb1(IntPtr context);
-
         internal const string DllName = "zenohc";
         internal static uint Router = 1;
         internal static uint Peer = 2;
@@ -1264,7 +1253,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// enum z_reliability_t
         /// z_reliability_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_reliability_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1273,8 +1262,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_clone(
-        ///      struct z_owned_bytes_t *dst,
-        ///      const struct z_loaned_bytes_t *this_
+        /// struct z_owned_bytes_t *dst,
+        /// const struct z_loaned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1282,9 +1271,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_copy_from_buf(
-        ///      struct z_owned_bytes_t *this_,
-        ///      const uint8_t *data,
-        ///      size_t len
+        /// struct z_owned_bytes_t *this_,
+        /// const uint8_t *data,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_copy_from_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1292,8 +1281,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_copy_from_slice(
-        ///      struct z_owned_bytes_t *this_,
-        ///      const struct z_loaned_slice_t *slice
+        /// struct z_owned_bytes_t *this_,
+        /// const struct z_loaned_slice_t *slice
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_copy_from_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1301,8 +1290,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_copy_from_str(
-        ///     struct z_owned_bytes_t *this_,
-        ///     const char *str
+        /// struct z_owned_bytes_t *this_,
+        /// const char *str
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_copy_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1311,8 +1300,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_copy_from_string(
-        ///     struct z_owned_bytes_t *this_,
-        ///     const struct z_loaned_string_t *str
+        /// struct z_owned_bytes_t *this_,
+        /// const struct z_loaned_string_t *str
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_copy_from_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1320,7 +1309,7 @@ namespace Zenoh
 
         /// void
         /// z_bytes_drop(
-        ///     struct z_moved_bytes_t *this_
+        /// struct z_moved_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1328,7 +1317,7 @@ namespace Zenoh
 
         /// void
         /// z_bytes_empty(
-        ///     struct z_owned_bytes_t *this_
+        /// struct z_owned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1336,11 +1325,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_from_buf(
-        ///     struct z_owned_bytes_t *this_,
-        ///     uint8_t *data,
-        ///     size_t len,
-        ///     void (*deleter)(void *data, void *context),
-        ///     void *context
+        /// struct z_owned_bytes_t *this_,
+        /// uint8_t *data,
+        /// size_t len,
+        /// void (*deleter)(void *data, void *context),
+        /// void *context
         /// );
         [DllImport(DllName, EntryPoint = "z_bytes_from_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1349,8 +1338,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_from_slice(
-        ///     struct z_owned_bytes_t *this_,
-        ///     struct z_moved_slice_t *slice
+        /// struct z_owned_bytes_t *this_,
+        /// struct z_moved_slice_t *slice
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_from_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1370,8 +1359,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_from_string(
-        ///     struct z_owned_bytes_t *this_,
-        ///     struct z_moved_string_t *s
+        /// struct z_owned_bytes_t *this_,
+        /// struct z_moved_string_t *s
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_from_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1379,7 +1368,7 @@ namespace Zenoh
 
         /// bool
         /// z_bytes_is_empty(
-        ///     const struct z_loaned_bytes_t *this_
+        /// const struct z_loaned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1388,7 +1377,7 @@ namespace Zenoh
 
         /// size_t
         /// z_bytes_len(
-        ///     const struct z_loaned_bytes_t *this_
+        /// const struct z_loaned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_len", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1396,7 +1385,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_bytes_loan(
-        ///     const struct z_owned_bytes_t *this_
+        /// const struct z_owned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1404,7 +1393,7 @@ namespace Zenoh
 
         /// struct z_loaned_bytes_t*
         /// z_bytes_loan_mut(
-        ///     struct z_owned_bytes_t *this_
+        /// struct z_owned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1412,7 +1401,7 @@ namespace Zenoh
 
         /// struct z_bytes_reader_t
         /// z_bytes_get_reader(
-        ///     const struct z_loaned_bytes_t *data
+        /// const struct z_loaned_bytes_t *data
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_get_reader", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1420,7 +1409,7 @@ namespace Zenoh
 
         /// struct z_bytes_slice_iterator_t
         /// z_bytes_get_slice_iterator(
-        ///     const struct z_loaned_bytes_t *this_
+        /// const struct z_loaned_bytes_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_get_slice_iterator", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1428,9 +1417,9 @@ namespace Zenoh
 
         /// size_t
         /// z_bytes_reader_read(
-        ///     struct z_bytes_reader_t *this_,
-        ///     uint8_t *dst,
-        ///     size_t len
+        /// struct z_bytes_reader_t *this_,
+        /// uint8_t *dst,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_read", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1438,7 +1427,7 @@ namespace Zenoh
 
         /// size_t
         /// z_bytes_reader_remaining(
-        ///     const struct z_bytes_reader_t *this_
+        /// const struct z_bytes_reader_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_remaining", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1446,9 +1435,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_reader_seek(
-        ///     struct z_bytes_reader_t *this_,
-        ///     int64_t offset,
-        ///     int origin
+        /// struct z_bytes_reader_t *this_,
+        /// int64_t offset,
+        /// int origin
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_seek", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1456,7 +1445,7 @@ namespace Zenoh
 
         /// int64_t
         /// z_bytes_reader_tell(
-        ///     struct z_bytes_reader_t *this_
+        /// struct z_bytes_reader_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_reader_tell", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1464,8 +1453,8 @@ namespace Zenoh
 
         /// bool
         /// z_bytes_slice_iterator_next(
-        ///     struct z_bytes_slice_iterator_t *this_,
-        ///     struct z_view_slice_t *slice
+        /// struct z_bytes_slice_iterator_t *this_,
+        /// struct z_view_slice_t *slice
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_slice_iterator_next", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1474,8 +1463,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_to_slice(
-        ///     const struct z_loaned_bytes_t *this_,
-        ///     struct z_owned_slice_t *dst
+        /// const struct z_loaned_bytes_t *this_,
+        /// struct z_owned_slice_t *dst
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_to_slice", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1483,8 +1472,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_to_string(
-        ///     const struct z_loaned_bytes_t *this_,
-        ///     struct z_owned_string_t *dst
+        /// const struct z_loaned_bytes_t *this_,
+        /// struct z_owned_string_t *dst
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_to_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1492,8 +1481,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_writer_append(
-        ///     struct z_loaned_bytes_writer_t *this_,
-        ///     struct z_moved_bytes_t *bytes
+        /// struct z_loaned_bytes_writer_t *this_,
+        /// struct z_moved_bytes_t *bytes
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_append", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1501,7 +1490,7 @@ namespace Zenoh
 
         /// void
         /// z_bytes_writer_drop(
-        ///     struct z_moved_bytes_writer_t *this_
+        /// struct z_moved_bytes_writer_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1509,7 +1498,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_writer_empty(
-        ///     struct z_owned_bytes_writer_t *this_
+        /// struct z_owned_bytes_writer_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1517,8 +1506,8 @@ namespace Zenoh
 
         /// void
         /// z_bytes_writer_finish(
-        ///     struct z_moved_bytes_writer_t *this_,
-        ///     struct z_owned_bytes_t *bytes
+        /// struct z_moved_bytes_writer_t *this_,
+        /// struct z_owned_bytes_t *bytes
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_finish", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1526,7 +1515,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_writer_t*
         /// z_bytes_writer_loan(
-        ///     const struct z_owned_bytes_writer_t *this_
+        /// const struct z_owned_bytes_writer_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1534,7 +1523,7 @@ namespace Zenoh
 
         /// struct z_loaned_bytes_writer_t*
         /// z_bytes_writer_loan_mut(
-        ///     struct z_owned_bytes_writer_t *this_
+        /// struct z_owned_bytes_writer_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1542,9 +1531,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_bytes_writer_write_all(
-        ///     struct z_loaned_bytes_writer_t *this_,
-        ///     const uint8_t *src,
-        ///     size_t len
+        /// struct z_loaned_bytes_writer_t *this_,
+        /// const uint8_t *src,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_bytes_writer_write_all", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1575,10 +1564,10 @@ namespace Zenoh
 
         /// void
         /// z_closure_hello(
-        ///     struct z_owned_closure_hello_t *this_,
-        ///     void (*call)(struct z_loaned_hello_t *hello, void *context),
-        ///     void (*drop)(void *context),
-        ///     void *context
+        /// struct z_owned_closure_hello_t *this_,
+        /// void (*call)(struct z_loaned_hello_t *hello, void *context),
+        /// void (*drop)(void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_hello", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1590,7 +1579,7 @@ namespace Zenoh
 
         /// void
         /// z_closure_hello_drop(
-        ///     struct z_moved_closure_hello_t *this_
+        /// struct z_moved_closure_hello_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_hello_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1607,15 +1596,15 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_closure_matching_status(
-        ///     struct z_owned_closure_matching_status_t *this_,
-        ///     void (*call)(
-        ///         const struct z_matching_status_t *matching_status,
-        ///         void *context
-        ///     ),
-        ///     void (*drop)(
-        ///         void *context
-        ///     ),
-        ///     void *context
+        /// struct z_owned_closure_matching_status_t *this_,
+        /// void (*call)(
+        /// const struct z_matching_status_t *matching_status,
+        /// void *context
+        /// ),
+        /// void (*drop)(
+        /// void *context
+        /// ),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_matching_status", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1625,8 +1614,8 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_closure_matching_status_call(
-        ///     const struct z_loaned_closure_matching_status_t *closure,
-        ///     const struct z_matching_status_t *mathing_status
+        /// const struct z_loaned_closure_matching_status_t *closure,
+        /// const struct z_matching_status_t *mathing_status
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_matching_status_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1636,7 +1625,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_closure_matching_status_drop(
-        ///     struct z_moved_closure_matching_status_t *closure_
+        /// struct z_moved_closure_matching_status_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_matching_status_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1646,7 +1635,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// const struct z_loaned_closure_matching_status_t*
         /// z_closure_matching_status_loan(
-        ///     const struct z_owned_closure_matching_status_t *closure
+        /// const struct z_owned_closure_matching_status_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_matching_status_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1655,10 +1644,10 @@ namespace Zenoh
 
         /// void
         /// z_closure_query(
-        ///     struct z_owned_closure_query_t *this_,
-        ///     void (*call)(struct z_loaned_query_t *query, void *context),
-        ///     void (*drop)(void *context),
-        ///     void *context
+        /// struct z_owned_closure_query_t *this_,
+        /// void (*call)(struct z_loaned_query_t *query, void *context),
+        /// void (*drop)(void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_query", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1666,8 +1655,8 @@ namespace Zenoh
 
         /// void
         /// z_closure_query_call(
-        ///     const struct z_loaned_closure_query_t *closure,
-        ///     struct z_loaned_query_t *query
+        /// const struct z_loaned_closure_query_t *closure,
+        /// struct z_loaned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_query_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1675,7 +1664,7 @@ namespace Zenoh
 
         /// void
         /// z_closure_query_drop(
-        ///     struct z_moved_closure_query_t *closure_
+        /// struct z_moved_closure_query_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_query_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1683,7 +1672,7 @@ namespace Zenoh
 
         /// const struct z_loaned_closure_query_t*
         /// z_closure_query_loan(
-        ///     const struct z_owned_closure_query_t *closure
+        /// const struct z_owned_closure_query_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_query_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1691,7 +1680,7 @@ namespace Zenoh
 
         /// struct z_loaned_closure_query_t*
         /// z_closure_query_loan_mut(
-        ///     struct z_owned_closure_query_t *closure
+        /// struct z_owned_closure_query_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_query_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1699,10 +1688,10 @@ namespace Zenoh
 
         /// void
         /// z_closure_reply(
-        ///     struct z_owned_closure_reply_t *this_,
-        ///     void (*call)(struct z_loaned_reply_t *reply, void *context),
-        ///     void (*drop)(void *context),
-        ///     void *context
+        /// struct z_owned_closure_reply_t *this_,
+        /// void (*call)(struct z_loaned_reply_t *reply, void *context),
+        /// void (*drop)(void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_reply", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1710,8 +1699,8 @@ namespace Zenoh
 
         /// void
         /// z_closure_reply_call(
-        ///     const struct z_loaned_closure_reply_t *closure,
-        ///     struct z_loaned_reply_t *reply
+        /// const struct z_loaned_closure_reply_t *closure,
+        /// struct z_loaned_reply_t *reply
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_reply_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1719,7 +1708,7 @@ namespace Zenoh
 
         /// void
         /// z_closure_reply_drop(
-        ///     struct z_moved_closure_reply_t *closure_
+        /// struct z_moved_closure_reply_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_reply_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1727,7 +1716,7 @@ namespace Zenoh
 
         /// const struct z_loaned_closure_reply_t*
         /// z_closure_reply_loan(
-        ///     const struct z_owned_closure_reply_t *closure
+        /// const struct z_owned_closure_reply_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_reply_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1735,7 +1724,7 @@ namespace Zenoh
 
         /// struct z_loaned_closure_reply_t*
         /// z_closure_reply_loan_mut(
-        ///     struct z_owned_closure_reply_t *closure
+        /// struct z_owned_closure_reply_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_reply_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1743,10 +1732,10 @@ namespace Zenoh
 
         /// void
         /// z_closure_sample(
-        ///     struct z_owned_closure_sample_t *this_,
-        ///     void (*call)(struct z_loaned_sample_t *sample, void *context),
-        ///     void (*drop)(void *context),
-        ///     void *context
+        /// struct z_owned_closure_sample_t *this_,
+        /// void (*call)(struct z_loaned_sample_t *sample, void *context),
+        /// void (*drop)(void *context),
+        /// void *context
         /// );
         [DllImport(DllName, EntryPoint = "z_closure_sample", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1754,8 +1743,8 @@ namespace Zenoh
 
         /// void
         /// z_closure_sample_call(
-        ///     const struct z_loaned_closure_sample_t *closure,
-        ///     struct z_loaned_sample_t *sample
+        /// const struct z_loaned_closure_sample_t *closure,
+        /// struct z_loaned_sample_t *sample
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_sample_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1763,7 +1752,7 @@ namespace Zenoh
 
         /// void
         /// z_closure_sample_drop(
-        ///     struct z_moved_closure_sample_t *closure_
+        /// struct z_moved_closure_sample_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_sample_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1771,7 +1760,7 @@ namespace Zenoh
 
         /// const struct z_loaned_closure_sample_t*
         /// z_closure_sample_loan(
-        ///     const struct z_owned_closure_sample_t *closure
+        /// const struct z_owned_closure_sample_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_sample_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1779,7 +1768,7 @@ namespace Zenoh
 
         /// struct z_loaned_closure_sample_t*
         /// z_closure_sample_loan_mut(
-        ///     struct z_owned_closure_sample_t *closure
+        /// struct z_owned_closure_sample_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_sample_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1787,10 +1776,10 @@ namespace Zenoh
 
         /// void
         /// z_closure_zid(
-        ///     struct z_owned_closure_zid_t *this_,
-        ///     void (*call)(const struct z_id_t *z_id, void *context),
-        ///     void (*drop)(void *context),
-        ///     void *context
+        /// struct z_owned_closure_zid_t *this_,
+        /// void (*call)(const struct z_id_t *z_id, void *context),
+        /// void (*drop)(void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1798,8 +1787,8 @@ namespace Zenoh
 
         /// void
         /// z_closure_zid_call(
-        ///     const struct z_loaned_closure_zid_t *closure,
-        ///     const struct z_id_t *z_id
+        /// const struct z_loaned_closure_zid_t *closure,
+        /// const struct z_id_t *z_id
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_zid_call", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1807,7 +1796,7 @@ namespace Zenoh
 
         /// void
         /// z_closure_zid_drop(
-        ///     struct z_moved_closure_zid_t *closure_
+        /// struct z_moved_closure_zid_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_zid_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1815,7 +1804,7 @@ namespace Zenoh
 
         /// const struct z_loaned_closure_zid_t*
         /// z_closure_zid_loan(
-        ///     const struct z_owned_closure_zid_t *closure
+        /// const struct z_owned_closure_zid_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_zid_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1823,7 +1812,7 @@ namespace Zenoh
 
         /// const struct z_loaned_closure_zid_t*
         /// z_closure_zid_loan_mut(
-        ///     const struct z_owned_closure_zid_t *closure
+        /// const struct z_owned_closure_zid_t *closure
         /// )
         [DllImport(DllName, EntryPoint = "z_closure_zid_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1831,7 +1820,7 @@ namespace Zenoh
 
         /// void
         /// z_condvar_drop(
-        ///     struct z_moved_condvar_t *this_
+        /// struct z_moved_condvar_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_condvar_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1859,8 +1848,8 @@ namespace Zenoh
 
         /// void
         /// z_config_clone(
-        ///     struct z_owned_config_t *dst,
-        ///     const struct z_loaned_config_t *this_
+        /// struct z_owned_config_t *dst,
+        /// const struct z_loaned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_config_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1868,7 +1857,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_config_default(
-        ///     struct z_owned_config_t *this_
+        /// struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_config_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1877,7 +1866,7 @@ namespace Zenoh
 
         /// void
         /// z_config_drop(
-        ///     struct z_moved_config_t *this_
+        /// struct z_moved_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_config_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1885,7 +1874,7 @@ namespace Zenoh
 
         /// const struct z_loaned_config_t*
         /// z_config_loan(
-        ///     const struct z_owned_config_t *this_
+        /// const struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_config_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1893,7 +1882,7 @@ namespace Zenoh
 
         /// struct z_loaned_config_t*
         /// z_config_loan_mut(
-        ///     struct z_owned_config_t *this_
+        /// struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_config_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1909,10 +1898,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_declare_publisher(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_publisher_t *publisher,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_publisher_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_publisher_t *publisher,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_publisher_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_declare_publisher", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1921,11 +1910,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_declare_queryable(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_queryable_t *queryable,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_closure_query_t *callback,
-        ///     struct z_queryable_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_queryable_t *queryable,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_closure_query_t *callback,
+        /// struct z_queryable_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_declare_queryable", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1935,11 +1924,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_declare_subscriber(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_subscriber_t *subscriber,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_closure_sample_t *callback,
-        ///     struct z_subscriber_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_subscriber_t *subscriber,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_closure_sample_t *callback,
+        /// struct z_subscriber_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_declare_subscriber", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1950,10 +1939,10 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_declare_querier(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_querier_t *querier,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_querier_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_querier_t *querier,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_querier_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_declare_querier", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1962,9 +1951,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_delete(
-        ///     const struct z_loaned_session_t *session,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_delete_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_delete_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_delete", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1972,7 +1961,7 @@ namespace Zenoh
 
         /// void
         /// z_delete_options_default(
-        ///     struct z_delete_options_t *this_
+        /// struct z_delete_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_delete_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1980,7 +1969,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_cbor(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_cbor", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1988,7 +1977,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_cdr(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_cdr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -1996,7 +1985,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_coap_payload(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_coap_payload",
             CallingConvention = CallingConvention.Cdecl,
@@ -2005,7 +1994,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_java_serialized_object(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_java_serialized_object",
             CallingConvention = CallingConvention.Cdecl,
@@ -2014,7 +2003,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_json(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_json", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2022,7 +2011,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_json_patch_json(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_json_patch_json",
             CallingConvention = CallingConvention.Cdecl,
@@ -2031,7 +2020,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_json_seq(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_json_seq", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2039,7 +2028,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_jsonpath(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_jsonpath", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2047,7 +2036,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_jwt(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_jwt", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2055,7 +2044,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_mp4(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_mp4", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2063,7 +2052,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_octet_stream(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_octet_stream",
             CallingConvention = CallingConvention.Cdecl,
@@ -2072,7 +2061,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_openmetrics_text(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_openmetrics_text",
             CallingConvention = CallingConvention.Cdecl,
@@ -2081,7 +2070,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_protobuf(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_protobuf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2089,7 +2078,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_python_serialized_object(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_python_serialized_object",
             CallingConvention = CallingConvention.Cdecl,
@@ -2098,7 +2087,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_soap_xml(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_soap_xml", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2106,7 +2095,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_sql(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_sql", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2114,7 +2103,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_x_www_form_urlencoded(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_x_www_form_urlencoded",
             CallingConvention = CallingConvention.Cdecl,
@@ -2123,7 +2112,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_xml(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_xml", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2131,7 +2120,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_yaml(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_yaml", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2139,7 +2128,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_application_yang(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_application_yang", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2147,7 +2136,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_audio_aac(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_audio_aac", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2155,7 +2144,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_audio_flac(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_audio_flac", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2163,7 +2152,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_audio_mp4(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_audio_mp4", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2171,7 +2160,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_audio_ogg(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_audio_ogg", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2179,7 +2168,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_audio_vorbis(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_audio_vorbis", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2187,7 +2176,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_image_bmp(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_image_bmp", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2195,7 +2184,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_image_gif(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_image_gif", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2203,7 +2192,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_image_jpeg(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_image_jpeg", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2211,7 +2200,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_image_png(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_image_png", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2219,7 +2208,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_image_webp(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_image_webp", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2227,7 +2216,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_css(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_css", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2235,7 +2224,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_csv(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_csv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2243,7 +2232,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_html(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_html", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2251,7 +2240,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_javascript(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_javascript", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2259,7 +2248,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_json(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_json", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2267,7 +2256,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_json5(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_json5", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2275,7 +2264,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_markdown(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_markdown", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2283,7 +2272,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_plain(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_plain", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2291,7 +2280,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_xml(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_xml", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2299,7 +2288,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_text_yaml(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_text_yaml", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2307,7 +2296,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_h261(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_h261", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2315,7 +2304,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_h263(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_h263", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2323,7 +2312,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_h264(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_h264", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2331,7 +2320,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_h265(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_h265", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2339,7 +2328,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_h266(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_h266", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2347,7 +2336,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_mp4(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_mp4", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2355,7 +2344,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_ogg(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_ogg", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2363,7 +2352,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_video_raw(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_raw", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2371,7 +2360,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t *
         /// z_encoding_video_vp8(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_vp8", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2379,7 +2368,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t *
         /// z_encoding_video_vp9(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_video_vp9", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2387,7 +2376,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_zenoh_bytes(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_zenoh_bytes", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2395,7 +2384,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_zenoh_serialized(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_zenoh_serialized", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2403,7 +2392,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_zenoh_string(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_zenoh_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2411,8 +2400,8 @@ namespace Zenoh
 
         /// void
         /// z_encoding_clone(
-        ///     struct z_owned_encoding_t *dst,
-        ///     const struct z_loaned_encoding_t *this_
+        /// struct z_owned_encoding_t *dst,
+        /// const struct z_loaned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2420,7 +2409,7 @@ namespace Zenoh
 
         /// void
         /// z_encoding_drop(
-        ///     struct z_moved_encoding_t *this_
+        /// struct z_moved_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2428,8 +2417,8 @@ namespace Zenoh
 
         /// bool
         /// z_encoding_equals(
-        ///     const struct z_loaned_encoding_t *this_,
-        ///     const struct z_loaned_encoding_t *other
+        /// const struct z_loaned_encoding_t *this_,
+        /// const struct z_loaned_encoding_t *other
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_equals", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2446,7 +2435,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_loan_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_loan_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2454,7 +2443,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_encoding_loan(
-        ///     const struct z_owned_encoding_t *this_
+        /// const struct z_owned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2462,7 +2451,7 @@ namespace Zenoh
 
         /// struct z_loaned_encoding_t*
         /// z_encoding_loan_mut(
-        ///     struct z_owned_encoding_t *this_
+        /// struct z_owned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2470,8 +2459,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_encoding_set_schema_from_str(
-        ///     struct z_loaned_encoding_t *this_,
-        ///     const char *s
+        /// struct z_loaned_encoding_t *this_,
+        /// const char *s
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_set_schema_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2479,9 +2468,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_encoding_set_schema_from_substr(
-        ///     struct z_loaned_encoding_t *this_,
-        ///     const char *s,
-        ///     size_t len
+        /// struct z_loaned_encoding_t *this_,
+        /// const char *s,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_set_schema_from_substr",
             CallingConvention = CallingConvention.Cdecl,
@@ -2490,8 +2479,8 @@ namespace Zenoh
 
         /// void
         /// z_encoding_to_string(
-        ///     const struct z_loaned_encoding_t *this_,
-        ///     struct z_owned_string_t *out_str
+        /// const struct z_loaned_encoding_t *this_,
+        /// struct z_owned_string_t *out_str
         /// )
         [DllImport(DllName, EntryPoint = "z_encoding_to_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2500,7 +2489,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// uint32_t 
         /// z_entity_global_id_eid(
-        ///     const struct z_entity_global_id_t *this_
+        /// const struct z_entity_global_id_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_entity_global_id_eid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2510,7 +2499,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_id_t 
         /// z_entity_global_id_zid(
-        ///     const struct z_entity_global_id_t *this_
+        /// const struct z_entity_global_id_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_entity_global_id_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2520,9 +2509,9 @@ namespace Zenoh
 
         /// void
         /// z_fifo_channel_query_new(
-        ///     struct z_owned_closure_query_t *callback,
-        ///     struct z_owned_fifo_handler_query_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_query_t *callback,
+        /// struct z_owned_fifo_handler_query_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_channel_query_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2530,7 +2519,7 @@ namespace Zenoh
 
         /// void
         /// z_fifo_handler_query_drop(
-        ///     struct z_moved_fifo_handler_query_t *this_
+        /// struct z_moved_fifo_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_query_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2538,7 +2527,7 @@ namespace Zenoh
 
         /// const struct z_loaned_fifo_handler_query_t*
         /// z_fifo_handler_query_loan(
-        ///     const struct z_owned_fifo_handler_query_t *this_
+        /// const struct z_owned_fifo_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_query_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2546,8 +2535,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_query_recv(
-        ///     const struct z_loaned_fifo_handler_query_t *this_,
-        ///     struct z_owned_query_t *query
+        /// const struct z_loaned_fifo_handler_query_t *this_,
+        /// struct z_owned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_query_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2555,8 +2544,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_query_try_recv(
-        ///     const struct z_loaned_fifo_handler_query_t *this_,
-        ///     struct z_owned_query_t *query
+        /// const struct z_loaned_fifo_handler_query_t *this_,
+        /// struct z_owned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_query_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2564,9 +2553,9 @@ namespace Zenoh
 
         /// void
         /// z_fifo_channel_reply_new(
-        ///     struct z_owned_closure_reply_t *callback,
-        ///     struct z_owned_fifo_handler_reply_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_reply_t *callback,
+        /// struct z_owned_fifo_handler_reply_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_channel_reply_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2574,7 +2563,7 @@ namespace Zenoh
 
         /// void
         /// z_fifo_handler_reply_drop(
-        ///     struct z_moved_fifo_handler_reply_t *this_
+        /// struct z_moved_fifo_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_reply_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2582,7 +2571,7 @@ namespace Zenoh
 
         /// const struct z_loaned_fifo_handler_reply_t*
         /// z_fifo_handler_reply_loan(
-        ///     const struct z_owned_fifo_handler_reply_t *this_
+        /// const struct z_owned_fifo_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_reply_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2590,8 +2579,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_reply_recv(
-        ///     const struct z_loaned_fifo_handler_reply_t *this_,
-        ///     struct z_owned_reply_t *reply
+        /// const struct z_loaned_fifo_handler_reply_t *this_,
+        /// struct z_owned_reply_t *reply
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_reply_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2599,8 +2588,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_reply_try_recv(
-        ///     const struct z_loaned_fifo_handler_reply_t *this_,
-        ///     struct z_owned_reply_t *reply
+        /// const struct z_loaned_fifo_handler_reply_t *this_,
+        /// struct z_owned_reply_t *reply
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_reply_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2608,9 +2597,9 @@ namespace Zenoh
 
         /// void
         /// z_fifo_channel_sample_new(
-        ///     struct z_owned_closure_sample_t *callback,
-        ///     struct z_owned_fifo_handler_sample_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_sample_t *callback,
+        /// struct z_owned_fifo_handler_sample_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_channel_sample_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2618,7 +2607,7 @@ namespace Zenoh
 
         /// void
         /// z_fifo_handler_sample_drop(
-        ///     struct z_moved_fifo_handler_sample_t *this_
+        /// struct z_moved_fifo_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_sample_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2626,7 +2615,7 @@ namespace Zenoh
 
         /// const struct z_loaned_fifo_handler_sample_t*
         /// z_fifo_handler_sample_loan(
-        ///     const struct z_owned_fifo_handler_sample_t *this_
+        /// const struct z_owned_fifo_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_sample_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2634,8 +2623,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_sample_recv(
-        ///     const struct z_loaned_fifo_handler_sample_t *this_,
-        ///     struct z_owned_sample_t *sample
+        /// const struct z_loaned_fifo_handler_sample_t *this_,
+        /// struct z_owned_sample_t *sample
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_sample_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2643,8 +2632,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_fifo_handler_sample_try_recv(
-        ///     const struct z_loaned_fifo_handler_sample_t *this_,
-        ///     struct z_owned_sample_t *sample
+        /// const struct z_loaned_fifo_handler_sample_t *this_,
+        /// struct z_owned_sample_t *sample
         /// )
         [DllImport(DllName, EntryPoint = "z_fifo_handler_sample_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2652,11 +2641,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_get(
-        ///     const struct z_loaned_session_t *session,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     const char *parameters,
-        ///     struct z_moved_closure_reply_t *callback,
-        ///     struct z_get_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// const char *parameters,
+        /// struct z_moved_closure_reply_t *callback,
+        /// struct z_get_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_get", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
         internal static extern Result z_get(
@@ -2669,7 +2658,7 @@ namespace Zenoh
 
         /// void
         /// z_get_options_default(
-        ///     struct z_get_options_t *this_
+        /// struct z_get_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_get_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2681,7 +2670,7 @@ namespace Zenoh
 
         /// void
         /// z_hello_drop(
-        ///     struct z_moved_hello_t *this_
+        /// struct z_moved_hello_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_hello_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2705,8 +2694,8 @@ namespace Zenoh
 
         /// void
         /// z_id_to_string(
-        ///     const struct z_id_t *zid,
-        ///     struct z_owned_string_t *dst
+        /// const struct z_id_t *zid,
+        /// struct z_owned_string_t *dst
         /// )
         [DllImport(DllName, EntryPoint = "z_id_to_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2714,8 +2703,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_info_peers_zid(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_moved_closure_zid_t *callback
+        /// const struct z_loaned_session_t *session,
+        /// struct z_moved_closure_zid_t *callback
         /// )
         [DllImport(DllName, EntryPoint = "z_info_peers_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2723,8 +2712,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_info_routers_zid(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_moved_closure_zid_t *callback
+        /// const struct z_loaned_session_t *session,
+        /// struct z_moved_closure_zid_t *callback
         /// )
         [DllImport(DllName, EntryPoint = "z_info_routers_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2732,7 +2721,7 @@ namespace Zenoh
 
         /// struct z_id_t
         /// z_info_zid(
-        ///     const struct z_loaned_session_t *session
+        /// const struct z_loaned_session_t *session
         /// )
         [DllImport(DllName, EntryPoint = "z_info_zid", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2768,7 +2757,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool
         /// z_internal_closure_matching_status_check(
-        ///     const struct z_owned_closure_matching_status_t *this_
+        /// const struct z_owned_closure_matching_status_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_closure_matching_status_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2780,7 +2769,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_internal_closure_matching_status_null(
-        ///     struct z_owned_closure_matching_status_t *this_
+        /// struct z_owned_closure_matching_status_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_closure_matching_status_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -2835,7 +2824,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_config_check(
-        ///     const struct z_owned_config_t *this_
+        /// const struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_config_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2844,7 +2833,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_config_null(
-        ///     struct z_owned_config_t *this_
+        /// struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_config_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2852,7 +2841,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_encoding_check(
-        ///     const struct z_owned_encoding_t *this_
+        /// const struct z_owned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_encoding_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2861,7 +2850,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_encoding_null(
-        ///     struct z_owned_encoding_t *this_
+        /// struct z_owned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_encoding_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2869,7 +2858,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_fifo_handler_query_check(
-        ///     const struct z_owned_fifo_handler_query_t *this_
+        /// const struct z_owned_fifo_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fifo_handler_query_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2879,7 +2868,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_fifo_handler_query_null(
-        ///     struct z_owned_fifo_handler_query_t *this_
+        /// struct z_owned_fifo_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fifo_handler_query_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -2888,7 +2877,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_fifo_handler_reply_check(
-        ///     const struct z_owned_fifo_handler_reply_t *this_
+        /// const struct z_owned_fifo_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fifo_handler_reply_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2898,7 +2887,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_fifo_handler_reply_null(
-        ///     struct z_owned_fifo_handler_reply_t *this_
+        /// struct z_owned_fifo_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fifo_handler_reply_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -2907,7 +2896,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_fifo_handler_sample_check(
-        ///     const struct z_owned_fifo_handler_sample_t *this_
+        /// const struct z_owned_fifo_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fi/fo_handler_sample_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2917,7 +2906,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_fifo_handler_sample_null(
-        ///     struct z_owned_fifo_handler_sample_t *this_
+        /// struct z_owned_fifo_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_fifo_handler_sample_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -2935,7 +2924,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_keyexpr_check(
-        ///     const struct z_owned_keyexpr_t *this_
+        /// const struct z_owned_keyexpr_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_keyexpr_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2944,7 +2933,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_keyexpr_null(
-        ///     struct z_owned_keyexpr_t *this_
+        /// struct z_owned_keyexpr_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_keyexpr_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -2952,7 +2941,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_liveliness_token_check(
-        ///     const struct z_owned_liveliness_token_t *this_
+        /// const struct z_owned_liveliness_token_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_liveliness_token_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2962,7 +2951,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_liveliness_token_null(
-        ///     struct z_owned_liveliness_token_t *this_
+        /// struct z_owned_liveliness_token_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_liveliness_token_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -2972,7 +2961,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool 
         /// z_internal_matching_listener_check(
-        ///     const struct z_owned_matching_listener_t *this_
+        /// const struct z_owned_matching_listener_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_matching_listener_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -2984,7 +2973,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void  
         /// z_internal_matching_listener_null(
-        ///     struct z_owned_matching_listener_t *this_
+        /// struct z_owned_matching_listener_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_matching_listener_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -3004,7 +2993,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool
         /// z_internal_querier_check(
-        ///     const struct z_owned_querier_t *this_
+        /// const struct z_owned_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_querier_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3015,7 +3004,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_internal_querier_null(
-        ///     struct z_owned_querier_t *this_
+        /// struct z_owned_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_querier_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3024,7 +3013,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_publisher_check(
-        ///     const struct z_owned_publisher_t *this_
+        /// const struct z_owned_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_publisher_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3033,7 +3022,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_publisher_null(
-        ///     struct z_owned_publisher_t *this_
+        /// struct z_owned_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_publisher_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3041,7 +3030,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_query_check(
-        ///     const struct z_owned_query_t *query
+        /// const struct z_owned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_query_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3050,7 +3039,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_query_null(
-        ///     struct z_owned_query_t *this_
+        /// struct z_owned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_query_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3058,7 +3047,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_queryable_check(
-        ///     const struct z_owned_queryable_t *this_
+        /// const struct z_owned_queryable_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_queryable_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3067,7 +3056,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_queryable_null(
-        ///     struct z_owned_queryable_t *this_
+        /// struct z_owned_queryable_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_queryable_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3075,7 +3064,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_reply_check(
-        ///     const struct z_owned_reply_t *this_
+        /// const struct z_owned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_reply_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3084,7 +3073,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_reply_null(
-        ///     struct z_owned_reply_t *this_
+        /// struct z_owned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_reply_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3092,7 +3081,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_reply_err_check(
-        ///     const struct z_owned_reply_err_t *this_
+        /// const struct z_owned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_reply_err_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3101,7 +3090,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_reply_err_null(
-        ///     struct z_owned_reply_err_t *this_
+        /// struct z_owned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_reply_err_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3109,7 +3098,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_ring_handler_query_check(
-        ///     const struct z_owned_ring_handler_query_t *this_
+        /// const struct z_owned_ring_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_query_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -3119,7 +3108,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_ring_handler_query_null(
-        ///     struct z_owned_ring_handler_query_t *this_
+        /// struct z_owned_ring_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_query_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -3128,7 +3117,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_ring_handler_reply_check(
-        ///     const struct z_owned_ring_handler_reply_t *this_
+        /// const struct z_owned_ring_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_reply_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -3138,7 +3127,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_ring_handler_reply_null(
-        ///     struct z_owned_ring_handler_reply_t *this_
+        /// struct z_owned_ring_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_reply_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -3147,7 +3136,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_ring_handler_sample_check(
-        ///     const struct z_owned_ring_handler_sample_t *this_
+        /// const struct z_owned_ring_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_sample_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -3157,7 +3146,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_ring_handler_sample_null(
-        ///     struct z_owned_ring_handler_sample_t *this_
+        /// struct z_owned_ring_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_ring_handler_sample_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -3166,7 +3155,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_sample_check(
-        ///     const struct z_owned_sample_t *this_
+        /// const struct z_owned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_sample_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3175,7 +3164,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_sample_null(
-        ///     struct z_owned_sample_t *this_
+        /// struct z_owned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_sample_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3183,7 +3172,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_session_check(
-        ///     const struct z_owned_session_t *this_
+        /// const struct z_owned_session_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_session_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3192,7 +3181,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_session_null(
-        ///     struct z_owned_session_t *this_
+        /// struct z_owned_session_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_session_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3210,7 +3199,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool
         /// z_internal_source_info_check(
-        ///     const struct z_owned_source_info_t *this_
+        /// const struct z_owned_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_source_info_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3221,7 +3210,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_internal_source_info_null(
-        ///     struct z_owned_source_info_t *this_
+        /// struct z_owned_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_source_info_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3249,7 +3238,7 @@ namespace Zenoh
 
         /// bool
         /// z_internal_subscriber_check(
-        ///     const struct z_owned_subscriber_t *this_
+        /// const struct z_owned_subscriber_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_subscriber_check", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3258,7 +3247,7 @@ namespace Zenoh
 
         /// void
         /// z_internal_subscriber_null(
-        ///     struct z_owned_subscriber_t *this_
+        /// struct z_owned_subscriber_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_internal_subscriber_null", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3275,8 +3264,8 @@ namespace Zenoh
 
         /// void
         /// z_keyexpr_as_view_string(
-        ///     const struct z_loaned_keyexpr_t *this_,
-        ///     struct z_view_string_t *out_string
+        /// const struct z_loaned_keyexpr_t *this_,
+        /// struct z_view_string_t *out_string
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_as_view_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3284,8 +3273,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_canonize(
-        ///     char *start,
-        ///     size_t *len
+        /// char *start,
+        /// size_t *len
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_canonize", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3293,7 +3282,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_canonize_null_terminated(
-        ///     char *start
+        /// char *start
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_canonize_null_terminated",
             CallingConvention = CallingConvention.Cdecl,
@@ -3302,8 +3291,8 @@ namespace Zenoh
 
         /// void
         /// z_keyexpr_clone(
-        ///     struct z_owned_keyexpr_t *dst,
-        ///     const struct z_loaned_keyexpr_t *this_
+        /// struct z_owned_keyexpr_t *dst,
+        /// const struct z_loaned_keyexpr_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3311,10 +3300,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_concat(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const char *right_start,
-        ///     size_t right_len
+        /// struct z_owned_keyexpr_t *this_,
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const char *right_start,
+        /// size_t right_len
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_concat", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3323,7 +3312,7 @@ namespace Zenoh
 
         /// void
         /// z_keyexpr_drop(
-        ///     struct z_moved_keyexpr_t *this_
+        /// struct z_moved_keyexpr_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3331,8 +3320,8 @@ namespace Zenoh
 
         /// bool
         /// z_keyexpr_equals(
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const struct z_loaned_keyexpr_t *right
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const struct z_loaned_keyexpr_t *right
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_equals", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3341,8 +3330,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_from_str(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const char *expr
+        /// struct z_owned_keyexpr_t *this_,
+        /// const char *expr
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3350,8 +3339,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_from_str_autocanonize(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const char *expr
+        /// struct z_owned_keyexpr_t *this_,
+        /// const char *expr
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_from_str_autocanonize", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3360,9 +3349,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_from_substr(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const char *expr,
-        ///     size_t len
+        /// struct z_owned_keyexpr_t *this_,
+        /// const char *expr,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3370,9 +3359,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_from_substr_autocanonize(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const char *start,
-        ///     size_t *len
+        /// struct z_owned_keyexpr_t *this_,
+        /// const char *start,
+        /// size_t *len
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_from_substr_autocanonize",
             CallingConvention = CallingConvention.Cdecl,
@@ -3381,8 +3370,8 @@ namespace Zenoh
 
         /// bool
         /// z_keyexpr_includes(
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const struct z_loaned_keyexpr_t *right
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const struct z_loaned_keyexpr_t *right
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_includes", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3391,8 +3380,8 @@ namespace Zenoh
 
         /// bool
         /// z_keyexpr_intersects(
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const struct z_loaned_keyexpr_t *right
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const struct z_loaned_keyexpr_t *right
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_intersects", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3401,8 +3390,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_is_canon(
-        ///     const char *start,
-        ///     size_t len
+        /// const char *start,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_is_canon", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3410,9 +3399,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_keyexpr_join(
-        ///     struct z_owned_keyexpr_t *this_,
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const struct z_loaned_keyexpr_t *right
+        /// struct z_owned_keyexpr_t *this_,
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const struct z_loaned_keyexpr_t *right
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_join", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3420,7 +3409,7 @@ namespace Zenoh
 
         /// const struct z_loaned_keyexpr_t*
         /// z_keyexpr_loan(
-        ///     const struct z_owned_keyexpr_t *this_
+        /// const struct z_owned_keyexpr_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3429,8 +3418,8 @@ namespace Zenoh
 #if UNSTABLE_API
         /// enum z_keyexpr_intersection_level_t
         /// z_keyexpr_relation_to(
-        ///     const struct z_loaned_keyexpr_t *left,
-        ///     const struct z_loaned_keyexpr_t *right
+        /// const struct z_loaned_keyexpr_t *left,
+        /// const struct z_loaned_keyexpr_t *right
         /// )
         [DllImport(DllName, EntryPoint = "z_keyexpr_relation_to", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3439,11 +3428,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_liveliness_declare_subscriber(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_subscriber_t *subscriber,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_closure_sample_t *callback,
-        ///     struct z_liveliness_subscriber_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_subscriber_t *subscriber,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_closure_sample_t *callback,
+        /// struct z_liveliness_subscriber_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_declare_subscriber", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3452,10 +3441,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_liveliness_declare_token(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_owned_liveliness_token_t *token,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     const struct z_liveliness_token_options_t *_options
+        /// const struct z_loaned_session_t *session,
+        /// struct z_owned_liveliness_token_t *token,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// const struct z_liveliness_token_options_t *_options
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_declare_token", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3464,10 +3453,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_liveliness_get(
-        ///     const struct z_loaned_session_t *session,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_closure_reply_t *callback,
-        ///     struct z_liveliness_get_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_closure_reply_t *callback,
+        /// struct z_liveliness_get_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_get", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3475,7 +3464,7 @@ namespace Zenoh
 
         /// void
         /// z_liveliness_get_options_default(
-        ///     struct z_liveliness_get_options_t *this_
+        /// struct z_liveliness_get_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_get_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3484,7 +3473,7 @@ namespace Zenoh
 
         /// void
         /// z_liveliness_subscriber_options_default(
-        ///     struct z_liveliness_subscriber_options_t *this_
+        /// struct z_liveliness_subscriber_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_subscriber_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3493,7 +3482,7 @@ namespace Zenoh
 
         /// void
         /// z_liveliness_token_drop(
-        ///     struct z_moved_liveliness_token_t *this_
+        /// struct z_moved_liveliness_token_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3501,7 +3490,7 @@ namespace Zenoh
 
         /// const struct z_loaned_liveliness_token_t*
         /// z_liveliness_token_loan(
-        ///     const struct z_owned_liveliness_token_t *this_
+        /// const struct z_owned_liveliness_token_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3509,7 +3498,7 @@ namespace Zenoh
 
         /// void
         /// z_liveliness_token_options_default(
-        ///     struct z_liveliness_token_options_t *this_
+        /// struct z_liveliness_token_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_token_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3518,7 +3507,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_liveliness_undeclare_token(
-        ///     struct z_moved_liveliness_token_t *this_
+        /// struct z_moved_liveliness_token_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_liveliness_undeclare_token", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3527,7 +3516,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void 
         /// z_matching_listener_drop(
-        ///     struct z_moved_matching_listener_t *this_
+        /// struct z_moved_matching_listener_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_matching_listener_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3536,7 +3525,7 @@ namespace Zenoh
 
         /// void
         /// z_mutex_drop(
-        ///     struct z_moved_mutex_t *this_
+        /// struct z_moved_mutex_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_mutex_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3564,9 +3553,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_open(
-        ///     struct z_owned_session_t *this_,
-        ///     struct z_moved_config_t *config,
-        ///     const struct z_open_options_t *_options
+        /// struct z_owned_session_t *this_,
+        /// struct z_moved_config_t *config,
+        /// const struct z_open_options_t *_options
         /// )
         [DllImport(DllName, EntryPoint = "z_open", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3575,7 +3564,7 @@ namespace Zenoh
 
         /// void
         /// z_open_options_default(
-        ///     struct z_open_options_t *this_
+        /// struct z_open_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_open_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3588,9 +3577,9 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_publisher_declare_matching_listener(
-        ///     const struct z_loaned_publisher_t *publisher,
-        ///     struct z_owned_matching_listener_t *matching_listener,
-        ///     struct z_moved_closure_matching_status_t *callback
+        /// const struct z_loaned_publisher_t *publisher,
+        /// struct z_owned_matching_listener_t *matching_listener,
+        /// struct z_moved_closure_matching_status_t *callback
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_declare_matching_listener",
             CallingConvention = CallingConvention.Cdecl,
@@ -3601,8 +3590,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_publisher_delete(
-        ///     const struct z_loaned_publisher_t *publisher,
-        ///     struct z_publisher_delete_options_t *options
+        /// const struct z_loaned_publisher_t *publisher,
+        /// struct z_publisher_delete_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_delete", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3610,7 +3599,7 @@ namespace Zenoh
 
         /// void
         /// z_publisher_delete_options_default(
-        ///     struct z_publisher_delete_options_t *this_
+        /// struct z_publisher_delete_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_delete_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3619,7 +3608,7 @@ namespace Zenoh
 
         /// void
         /// z_publisher_drop(
-        ///     struct z_moved_publisher_t *this_
+        /// struct z_moved_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3629,8 +3618,8 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_publisher_get_matching_status(
-        ///     const struct z_loaned_publisher_t *this_,
-        ///     struct z_matching_status_t *matching_status
+        /// const struct z_loaned_publisher_t *this_,
+        /// struct z_matching_status_t *matching_status
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_get_matching_status", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3640,7 +3629,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// struct z_entity_global_id_t
         /// z_publisher_id(
-        ///     const struct z_loaned_publisher_t *publisher
+        /// const struct z_loaned_publisher_t *publisher
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3649,7 +3638,7 @@ namespace Zenoh
 
         /// const struct z_loaned_keyexpr_t*
         /// z_publisher_keyexpr(
-        ///     const struct z_loaned_publisher_t *publisher
+        /// const struct z_loaned_publisher_t *publisher
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3657,7 +3646,7 @@ namespace Zenoh
 
         /// const struct z_loaned_publisher_t*
         /// z_publisher_loan(
-        ///     const struct z_owned_publisher_t *this_
+        /// const struct z_owned_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3665,7 +3654,7 @@ namespace Zenoh
 
         /// struct z_loaned_publisher_t*
         /// z_publisher_loan_mut(
-        ///     struct z_owned_publisher_t *this_
+        /// struct z_owned_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3673,7 +3662,7 @@ namespace Zenoh
 
         /// void
         /// z_publisher_options_default(
-        ///     struct z_publisher_options_t *this_
+        /// struct z_publisher_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3681,9 +3670,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_publisher_put(
-        ///     const struct z_loaned_publisher_t *this_,
-        ///     struct z_moved_bytes_t *payload,
-        ///     struct z_publisher_put_options_t *options
+        /// const struct z_loaned_publisher_t *this_,
+        /// struct z_moved_bytes_t *payload,
+        /// struct z_publisher_put_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_put", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3691,7 +3680,7 @@ namespace Zenoh
 
         /// void
         /// z_publisher_put_options_default(
-        ///     struct z_publisher_put_options_t *this_
+        /// struct z_publisher_put_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_publisher_put_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3699,10 +3688,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_put(
-        ///     const struct z_loaned_session_t *session,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_bytes_t *payload,
-        ///     struct z_put_options_t *options
+        /// const struct z_loaned_session_t *session,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_bytes_t *payload,
+        /// struct z_put_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_put", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3711,7 +3700,7 @@ namespace Zenoh
 
         /// void
         /// z_put_options_default(
-        ///     struct z_put_options_t *this_
+        /// struct z_put_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_put_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3720,7 +3709,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_querier_drop(
-        ///     struct z_moved_querier_t *this_
+        /// struct z_moved_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3730,10 +3719,10 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_querier_get(
-        ///     const struct z_loaned_querier_t *querier,
-        ///     const char *parameters,
-        ///     struct z_moved_closure_reply_t *callback,
-        ///     struct z_querier_get_options_t *options
+        /// const struct z_loaned_querier_t *querier,
+        /// const char *parameters,
+        /// struct z_moved_closure_reply_t *callback,
+        /// struct z_querier_get_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_get", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3743,7 +3732,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_querier_get_options_default(
-        ///     struct z_querier_get_options_t *this_
+        /// struct z_querier_get_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_get_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3753,7 +3742,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// const struct z_loaned_keyexpr_t*
         /// z_querier_keyexpr(
-        ///     const struct z_loaned_querier_t *querier
+        /// const struct z_loaned_querier_t *querier
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3763,7 +3752,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// const struct z_loaned_querier_t*
         /// z_querier_loan(
-        ///     const struct z_owned_querier_t *this_
+        /// const struct z_owned_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3773,7 +3762,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// struct z_loaned_querier_t*
         /// z_querier_loan_mut(
-        ///     struct z_owned_querier_t *this_
+        /// struct z_owned_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3783,7 +3772,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_querier_options_default(
-        ///     struct z_querier_options_t *this_
+        /// struct z_querier_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_querier_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3792,7 +3781,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_query_attachment(
-        ///     const struct z_loaned_query_t *this_
+        /// const struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_attachment", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3800,7 +3789,7 @@ namespace Zenoh
 
         /// struct z_loaned_bytes_t*
         /// z_query_attachment_mut(
-        ///     struct z_loaned_query_t *this_
+        /// struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_attachment_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3808,8 +3797,8 @@ namespace Zenoh
 
         /// void
         /// z_query_clone(
-        ///     struct z_owned_query_t *dst,
-        ///     const struct z_loaned_query_t *this_
+        /// struct z_owned_query_t *dst,
+        /// const struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3817,7 +3806,7 @@ namespace Zenoh
 
         /// struct z_query_consolidation_t
         /// z_query_consolidation_auto(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_consolidation_auto", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3825,7 +3814,7 @@ namespace Zenoh
 
         /// struct z_query_consolidation_t
         /// z_query_consolidation_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_consolidation_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3833,7 +3822,7 @@ namespace Zenoh
 
         /// struct z_query_consolidation_t
         /// z_query_consolidation_latest(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_consolidation_latest", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3841,7 +3830,7 @@ namespace Zenoh
 
         /// struct z_query_consolidation_t
         /// z_query_consolidation_monotonic(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_consolidation_monotonic", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3849,7 +3838,7 @@ namespace Zenoh
 
         /// struct z_query_consolidation_t
         /// z_query_consolidation_none(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_consolidation_none", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3857,7 +3846,7 @@ namespace Zenoh
 
         /// void
         /// z_query_drop(
-        ///     struct z_moved_query_t *this_
+        /// struct z_moved_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3865,7 +3854,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_query_encoding(
-        ///     const struct z_loaned_query_t *this_
+        /// const struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_encoding", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3873,7 +3862,7 @@ namespace Zenoh
 
         /// const struct z_loaned_keyexpr_t*
         /// z_query_keyexpr(
-        ///     const struct z_loaned_query_t *this_
+        /// const struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3881,7 +3870,7 @@ namespace Zenoh
 
         /// const struct z_loaned_query_t*
         /// z_query_loan(
-        ///     const struct z_owned_query_t *this_
+        /// const struct z_owned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3889,7 +3878,7 @@ namespace Zenoh
 
         /// struct z_loaned_query_t*
         /// z_query_loan_mut(
-        ///     struct z_owned_query_t *this_
+        /// struct z_owned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3897,8 +3886,8 @@ namespace Zenoh
 
         /// void
         /// z_query_parameters(
-        ///     const struct z_loaned_query_t *this_,
-        ///     struct z_view_string_t *parameters
+        /// const struct z_loaned_query_t *this_,
+        /// struct z_view_string_t *parameters
         /// )
         [DllImport(DllName, EntryPoint = "z_query_parameters", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3906,7 +3895,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_query_payload(
-        ///     const struct z_loaned_query_t *this_
+        /// const struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_payload", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3914,7 +3903,7 @@ namespace Zenoh
 
         /// struct z_loaned_bytes_t*
         /// z_query_payload_mut(
-        ///     struct z_loaned_query_t *this_
+        /// struct z_loaned_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_payload_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3922,10 +3911,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_query_reply(
-        ///     const struct z_loaned_query_t *this_,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_moved_bytes_t *payload,
-        ///     struct z_query_reply_options_t *options
+        /// const struct z_loaned_query_t *this_,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_moved_bytes_t *payload,
+        /// struct z_query_reply_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3933,9 +3922,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_query_reply_del(
-        ///     const struct z_loaned_query_t *this_,
-        ///     const struct z_loaned_keyexpr_t *key_expr,
-        ///     struct z_query_reply_del_options_t *options
+        /// const struct z_loaned_query_t *this_,
+        /// const struct z_loaned_keyexpr_t *key_expr,
+        /// struct z_query_reply_del_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply_del", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3943,7 +3932,7 @@ namespace Zenoh
 
         /// void
         /// z_query_reply_del_options_default(
-        ///     struct z_query_reply_del_options_t *this_
+        /// struct z_query_reply_del_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply_del_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3952,9 +3941,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_query_reply_err(
-        ///     const struct z_loaned_query_t *this_,
-        ///     struct z_moved_bytes_t *payload,
-        ///     struct z_query_reply_err_options_t *options
+        /// const struct z_loaned_query_t *this_,
+        /// struct z_moved_bytes_t *payload,
+        /// struct z_query_reply_err_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply_err", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3962,7 +3951,7 @@ namespace Zenoh
 
         /// void
         /// z_query_reply_err_options_default(
-        ///     struct z_query_reply_err_options_t *this_
+        /// struct z_query_reply_err_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply_err_options_default",
             CallingConvention = CallingConvention.Cdecl,
@@ -3971,7 +3960,7 @@ namespace Zenoh
 
         /// void
         /// z_query_reply_options_default(
-        ///     struct z_query_reply_options_t *this_
+        /// struct z_query_reply_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_query_reply_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3979,7 +3968,7 @@ namespace Zenoh
 
         /// enum z_query_target_t
         /// z_query_target_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "z_query_target_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3987,7 +3976,7 @@ namespace Zenoh
 
         /// void
         /// z_queryable_drop(
-        ///     struct z_moved_queryable_t *this_
+        /// struct z_moved_queryable_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_queryable_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -3996,7 +3985,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// struct z_entity_global_id_t
         /// z_queryable_id(
-        ///     const struct z_loaned_queryable_t *queryable
+        /// const struct z_loaned_queryable_t *queryable
         /// )
         [DllImport(DllName, EntryPoint = "z_queryable_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4005,7 +3994,7 @@ namespace Zenoh
 
         /// const struct z_loaned_queryable_t*
         /// z_queryable_loan(
-        ///     const struct z_owned_queryable_t *this_
+        /// const struct z_owned_queryable_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_queryable_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4013,7 +4002,7 @@ namespace Zenoh
 
         /// void
         /// z_queryable_options_default(
-        ///     struct z_queryable_options_t *this_
+        /// struct z_queryable_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_queryable_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4045,8 +4034,8 @@ namespace Zenoh
 
         /// void
         /// z_reply_clone(
-        ///     struct z_owned_reply_t *dst,
-        ///     const struct z_loaned_reply_t *this_
+        /// struct z_owned_reply_t *dst,
+        /// const struct z_loaned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4054,7 +4043,7 @@ namespace Zenoh
 
         /// void
         /// z_reply_drop(
-        ///     struct z_moved_reply_t *this_
+        /// struct z_moved_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4063,8 +4052,8 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool
         /// z_reply_replier_id(
-        ///     const struct z_loaned_reply_t *this_,
-        ///     struct z_id_t *out_id
+        /// const struct z_loaned_reply_t *this_,
+        /// struct z_id_t *out_id
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_replier_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4074,8 +4063,8 @@ namespace Zenoh
 
         /// void
         /// z_reply_take_from_loaned(
-        ///     struct z_owned_reply_t *dst,
-        ///     struct z_loaned_reply_t *src
+        /// struct z_owned_reply_t *dst,
+        /// struct z_loaned_reply_t *src
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_take_from_loaned", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4083,7 +4072,7 @@ namespace Zenoh
 
         /// bool
         /// z_reply_is_ok(
-        ///     const struct z_loaned_reply_t *this_
+        /// const struct z_loaned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_is_ok", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4092,7 +4081,7 @@ namespace Zenoh
 
         /// const struct z_loaned_reply_t*
         /// z_reply_loan(
-        ///     const struct z_owned_reply_t *this_
+        /// const struct z_owned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4100,7 +4089,7 @@ namespace Zenoh
 
         /// struct z_loaned_reply_t*
         /// z_reply_loan(
-        ///     struct z_owned_reply_t *this_
+        /// struct z_owned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4108,7 +4097,7 @@ namespace Zenoh
 
         /// const struct z_loaned_sample_t*
         /// z_reply_ok(
-        ///     const struct z_loaned_reply_t *this_
+        /// const struct z_loaned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_ok", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4116,7 +4105,7 @@ namespace Zenoh
 
         /// struct z_loaned_sample_t*
         /// z_reply_ok(
-        ///     struct z_loaned_reply_t *this_
+        /// struct z_loaned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_ok_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4124,7 +4113,7 @@ namespace Zenoh
 
         /// const struct z_loaned_reply_err_t*
         /// z_reply_err(
-        ///     const struct z_loaned_reply_t *this_
+        /// const struct z_loaned_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4132,8 +4121,8 @@ namespace Zenoh
 
         /// void
         /// z_reply_err_clone(
-        ///     struct z_owned_reply_err_t *dst,
-        ///     const struct z_loaned_reply_err_t *this_
+        /// struct z_owned_reply_err_t *dst,
+        /// const struct z_loaned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4141,7 +4130,7 @@ namespace Zenoh
 
         /// void
         /// z_reply_err_drop(
-        ///     struct z_moved_reply_err_t *this_
+        /// struct z_moved_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4149,7 +4138,7 @@ namespace Zenoh
 
         /// const struct z_loaned_reply_err_t*
         /// z_reply_err_loan(
-        ///     const struct z_owned_reply_err_t *this_
+        /// const struct z_owned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4157,7 +4146,7 @@ namespace Zenoh
 
         /// struct z_loaned_reply_err_t*
         /// z_reply_err_loan_mut(
-        ///     struct z_owned_reply_err_t *this_
+        /// struct z_owned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4165,7 +4154,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_reply_err_payload(
-        ///     const struct z_loaned_reply_err_t *this_
+        /// const struct z_loaned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_payload", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4173,7 +4162,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_reply_err_encoding(
-        ///     const struct z_loaned_reply_err_t *this_
+        /// const struct z_loaned_reply_err_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_reply_err_encoding", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4181,9 +4170,9 @@ namespace Zenoh
 
         /// void
         /// z_ring_channel_query_new(
-        ///     struct z_owned_closure_query_t *callback,
-        ///     struct z_owned_ring_handler_query_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_query_t *callback,
+        /// struct z_owned_ring_handler_query_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_channel_query_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4191,9 +4180,9 @@ namespace Zenoh
 
         /// void
         /// z_ring_channel_reply_new(
-        ///     struct z_owned_closure_reply_t *callback,
-        ///     struct z_owned_ring_handler_reply_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_reply_t *callback,
+        /// struct z_owned_ring_handler_reply_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_channel_reply_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4201,9 +4190,9 @@ namespace Zenoh
 
         /// void
         /// z_ring_channel_sample_new(
-        ///     struct z_owned_closure_sample_t *callback,
-        ///     struct z_owned_ring_handler_sample_t *handler,
-        ///     size_t capacity
+        /// struct z_owned_closure_sample_t *callback,
+        /// struct z_owned_ring_handler_sample_t *handler,
+        /// size_t capacity
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_channel_sample_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4211,7 +4200,7 @@ namespace Zenoh
 
         /// void
         /// z_ring_handler_sample_drop(
-        ///     struct z_moved_ring_handler_sample_t *this_
+        /// struct z_moved_ring_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_sample_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4219,7 +4208,7 @@ namespace Zenoh
 
         /// const struct z_loaned_ring_handler_sample_t*
         /// z_ring_handler_sample_loan(
-        ///     const struct z_owned_ring_handler_sample_t *this_
+        /// const struct z_owned_ring_handler_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_sample_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4227,8 +4216,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_sample_recv(
-        ///     const struct z_loaned_ring_handler_sample_t *this_,
-        ///     struct z_owned_sample_t *sample
+        /// const struct z_loaned_ring_handler_sample_t *this_,
+        /// struct z_owned_sample_t *sample
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_sample_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4236,8 +4225,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_sample_try_recv(
-        ///     const struct z_loaned_ring_handler_sample_t *this_,
-        ///     struct z_owned_sample_t *sample
+        /// const struct z_loaned_ring_handler_sample_t *this_,
+        /// struct z_owned_sample_t *sample
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_sample_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4245,7 +4234,7 @@ namespace Zenoh
 
         /// void
         /// z_ring_handler_query_drop(
-        ///     struct z_moved_ring_handler_query_t *this_
+        /// struct z_moved_ring_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_query_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4253,7 +4242,7 @@ namespace Zenoh
 
         /// const struct z_loaned_ring_handler_query_t*
         /// z_ring_handler_query_loan(
-        ///     const struct z_owned_ring_handler_query_t *this_
+        /// const struct z_owned_ring_handler_query_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_query_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4261,8 +4250,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_query_recv(
-        ///     const struct z_loaned_ring_handler_query_t *this_,
-        ///     struct z_owned_query_t *query
+        /// const struct z_loaned_ring_handler_query_t *this_,
+        /// struct z_owned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_query_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4270,8 +4259,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_query_recv(
-        ///     const struct z_loaned_ring_handler_query_t *this_,
-        ///     struct z_owned_query_t *query
+        /// const struct z_loaned_ring_handler_query_t *this_,
+        /// struct z_owned_query_t *query
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_query_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4279,7 +4268,7 @@ namespace Zenoh
 
         /// void
         /// z_ring_handler_reply_drop(
-        ///     struct z_moved_ring_handler_reply_t *this_
+        /// struct z_moved_ring_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_reply_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4287,7 +4276,7 @@ namespace Zenoh
 
         /// const struct z_loaned_ring_handler_reply_t*
         /// z_ring_handler_reply_loan(
-        ///     const struct z_owned_ring_handler_reply_t *this_
+        /// const struct z_owned_ring_handler_reply_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_reply_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4295,8 +4284,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_reply_recv(
-        ///     const struct z_loaned_ring_handler_reply_t *this_,
-        ///     struct z_owned_reply_t *reply
+        /// const struct z_loaned_ring_handler_reply_t *this_,
+        /// struct z_owned_reply_t *reply
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_reply_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4304,8 +4293,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_ring_handler_reply_try_recv(
-        ///     const struct z_loaned_ring_handler_reply_t *this_,
-        ///     struct z_owned_reply_t *reply
+        /// const struct z_loaned_ring_handler_reply_t *this_,
+        /// struct z_owned_reply_t *reply
         /// )
         [DllImport(DllName, EntryPoint = "z_ring_handler_reply_try_recv", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4313,7 +4302,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_sample_attachment(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_attachment", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4321,8 +4310,8 @@ namespace Zenoh
 
         /// void
         /// z_sample_clone(
-        ///     struct z_owned_sample_t *dst,
-        ///     const struct z_loaned_sample_t *this_
+        /// struct z_owned_sample_t *dst,
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4330,7 +4319,7 @@ namespace Zenoh
 
         /// void
         /// z_sample_drop(
-        ///     struct z_moved_sample_t *this_
+        /// struct z_moved_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4338,7 +4327,7 @@ namespace Zenoh
 
         /// enum z_congestion_control_t
         /// z_sample_congestion_control(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_congestion_control", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4346,7 +4335,7 @@ namespace Zenoh
 
         /// const struct z_loaned_encoding_t*
         /// z_sample_encoding(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_encoding", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4354,7 +4343,7 @@ namespace Zenoh
 
         /// bool
         /// z_sample_express(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_express", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4363,7 +4352,7 @@ namespace Zenoh
 
         /// const struct z_loaned_keyexpr_t*
         /// z_sample_keyexpr(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4371,7 +4360,7 @@ namespace Zenoh
 
         /// enum z_sample_kind_t
         /// z_sample_kind(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_kind", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4379,7 +4368,7 @@ namespace Zenoh
 
         /// const struct z_loaned_sample_t*
         /// z_sample_loan_mut(
-        ///     struct z_owned_sample_t *this_
+        /// struct z_owned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4387,7 +4376,7 @@ namespace Zenoh
 
         /// struct z_loaned_sample_t*
         /// z_sample_loan_mut(
-        ///     struct z_owned_sample_t *this_
+        /// struct z_owned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4395,8 +4384,8 @@ namespace Zenoh
 
         /// void
         /// z_sample_take_from_loaned(
-        ///     struct z_owned_sample_t *dst,
-        ///     struct z_loaned_sample_t *src
+        /// struct z_owned_sample_t *dst,
+        /// struct z_loaned_sample_t *src
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_take_from_loaned", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4404,7 +4393,7 @@ namespace Zenoh
 
         /// const struct z_loaned_bytes_t*
         /// z_sample_payload(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_payload", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4412,7 +4401,7 @@ namespace Zenoh
 
         /// enum z_priority_t
         /// z_sample_priority(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_priority", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4421,7 +4410,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// enum z_reliability_t
         /// z_sample_reliability(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_reliability", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4431,7 +4420,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// const struct z_loaned_source_info_t*
         /// z_sample_source_info(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_source_info", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4440,7 +4429,7 @@ namespace Zenoh
 
         /// const struct z_timestamp_t*
         /// z_sample_timestamp(
-        ///     const struct z_loaned_sample_t *this_
+        /// const struct z_loaned_sample_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_sample_timestamp", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4448,9 +4437,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_scout(
-        ///     struct z_moved_config_t *config,
-        ///     struct z_moved_closure_hello_t *callback,
-        ///     const struct z_scout_options_t *options
+        /// struct z_moved_config_t *config,
+        /// struct z_moved_closure_hello_t *callback,
+        /// const struct z_scout_options_t *options
         /// )
         [DllImport(DllName, EntryPoint = "z_scout", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4458,7 +4447,7 @@ namespace Zenoh
 
         /// void
         /// z_scout_options_default(
-        ///     struct z_scout_options_t *this_
+        /// struct z_scout_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_scout_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4466,7 +4455,7 @@ namespace Zenoh
 
         /// void
         /// z_session_drop(
-        ///     struct z_moved_session_t *this_
+        /// struct z_moved_session_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_session_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4474,7 +4463,7 @@ namespace Zenoh
 
         /// bool
         /// z_session_is_closed(
-        ///     const struct z_loaned_session_t *session
+        /// const struct z_loaned_session_t *session
         /// )
         [DllImport(DllName, EntryPoint = "z_session_is_closed", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4483,7 +4472,7 @@ namespace Zenoh
 
         /// const struct z_loaned_session_t*
         /// z_session_loan(
-        ///     const struct z_owned_session_t *this_
+        /// const struct z_owned_session_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_session_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4491,7 +4480,7 @@ namespace Zenoh
 
         /// struct z_loaned_session_t*
         /// z_session_loan_mut(
-        ///     struct z_owned_session_t *this_
+        /// struct z_owned_session_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_session_loan_mut", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4511,8 +4500,8 @@ namespace Zenoh
 
         /// void
         /// z_slice_clone(
-        ///     struct z_owned_slice_t *dst,
-        ///     const struct z_loaned_slice_t *this_
+        /// struct z_owned_slice_t *dst,
+        /// const struct z_loaned_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4528,7 +4517,7 @@ namespace Zenoh
 
         /// void
         /// z_slice_drop(
-        ///     struct z_moved_slice_t *this_
+        /// struct z_moved_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4536,7 +4525,7 @@ namespace Zenoh
 
         /// void
         /// z_slice_empty(
-        ///     struct z_owned_slice_t *this_
+        /// struct z_owned_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4544,11 +4533,11 @@ namespace Zenoh
 
         /// z_result_t
         /// z_slice_from_buf(
-        ///     struct z_owned_slice_t *this_,
-        ///     uint8_t *data,
-        ///     size_t len,
-        ///     void (*drop)(void *data, void *context),
-        ///     void *context
+        /// struct z_owned_slice_t *this_,
+        /// uint8_t *data,
+        /// size_t len,
+        /// void (*drop)(void *data, void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_from_buf", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4557,7 +4546,7 @@ namespace Zenoh
 
         /// bool
         /// z_slice_is_empty(
-        ///     const struct z_loaned_slice_t *this_
+        /// const struct z_loaned_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4566,7 +4555,7 @@ namespace Zenoh
 
         /// size_t
         /// z_slice_len(
-        ///     const struct z_loaned_slice_t *this_
+        /// const struct z_loaned_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_len", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4574,7 +4563,7 @@ namespace Zenoh
 
         /// const struct z_loaned_slice_t*
         /// z_slice_loan(
-        ///     const struct z_owned_slice_t *this_
+        /// const struct z_owned_slice_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_slice_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4583,9 +4572,9 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_source_info_new(
-        ///     struct z_owned_source_info_t *this_,
-        ///     const struct z_entity_global_id_t *source_id,
-        ///     uint32_t source_sn
+        /// struct z_owned_source_info_t *this_,
+        /// const struct z_entity_global_id_t *source_id,
+        /// uint32_t source_sn
         /// )
         [DllImport(DllName, EntryPoint = "z_source_info_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4595,7 +4584,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// z_source_info_drop(
-        ///     struct z_moved_source_info_t *this_
+        /// struct z_moved_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_source_info_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4605,7 +4594,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// const struct z_loaned_source_info_t*
         /// z_source_info_loan(
-        ///     const struct z_owned_source_info_t *this_
+        /// const struct z_owned_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_source_info_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4615,7 +4604,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// struct z_entity_global_id_t
         /// z_source_info_id(
-        ///     const struct z_loaned_source_info_t *this_
+        /// const struct z_loaned_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_source_info_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4626,7 +4615,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// uint32_t
         /// z_source_info_sn(
-        ///     const struct z_loaned_source_info_t *this_
+        /// const struct z_loaned_source_info_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_source_info_sn", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4639,7 +4628,7 @@ namespace Zenoh
 
         /// void
         /// z_string_array_drop(
-        ///     struct z_moved_string_array_t *this_
+        /// struct z_moved_string_array_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_array_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4686,8 +4675,8 @@ namespace Zenoh
 
         /// void
         /// z_string_clone(
-        ///     struct z_owned_string_t *dst,
-        ///     const struct z_loaned_string_t *this_
+        /// struct z_owned_string_t *dst,
+        /// const struct z_loaned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_clone", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4695,8 +4684,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_string_copy_from_str(
-        ///     struct z_owned_string_t *this_,
-        ///     const char *str
+        /// struct z_owned_string_t *this_,
+        /// const char *str
         /// )
         [DllImport(DllName, EntryPoint = "z_string_copy_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4704,9 +4693,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_string_copy_from_substr(
-        ///     struct z_owned_string_t *this_,
-        ///     const char *str,
-        ///     size_t len
+        /// struct z_owned_string_t *this_,
+        /// const char *str,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_string_copy_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4714,7 +4703,7 @@ namespace Zenoh
 
         /// const char*
         /// z_string_data(
-        ///     const struct z_loaned_string_t *this_
+        /// const struct z_loaned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_data", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4722,7 +4711,7 @@ namespace Zenoh
 
         /// void
         /// z_string_drop(
-        ///     struct z_moved_string_t *this_
+        /// struct z_moved_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4730,7 +4719,7 @@ namespace Zenoh
 
         /// void
         /// z_string_empty(
-        ///     struct z_owned_string_t *this_
+        /// struct z_owned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4738,10 +4727,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_string_from_str(
-        ///     struct z_owned_string_t *this_,
-        ///     char *str,
-        ///     void (*drop)(void *value, void *context),
-        ///     void *context
+        /// struct z_owned_string_t *this_,
+        /// char *str,
+        /// void (*drop)(void *value, void *context),
+        /// void *context
         /// )
         [DllImport(DllName, EntryPoint = "z_string_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4749,7 +4738,7 @@ namespace Zenoh
 
         /// bool
         /// z_string_is_empty(
-        ///     const struct z_loaned_string_t *this_
+        /// const struct z_loaned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4758,7 +4747,7 @@ namespace Zenoh
 
         /// size_t
         /// z_string_len(
-        ///     const struct z_loaned_string_t *this_
+        /// const struct z_loaned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_len", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4766,7 +4755,7 @@ namespace Zenoh
 
         /// const struct z_loaned_string_t*
         /// z_string_loan(
-        ///     const struct z_owned_string_t *this_
+        /// const struct z_owned_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_string_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4774,7 +4763,7 @@ namespace Zenoh
 
         /// void
         /// z_subscriber_drop(
-        ///     struct z_moved_subscriber_t *this_
+        /// struct z_moved_subscriber_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_subscriber_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4783,7 +4772,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// struct z_entity_global_id_t
         /// z_subscriber_id(
-        ///     const struct z_loaned_subscriber_t *subscriber
+        /// const struct z_loaned_subscriber_t *subscriber
         /// )
         [DllImport(DllName, EntryPoint = "z_subscriber_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4792,7 +4781,7 @@ namespace Zenoh
 
         /// const struct z_loaned_keyexpr_t*
         /// z_subscriber_keyexpr(
-        ///     const struct z_loaned_subscriber_t *subscriber
+        /// const struct z_loaned_subscriber_t *subscriber
         /// )
         [DllImport(DllName, EntryPoint = "z_subscriber_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4800,7 +4789,7 @@ namespace Zenoh
 
         /// const struct z_loaned_subscriber_t*
         /// z_subscriber_loan(
-        ///     const struct z_owned_subscriber_t *this_
+        /// const struct z_owned_subscriber_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_subscriber_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4808,7 +4797,7 @@ namespace Zenoh
 
         /// void
         /// z_subscriber_options_default(
-        ///     struct z_subscriber_options_t *this_
+        /// struct z_subscriber_options_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_subscriber_options_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4816,7 +4805,7 @@ namespace Zenoh
 
         /// void
         /// z_task_detach(
-        ///     struct z_moved_task_t *this_
+        /// struct z_moved_task_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_task_detach", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4824,7 +4813,7 @@ namespace Zenoh
 
         /// void
         /// z_task_drop(
-        ///     struct z_moved_task_t *this_
+        /// struct z_moved_task_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_task_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4832,10 +4821,10 @@ namespace Zenoh
 
         /// z_result_t
         /// z_task_init(
-        ///     struct z_owned_task_t *this_,
-        ///     const struct z_task_attr_t *_attr,
-        ///     void *(*fun)(void *arg),
-        ///     void *arg
+        /// struct z_owned_task_t *this_,
+        /// const struct z_task_attr_t *_attr,
+        /// void *(*fun)(void *arg),
+        /// void *arg
         /// )
         [DllImport(DllName, EntryPoint = "z_task_init", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4843,7 +4832,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_task_join(
-        ///     struct z_moved_task_t *this_
+        /// struct z_moved_task_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_task_join", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4874,7 +4863,7 @@ namespace Zenoh
 
         /// struct z_id_t
         /// z_timestamp_id(
-        ///     const struct z_timestamp_t *this_
+        /// const struct z_timestamp_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_timestamp_id", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4882,8 +4871,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_timestamp_new(
-        ///     struct z_timestamp_t *this_,
-        ///     const struct z_loaned_session_t *session
+        /// struct z_timestamp_t *this_,
+        /// const struct z_loaned_session_t *session
         /// )
         [DllImport(DllName, EntryPoint = "z_timestamp_new", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4891,7 +4880,7 @@ namespace Zenoh
 
         /// uint64_t
         /// z_timestamp_ntp64_time(
-        ///     const struct z_timestamp_t *this_
+        /// const struct z_timestamp_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_timestamp_ntp64_time", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4900,8 +4889,8 @@ namespace Zenoh
 
         /// z_result_t
         /// z_undeclare_keyexpr(
-        ///     const struct z_loaned_session_t *session,
-        ///     struct z_moved_keyexpr_t *key_expr
+        /// const struct z_loaned_session_t *session,
+        /// struct z_moved_keyexpr_t *key_expr
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_keyexpr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4910,7 +4899,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_undeclare_matching_listener(
-        ///     struct z_moved_matching_listener_t *this_
+        /// struct z_moved_matching_listener_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_matching_listener", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4919,7 +4908,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_undeclare_publisher(
-        ///     struct z_moved_publisher_t *this_
+        /// struct z_moved_publisher_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_publisher", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4928,7 +4917,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// z_result_t
         /// z_undeclare_querier(
-        ///     struct z_moved_querier_t *this_
+        /// struct z_moved_querier_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_querier", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4937,7 +4926,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_undeclare_queryable(
-        ///     struct z_moved_queryable_t *this_
+        /// struct z_moved_queryable_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_queryable", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -4945,7 +4934,7 @@ namespace Zenoh
 
         /// z_result_t
         /// z_undeclare_subscriber(
-        ///     struct z_moved_subscriber_t *this_
+        /// struct z_moved_subscriber_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_undeclare_subscriber", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5013,7 +5002,7 @@ namespace Zenoh
 
         /// void
         /// z_view_string_empty(
-        ///     struct z_view_string_t *this_
+        /// struct z_view_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_view_string_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5028,9 +5017,9 @@ namespace Zenoh
 
         /// z_result_t
         /// z_view_string_from_substr(
-        ///     struct z_view_string_t *this_,
-        ///     const char *str,
-        ///     size_t len
+        /// struct z_view_string_t *this_,
+        /// const char *str,
+        /// size_t len
         /// )
         [DllImport(DllName, EntryPoint = "z_view_string_from_substr", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5038,7 +5027,7 @@ namespace Zenoh
 
         /// bool
         /// z_view_string_is_empty(
-        ///     const struct z_view_string_t *this_
+        /// const struct z_view_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_view_string_is_empty", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5047,7 +5036,7 @@ namespace Zenoh
 
         /// const struct z_loaned_string_t*
         /// z_view_string_loan(
-        ///     const struct z_view_string_t *this_
+        /// const struct z_view_string_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "z_view_string_loan", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5058,25 +5047,17 @@ namespace Zenoh
         internal static extern Result z_whatami_to_view_string(Whatami whatami, IntPtr strOut);
 
         /// void
-        /// (*call)(
-        ///     enum zc_log_severity_t severity,
-        ///     const struct z_loaned_string_t *msg,
-        ///     void *context
-        /// )
-        internal delegate void CbClosureLogCall(LogSeverity severity, IntPtr msg, IntPtr context);
-
-        /// void
         /// zc_closure_log(
-        ///     struct zc_owned_closure_log_t *this_,
-        ///     void (*call)(
-        ///         enum zc_log_severity_t severity,
-        ///         const struct z_loaned_string_t *msg,
-        ///         void *context
-        ///     ),
-        ///     void (*drop)(
-        ///         void *context
-        ///     ),
-        ///     void *context
+        /// struct zc_owned_closure_log_t *this_,
+        /// void (*call)(
+        /// enum zc_log_severity_t severity,
+        /// const struct z_loaned_string_t *msg,
+        /// void *context
+        /// ),
+        /// void (*drop)(
+        /// void *context
+        /// ),
+        /// void *context
         /// );
         [DllImport(DllName, EntryPoint = "zc_closure_log", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5089,7 +5070,7 @@ namespace Zenoh
 
         /// void
         /// zc_closure_log_drop(
-        ///     struct zc_moved_closure_log_t *closure_
+        /// struct zc_moved_closure_log_t *closure_
         /// )
         [DllImport(DllName, EntryPoint = "zc_closure_log_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5102,7 +5083,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// zc_concurrent_close_handle_drop(
-        ///     struct zc_moved_concurrent_close_handle_t *this_
+        /// struct zc_moved_concurrent_close_handle_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_concurrent_close_handle_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5112,7 +5093,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// zc_concurrent_close_handle_drop(
-        ///     struct zc_moved_concurrent_close_handle_t *this_
+        /// struct zc_moved_concurrent_close_handle_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_concurrent_close_handle_wait", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5121,7 +5102,7 @@ namespace Zenoh
 
         /// z_result_t
         /// zc_config_from_env(
-        ///     struct z_owned_config_t *this_
+        /// struct z_owned_config_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_config_from_env", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5129,8 +5110,8 @@ namespace Zenoh
 
         /// z_result_t
         /// zc_config_from_file(
-        ///     struct z_owned_config_t *this_,
-        ///     const char *path
+        /// struct z_owned_config_t *this_,
+        /// const char *path
         /// )
         [DllImport(DllName, EntryPoint = "zc_config_from_file", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5138,8 +5119,8 @@ namespace Zenoh
 
         /// z_result_t
         /// zc_config_from_str(
-        ///     struct z_owned_config_t *this_,
-        ///     const char *s
+        /// struct z_owned_config_t *this_,
+        /// const char *s
         /// )
         [DllImport(DllName, EntryPoint = "zc_config_from_str", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5168,8 +5149,8 @@ namespace Zenoh
 
         /// z_result_t
         /// zc_config_to_string(
-        ///     const struct z_loaned_config_t *config,
-        ///     struct z_owned_string_t *out_config_string
+        /// const struct z_loaned_config_t *config,
+        /// struct z_owned_string_t *out_config_string
         /// )
         [DllImport(DllName, EntryPoint = "zc_config_to_string", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5185,8 +5166,8 @@ namespace Zenoh
 
         /// void
         /// zc_init_log_with_callback(
-        ///     enum zc_log_severity_t min_severity,
-        ///     struct zc_moved_closure_log_t *callback
+        /// enum zc_log_severity_t min_severity,
+        /// struct zc_moved_closure_log_t *callback
         /// )
         [DllImport(DllName, EntryPoint = "zc_init_log_with_callback", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5204,7 +5185,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// bool
         /// zc_internal_concurrent_close_handle_check(
-        ///     const struct zc_owned_concurrent_close_handle_t *this_
+        /// const struct zc_owned_concurrent_close_handle_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_internal_concurrent_close_handle_check",
             CallingConvention = CallingConvention.Cdecl,
@@ -5216,7 +5197,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// void
         /// zc_internal_concurrent_close_handle_null(
-        ///     struct zc_owned_concurrent_close_handle_t *this_
+        /// struct zc_owned_concurrent_close_handle_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_internal_concurrent_close_handle_null",
             CallingConvention = CallingConvention.Cdecl,
@@ -5227,7 +5208,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// enum zc_locality_t
         /// zc_locality_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "zc_locality_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5237,7 +5218,7 @@ namespace Zenoh
 #if UNSTABLE_API
         /// enum zc_reply_keyexpr_t
         /// zc_reply_keyexpr_default(
-        ///     void
+        /// void
         /// )
         [DllImport(DllName, EntryPoint = "zc_reply_keyexpr_default", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5246,8 +5227,8 @@ namespace Zenoh
 
         /// void
         /// zc_internal_encoding_from_data(
-        ///     struct z_owned_encoding_t *this_,
-        ///     struct zc_internal_encoding_data_t data
+        /// struct z_owned_encoding_t *this_,
+        /// struct zc_internal_encoding_data_t data
         /// )
         [DllImport(DllName, EntryPoint = "zc_internal_encoding_from_data", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5255,7 +5236,7 @@ namespace Zenoh
 
         /// struct zc_internal_encoding_data_t
         /// zc_internal_encoding_get_data(
-        ///     const struct z_loaned_encoding_t *this_
+        /// const struct z_loaned_encoding_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "zc_internal_encoding_get_data", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5474,7 +5455,7 @@ namespace Zenoh
 
         /// void
         /// ze_serializer_drop(
-        ///     struct ze_moved_serializer_t *this_
+        /// struct ze_moved_serializer_t *this_
         /// )
         [DllImport(DllName, EntryPoint = "ze_serializer_drop", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5486,8 +5467,8 @@ namespace Zenoh
 
         /// void
         /// ze_serializer_finish(
-        ///     struct ze_moved_serializer_t *this_,
-        ///     struct z_owned_bytes_t *bytes
+        /// struct ze_moved_serializer_t *this_,
+        /// struct z_owned_bytes_t *bytes
         /// )
         [DllImport(DllName, EntryPoint = "ze_serializer_finish", CallingConvention = CallingConvention.Cdecl,
             ExactSpelling = true)]
@@ -5571,5 +5552,17 @@ namespace Zenoh
             ExactSpelling = true)]
         internal static extern Result
             ze_serializer_serialize_string(IntPtr serializer, IntPtr str);
+
+        internal delegate void Cb2(IntPtr data, IntPtr context);
+
+        internal delegate void Cb1(IntPtr context);
+
+        /// void
+        /// (*call)(
+        /// enum zc_log_severity_t severity,
+        /// const struct z_loaned_string_t *msg,
+        /// void *context
+        /// )
+        internal delegate void CbClosureLogCall(LogSeverity severity, IntPtr msg, IntPtr context);
     }
 }

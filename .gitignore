@@ -1,7 +1,9 @@
 .idea
 .vs
+.env
 obj
 bin
 Properties
 *.user
 package/
+lib/

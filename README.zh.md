@@ -34,15 +34,16 @@ Zenoh-CS 提供 Zenoh-C 的常用接口, 可以很容易地针对运行在Docker
 |     v1.3.0      |  v0.2.0  |
 | v1.3.2 ~ v1.3.3 |  v0.2.2  |
 |     v1.5.0      |  v0.3.0  |
+|     v1.6.2      |  v0.4.0  |
 
 ### 开发和测试环境组合
 
 | 操作系统         | CPU | .NET 实现              | 备注   |
 |--------------|-----|----------------------|------|
-| macOS 15     | x64 | .NET 8.0             | 主要环境 |
-| macOS 15     | x64 | Unity 2022.3         |      |
-| Windows 11   | x64 | .NET 8.0             |      |
+| Windows 11   | x64 | .NET 8.0             | 主要环境 |
 | Windows 11   | x64 | .NET Framework 4.8.1 |      |
+| macOS 15     | x64 | .NET 8.0             |      |
+| macOS 15     | x64 | Unity 2022.3         |      |
 | Ubuntu 24.04 | x64 | .NET 8.0             |      |
 
 
@@ -51,7 +52,7 @@ Zenoh-CS 提供 Zenoh-C 的常用接口, 可以很容易地针对运行在Docker
 
 需求:
 - [zenoh-c](https://github.com/eclipse-zenoh/zenoh-c) 必需被 [安装](https://zenoh.io/docs/getting-started/installation/) 在你的主机上.
-  - 需要选择与 zenoh-cs 版本对应的 zenoh-c 版本 (例如 zenoh-c V1.5.0).
+  - 需要选择与 zenoh-cs 版本对应的 zenoh-c 版本 (例如 zenoh-c V1.6.2).
   - 兼容 zenoh 官方提供的编译好的 [库文件](https://github.com/eclipse-zenoh/zenoh-c/releases).
   - 若自行编译 zenoh-c, 则需使用 **UNSTABLE_API**, **SHARED_MEMORY** 编译选项.
 
