@@ -95,6 +95,22 @@ dotnet build ZPub/ZPub.csproj
 ./ZPub -c <zenoh_config_file>
 ```
 
+### ZPubShm
+
+一个涉及共享内存特性的pub示例.
+
+构建命令
+
+```bash
+dotnet build ZPubShm/ZPubShm.csproj 
+```
+
+启动命令, 在生成产物目录下运行
+
+```bash
+./ZPubShm -c <zenoh_config_file>
+```
+
 ### ZPull
 
 声明一个key表达式和一个 pull subscriber.

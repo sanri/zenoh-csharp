@@ -102,6 +102,22 @@ Run
 ./ZPub -c <zenoh_config_file>
 ```
 
+### ZPubShm
+
+A pub example involving the shared-memory feature.
+
+Build
+
+```bash
+dotnet build ZPubShm/ZPubShm.csproj 
+```
+
+Run
+
+```bash
+./ZPubShm -c <zenoh_config_file>
+```
+
 ### ZPull
 
 Declares a key expression and a pull subscriber.

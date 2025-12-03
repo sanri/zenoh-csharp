@@ -50,6 +50,13 @@ run_z_pub:
         -- \
         --config demo.json5
         
+run_z_pub_shm:
+    dotnet run --project ZPubShm/ZPubShm.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path" \
+        -- \
+        --config demo.json5
+        
 run_z_pull:
     dotnet run --project ZPull/ZPull.csproj \
         --configuration Release \
