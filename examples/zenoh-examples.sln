@@ -33,6 +33,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZQuerier", "ZQuerier\ZQueri
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZBytes", "ZBytes\ZBytes.csproj", "{3985AEFB-7DFC-4E16-A3D8-B82BA35DEEC5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ZPubShm", "ZPubShm\ZPubShm.csproj", "{570FA04C-A01B-49A2-A4F4-C95C54E224BD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -164,5 +166,13 @@ Global
 		{3985AEFB-7DFC-4E16-A3D8-B82BA35DEEC5}.Release|x64.Build.0 = Release|x64
 		{3985AEFB-7DFC-4E16-A3D8-B82BA35DEEC5}.Release|ARM64.ActiveCfg = Release|ARM64
 		{3985AEFB-7DFC-4E16-A3D8-B82BA35DEEC5}.Release|ARM64.Build.0 = Release|ARM64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Debug|x64.ActiveCfg = Debug|x64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Debug|x64.Build.0 = Debug|x64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Debug|ARM64.Build.0 = Debug|ARM64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Release|x64.ActiveCfg = Release|x64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Release|x64.Build.0 = Release|x64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Release|ARM64.ActiveCfg = Release|ARM64
+		{570FA04C-A01B-49A2-A4F4-C95C54E224BD}.Release|ARM64.Build.0 = Release|ARM64
 	EndGlobalSection
 EndGlobal
