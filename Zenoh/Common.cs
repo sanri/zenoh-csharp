@@ -1469,7 +1469,7 @@ namespace Zenoh
             var pOther = other.LoanedPointer();
             var sn = ZenohC.z_source_info_sn(pOther);
             var eid = ZenohC.z_source_info_id(pOther);
-            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZSourceInfo>());
             unsafe
             {
                 var pEid = (IntPtr)(&eid);
@@ -1497,7 +1497,7 @@ namespace Zenoh
         {
             id.CheckDisposed();
 
-            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZSourceInfo>());
             var r = ZenohC.z_source_info_new(pOwnedSourceInfo, id.Handle, sn);
 
             if (r == Result.Ok)
@@ -1543,7 +1543,7 @@ namespace Zenoh
 
             var sn = ZenohC.z_source_info_sn(Handle);
             var eid = ZenohC.z_source_info_id(Handle);
-            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZSourceInfo>());
             unsafe
             {
                 var pEid = (IntPtr)(&eid);
@@ -1594,7 +1594,7 @@ namespace Zenoh
             var pLoanedSourceInfo = LoanedPointer();
             var eid = ZenohC.z_source_info_id(pLoanedSourceInfo);
             var sn = ZenohC.z_source_info_sn(pLoanedSourceInfo);
-            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZOwnedSourceInfo>());
+            var pOwnedSourceInfo = Marshal.AllocHGlobal(Marshal.SizeOf<ZSourceInfo>());
             unsafe
             {
                 var pEid = (IntPtr)(&eid);

@@ -568,7 +568,7 @@ namespace Zenoh
     internal unsafe struct ZOwnedReply
     {
 #if UNSTABLE_API
-        private fixed byte data[256];
+        private fixed byte data[280];
 #else
         private fixed byte data[184];
 #endif
@@ -580,7 +580,7 @@ namespace Zenoh
     internal unsafe struct ZOwnedReplyErr
     {
 #if UNSTABLE_API
-        private fixed byte data[88];
+        private fixed byte data[120];
 #else
         private fixed byte data[72];
 #endif
@@ -606,7 +606,7 @@ namespace Zenoh
     internal unsafe struct ZOwnedSample
     {
 #if UNSTABLE_API
-        private fixed byte data[232];
+        private fixed byte data[256];
 #else
         private fixed byte data[184];
 #endif
@@ -627,11 +627,11 @@ namespace Zenoh
     }
 
     // zenoh_opaque.h
-    // z_owned_source_info_t
+    // z_source_info_t
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
-    internal unsafe struct ZOwnedSourceInfo
+    internal unsafe struct ZSourceInfo
     {
-        private fixed byte data[32];
+        private fixed byte data[24];
     }
 
     // zenoh_opaque.h
@@ -705,10 +705,10 @@ namespace Zenoh
     internal struct ZCloseOptions
     {
 #if UNSTABLE_API
-        private uint timeout_ms;
+        private uint internal_timeout_ms;
 
         // zc_owned_concurrent_close_handle_t*
-        private IntPtr out_concurrent;
+        private IntPtr internal_out_concurrent;
 #else
         internal byte dummy;
 #endif
@@ -719,7 +719,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedConfig
     {
-        private fixed byte data[1984];
+        private fixed byte data[2064];
     }
 
     // zenoh_opaque.h
@@ -750,7 +750,6 @@ namespace Zenoh
 #endif
     }
 
-#if UNSTABLE_API
     // zenoh_opaque.h
     // z_entity_global_id_t
     [StructLayout(LayoutKind.Sequential, Pack = 4)]
@@ -758,7 +757,6 @@ namespace Zenoh
     {
         private fixed byte data[20];
     }
-#endif
 
     // zenoh_opaque.h
     // z_owned_publisher_t
@@ -766,7 +764,7 @@ namespace Zenoh
     internal unsafe struct ZOwnedPublisher
     {
 #if UNSTABLE_API
-        private fixed byte data[112];
+        private fixed byte data[120];
 #else
         private fixed byte data[96];
 #endif
@@ -777,7 +775,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedQuerier
     {
-        private fixed byte data[80];
+        private fixed byte data[88];
     }
 
     // zenoh_opaque.h
@@ -785,7 +783,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedQueryable
     {
-        private fixed byte data[48];
+        private fixed byte data[56];
     }
 
     // zenoh_opaque.h
@@ -793,7 +791,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedSubscriber
     {
-        private fixed byte data[48];
+        private fixed byte data[56];
     }
 
     // zenoh_opaque.h
@@ -905,7 +903,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential, Pack = 8)]
     internal unsafe struct ZOwnedTask
     {
-        private fixed byte data[32];
+        private fixed byte data[24];
     }
 
     // zenoh_commons.h
@@ -1232,7 +1230,7 @@ namespace Zenoh
 #endif
     }
 
-#if (UNSTABLE_API && SHARED_MEMORY)
+#if UNSTABLE_API && SHARED_MEMORY
     // zenoh_opaque.h
     // zc_buf_alloc_status_t
     /// <summary>
@@ -1355,7 +1353,7 @@ namespace Zenoh
     [StructLayout(LayoutKind.Sequential)]
     public struct AllocAlignment
     {
-        /// alignment in powers of 2: 0 == 1-byte alignment, 1 == 2byte, 2 == 4byte, 3 == 8byte etc 
+        /// alignment in powers of 2: 0 == 1-byte alignment, 1 == 2byte, 2 == 4byte, 3 == 8byte etc
         public byte pow;
     }
 #endif
@@ -5696,7 +5694,7 @@ namespace Zenoh
         //  )
         internal delegate void CbClosureLogCall(LogSeverity severity, IntPtr msg, IntPtr context);
 
-#if (UNSTABLE_API && SHARED_MEMORY)
+#if UNSTABLE_API && SHARED_MEMORY
         //  bool
         //  z_internal_shm_mut_check(
         //      const struct z_owned_shm_mut_t *this_
