@@ -856,6 +856,11 @@ namespace Zenoh
     internal struct ZLivelinessGetOptions
     {
         internal ulong timeout_ms;
+
+#if UNSTABLE_API
+        // z_moved_cancellation_token_t*
+        internal IntPtr cancellation_token;
+#endif
     }
 
     // zenoh_opaque.h
@@ -1056,6 +1061,11 @@ namespace Zenoh
 
         // z_moved_bytes_t*
         internal IntPtr attachment;
+
+#if UNSTABLE_API
+        // z_moved_cancellation_token_t*
+        internal IntPtr cancellation_token;
+#endif
     }
 
     // zenoh_commons.h
@@ -1094,6 +1104,11 @@ namespace Zenoh
         internal IntPtr attachment;
 
         internal ulong timeout_ms;
+
+#if UNSTABLE_API
+        // z_moved_cancellation_token_t*
+        internal IntPtr cancellation_token;
+#endif
     }
 
     // zenoh_commons.h
