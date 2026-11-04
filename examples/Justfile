@@ -92,6 +92,11 @@ run_z_queryable_with_channels:
         -- \
         --config demo.json5
         
+run_z_scout:
+    dotnet run --project ZScout/ZScout.csproj \
+        --configuration Release \
+        --environment Path="{{zenohc_lib_dir}};$Path"
+
 run_z_sub:
     dotnet run --project ZSub/ZSub.csproj \
         --configuration Release \
