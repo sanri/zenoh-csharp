@@ -189,6 +189,23 @@ Run
 ./ZQueryableWithChannels -c <zenoh_config_file>
 ```
 
+### ZScout
+
+Scouts for zenoh routers and peers on the network and prints the hello messages received
+(zid, whatami and locators). Requires UDP multicast, so it will not work against a router in Docker.
+
+Build
+
+```bash
+dotnet build ZScout/ZScout.csproj
+```
+
+Run
+
+```bash
+./ZScout -t 2000
+```
+
 ### ZSub
 
 Declares a key expression and a subscriber.
